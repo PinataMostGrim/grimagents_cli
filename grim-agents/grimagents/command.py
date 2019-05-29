@@ -4,8 +4,25 @@ import os
 
 from asyncio.subprocess import PIPE
 from io import StringIO
+from pathlib import Path
 from subprocess import Popen, PIPE
 
+
+def open_file(file_path: Path):
+    """Opens a file using the default system application.
+
+    Args:
+      file_path: Path: The file to open.
+    """
+
+    print(f'Opening \'{file_path}\'')
+    try:
+        # Note: Open file in Windows
+        os.startfile(str(file_path))
+    except AttributeError:
+        # Note: Open file in OSX / Linux
+        command = ['open', str(file_path)]
+        execute_command(command)
 
 # from hard_pi
 # - prints stdout to terminal, displays stream in realtime
