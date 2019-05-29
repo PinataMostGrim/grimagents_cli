@@ -3,7 +3,7 @@
 import json
 
 from pathlib import Path
-from .command import open_file
+from .command_util import open_file
 
 
 # Default configuration values
