@@ -14,6 +14,7 @@ from argparse import Namespace
 from pathlib import Path
 
 import grimagents.config as config
+import grimagents.command_util as command_util
 
 
 class Command:
@@ -45,6 +46,17 @@ class Config(Command):
         subparser.add_argument('file', type=str, help='The configuration file to edit')
 
 
+class List(Command):
+    def execute(self, args):
+        command = ['pipenv', 'run', 'mlagents-learn', '--help']
+        command_util.execute_command(command)
+        pass
+
+    @staticmethod
+    def configure(subparser):
+        pass
+
+
 class Train(Command):
     def execute(self, args):
         print("This is a test")
@@ -70,6 +82,10 @@ def parse_args(argv):
     config_parser = subparsers.add_parser('config', help='Open a configuration file for editing')
     Config.configure(config_parser)
     config_parser.set_defaults(command=Config)
+
+    list_parser = subparsers.add_parser('list', help='List mlagents-learn training options')
+    List.configure(list_parser)
+    list_parser.set_defaults(command=List)
 
     training_parser = subparsers.add_parser('train', help='Begins training using the specified configuration')
     Train.configure(training_parser)

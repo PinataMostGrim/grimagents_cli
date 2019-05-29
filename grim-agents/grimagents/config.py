@@ -1,4 +1,7 @@
-"""Loads configuration files and fetches loaded configuration values."""
+"""Loads configuration files and fetches loaded configuration values.
+
+See mlagents-learn for a description of each option.
+"""
 
 import json
 
