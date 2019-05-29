@@ -1,74 +1,66 @@
 #!/usr/bin/env python3
-"""CLI application that wraps 'mlagents-learn' and facilitates training logging.
-
-# - use command_util to launch an mlagents-learn process
-# - log output to file
-# - record the runtime of the training
-# - parse args for '--run-id'
+"""CLI application that wraps 'mlagents-learn' and logs training output.
 """
 
-
 import argparse
-from datetime import datetime
+import logging
+import logging.config
 import sys
 import time
 
 from pathlib import Path
 from subprocess import Popen, PIPE
+
 import settings as settings
 
 
 _TRAINER_RELATIVE_PATH = 'grim-agents\\mock_trainer.py'
-TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 def main():
-    args = parse_args(sys.argv[1:])
 
+    args = parse_args(sys.argv[1:])
     cwd = settings.get_project_folder_absolute()
     trainer_path = _TRAINER_RELATIVE_PATH
-
-    log_folder = settings.get_log_folder_absolute()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
-
     run_id = Path(args.run_id)
-    if not run_id.suffix == '.log':
-        run_id = run_id.with_suffix('.log')
 
-    log_path = log_folder / run_id.name
+    configure_log(run_id)
+    training_log = logging.getLogger('training_wrapper')
 
-    # Note: As these arguments are being passed direction into popen,
+    # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
     command = ['pipenv', 'run', 'python', f"{trainer_path}"] + sys.argv[1:]
     print(' '.join(command))
 
-    with Popen(
-        command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True
-    ) as p, log_path.open('a') as f:
+    try:
+        with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
-        started = f'Training started at {datetime.now().strftime(TIME_FORMAT)}'
-        print(started)
-        f.write(started)
+            training_log.info(f'Training run \'{run_id}\' started')
 
-        start_time = time.perf_counter()
+            start_time = time.perf_counter()
 
-        for line in p.stdout:
-            print(line, end='')
-            f.write(line)
+            for line in p.stdout:
+                training_log.info(line.rstrip())
 
-        end_time = time.perf_counter()
+            end_time = time.perf_counter()
 
-        finished = f'Training finished at {datetime.now().strftime(TIME_FORMAT)} ({end_time - start_time} seconds)\n\n'
-        print(finished)
-        f.write(finished)
+            training_log.info(
+                f'Training run \'{run_id}\' completed in {end_time - start_time:.0f} seconds'
+            )
 
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    print(p.returncode)
+    except KeyboardInterrupt:
+        training_log.warning('KeyboardInterrupt, aborting')
+        raise
+
+    print('')
+    print(f'Exit code: {p.returncode}')
+
+    logging.shutdown()
 
 
 def parse_args(argv):
+
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
         description='CLI application that wraps mlagents-learn with logging',
@@ -79,6 +71,42 @@ def parse_args(argv):
 
     args = parser.parse_args(argv)
     return args
+
+
+def configure_log(run_id: str):
+    """Configures logging for a training session."""
+
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            # "default": {"style": "{", "format": "{levelname}:{name}:{message}"},
+            "display": {"style": "{", "format": "{message}"},
+            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stderr",
+                "formatter": "display",
+            },
+            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+        },
+        "loggers": {"training_wrapper": {"handlers": ["console", "file"]}},
+        "root": {"level": "INFO"},
+    }
+
+    log_folder = settings.get_log_folder_absolute()
+    if not log_folder.exists():
+        log_folder.mkdir(parents=True, exist_ok=True)
+
+    if not run_id.suffix == '.log':
+        run_id = run_id.with_suffix('.log')
+
+    log_path = log_folder / run_id.name
+
+    log_config['handlers']['file']['filename'] = log_path
+    logging.config.dictConfig(log_config)
 
 
 if __name__ == '__main__':
