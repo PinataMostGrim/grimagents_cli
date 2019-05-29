@@ -1,10 +1,10 @@
-'''
+"""
 CLI application that wraps 'mlagents-learn' with some quality of life improvements.
 - creating a timestamped run-id
 - optionally load arguments from a configuration file
 - optionally override loaded configuration
 - logging training out put to file
-'''
+"""
 
 
 import argparse

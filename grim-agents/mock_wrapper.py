@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 from grimagents.command import execute_command
 from grimagents.command import execute_command_shell
 

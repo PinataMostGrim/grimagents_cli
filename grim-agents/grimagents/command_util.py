@@ -1,3 +1,5 @@
+"""Facilitates executing system commands and opening files."""
+
 import asyncio
 import sys
 import os

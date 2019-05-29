@@ -11,6 +11,10 @@ print(f'Python executable: {os.path.abspath(sys.executable)}')
 print(f'Python version: {sys.version}')
 print('')
 
+print(f'CWD: {os.getcwd()}')
+print(f'Arguments: {sys.argv[1:]}')
+print('')
+
 print('Starting mock training...')
 for i in range(5):
     print('Training...')
