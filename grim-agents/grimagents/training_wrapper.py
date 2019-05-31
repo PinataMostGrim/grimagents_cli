@@ -20,8 +20,13 @@ _TRAINER_RELATIVE_PATH = 'grim-agents\\mock_trainer.py'
 def main():
 
     args = parse_args(sys.argv[1:])
+    # print('==================================================')
+    # print(args)
+    # print(args.trainer_config_path)
+    # print(args.run_id)
+    # print('==================================================')
+
     cwd = settings.get_project_folder_absolute()
-    trainer_path = _TRAINER_RELATIVE_PATH
     run_id = Path(args.run_id)
 
     configure_log(run_id)
@@ -30,13 +35,17 @@ def main():
     # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
-    command = ['pipenv', 'run', 'python', f"{trainer_path}"] + sys.argv[1:]
-    print(' '.join(command))
 
+    # trainer_path = _TRAINER_RELATIVE_PATH
+    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
+
+    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
-            training_log.info(f'Training run \'{run_id}\' started')
+            training_log.info('==================================================')
+            training_log.info(f'{" ".join(command[2:])}')
+            training_log.info(f'Initiating training run \'{run_id}\'')
 
             start_time = time.perf_counter()
 
@@ -45,31 +54,50 @@ def main():
 
             end_time = time.perf_counter()
 
+            training_log.info('')
             training_log.info(
                 f'Training run \'{run_id}\' completed in {end_time - start_time:.0f} seconds'
             )
 
     except KeyboardInterrupt:
+        # p.kill()
         training_log.warning('KeyboardInterrupt, aborting')
         raise
 
-    print('')
-    print(f'Exit code: {p.returncode}')
-
-    logging.shutdown()
+    finally:
+        training_log.info('==================================================')
+        print(f'Exit code: {p.returncode}')
+        logging.shutdown()
 
 
 def parse_args(argv):
 
+    # Note: It is important to keep the argument naming and positional arguments
+    # identical to those used in mlagents-learn. As ArgParser for Python 3.6 does
+    # not yet support intermixed parsing, we need to separate parsing into two
+    # parser to accomplish this.
+
+    # The issue being that optional arguments will get collected by argpars.REMAINDER
+    # if they are not placed before positional arguments. As this places an idiosyncratic
+    # restriction on the wrapper's command line argument positioning, another solution
+    # needs to be found.
+
+    wrapper_parser = argparse.ArgumentParser(add_help=False)
+    wrapper_parser.add_argument('--run-id', metavar='<run-id>', default='ppo', type=str, help='Run-id help')
+    # wrapper_parser.add_argument('--log-path', type=str, help='Log-path help')
+
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
         description='CLI application that wraps mlagents-learn with logging',
+        parents=[wrapper_parser]
     )
 
-    # parser.add_argument('--log-path', type=str, help='Log-path help')
-    parser.add_argument('--run-id', type=str, help='Run-id help', required=True)
+    parser.add_argument('trainer_config_path', type=str, help='Trainer config path help')
+    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments help')
 
-    args = parser.parse_args(argv)
+    wrapper_args, _ = wrapper_parser.parse_known_args(argv)
+    args = parser.parse_args(argv, wrapper_args)
+
     return args
 
 
