@@ -20,12 +20,6 @@ _TRAINER_RELATIVE_PATH = 'grim-agents\\mock_trainer.py'
 def main():
 
     args = parse_args(sys.argv[1:])
-    # print('==================================================')
-    # print(args)
-    # print(args.trainer_config_path)
-    # print(args.run_id)
-    # print('==================================================')
-
     cwd = settings.get_project_folder_absolute()
     run_id = Path(args.run_id)
 
@@ -60,7 +54,6 @@ def main():
             )
 
     except KeyboardInterrupt:
-        # p.kill()
         training_log.warning('KeyboardInterrupt, aborting')
         raise
 
@@ -83,13 +76,15 @@ def parse_args(argv):
     # needs to be found.
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
-    wrapper_parser.add_argument('--run-id', metavar='<run-id>', default='ppo', type=str, help='Run-id help')
+    wrapper_parser.add_argument(
+        '--run-id', metavar='<run-id>', default='ppo', type=str, help='Run-id help'
+    )
     # wrapper_parser.add_argument('--log-path', type=str, help='Log-path help')
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
         description='CLI application that wraps mlagents-learn with logging',
-        parents=[wrapper_parser]
+        parents=[wrapper_parser],
     )
 
     parser.add_argument('trainer_config_path', type=str, help='Trainer config path help')
@@ -108,7 +103,6 @@ def configure_log(run_id: str):
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            # "default": {"style": "{", "format": "{levelname}:{name}:{message}"},
             "display": {"style": "{", "format": "{message}"},
             "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
         },
