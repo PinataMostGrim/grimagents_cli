@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """CLI application that wraps 'mlagents-learn' and logs training output.
+
+Executes training with the current working directory set to the the project's root folder.
 """
 
 import argparse
@@ -30,10 +32,10 @@ def main():
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
 
-    # trainer_path = _TRAINER_RELATIVE_PATH
-    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
+    trainer_path = _TRAINER_RELATIVE_PATH
+    command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
 
-    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
+    # command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
@@ -65,15 +67,14 @@ def main():
 
 def parse_args(argv):
 
-    # Note: It is important to keep the argument naming and positional arguments
-    # identical to those used in mlagents-learn. As ArgParser for Python 3.6 does
-    # not yet support intermixed parsing, we need to separate parsing into two
-    # parser to accomplish this.
+    # It is important to keep command line argument parity with mlagents-learn.
+    # As intermixed parsing was not introduced into ArgParser until Python 3.7,
+    # we need to separate parsing into two parsers to accomplish this.
 
-    # The issue being that optional arguments will get collected by argpars.REMAINDER
-    # if they are not placed before positional arguments. As this places an idiosyncratic
-    # restriction on the wrapper's command line argument positioning, another solution
-    # needs to be found.
+    # The issue with ArgParse in Python 3.6 is that optional arguments will get
+    # collected by argparse.REMAINDER if they are not placed before positional
+    # arguments. As this places an idiosyncratic restriction on the wrapper's
+    # command line argument positioning, another solution needs to be found.
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
