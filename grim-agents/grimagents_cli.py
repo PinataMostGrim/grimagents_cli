@@ -6,95 +6,77 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 - logging training out put to file
 """
 
-
 import argparse
 import sys
 
-from argparse import Namespace
 from pathlib import Path
 
 import grimagents.config as config
 import grimagents.command_util as command_util
 
 
-class Command:
-    def execute(self, args: Namespace):
-        pass
-
-    @staticmethod
-    def configure(subparser):
-        pass
+def list_training_options():
+    command = ['pipenv', 'run', 'mlagents-learn', '--help']
+    command_util.execute_command(command)
 
 
-class Config(Command):
-    def execute(self, args):
-        """Opens a configuration file for editing.
+def edit_config_file(args):
 
-        Args:
-          args: A Namespace object containing a parsed argument for the configuration
-          file to edit.
-        """
-
-        config_path = Path(args.file)
-
-        print('')
-        config.edit_config_file(config_path)
-        print('')
-
-    @staticmethod
-    def configure(subparser):
-        subparser.add_argument('file', type=str, help='The configuration file to edit')
+    print('')
+    config_path = Path(args.edit_config)
+    config.edit_config_file(config_path)
+    print('')
 
 
-class List(Command):
-    def execute(self, args):
-        command = ['pipenv', 'run', 'mlagents-learn', '--help']
-        command_util.execute_command(command)
-        pass
-
-    @staticmethod
-    def configure(subparser):
-        pass
-
-
-class Train(Command):
-    def execute(self, args):
-        print("This is a test")
-
-    @staticmethod
-    def configure(subparser):
-        pass
+def perform_training(args):
+    print('Training...')
+    print(args)
 
 
 def main():
     args = parse_args(sys.argv[1:])
-    command = args.command()
-    command.execute(args)
+
+    if args.list:
+        list_training_options()
+        return
+
+    if args.edit_config:
+        edit_config_file(args)
+        return
+
+    perform_training(args)
 
 
 def parse_args(argv):
+    options_parser = argparse.ArgumentParser(add_help=False)
+    options_parser.add_argument(
+        '--list', action='store_true', help='List mlagents-learn training options'
+    )
+    options_parser.add_argument(
+        '--edit-config',
+        dest='edit_config',
+        metavar='FILE',
+        type=str,
+        help='Open a configuration file for editing',
+    )
+
     parser = argparse.ArgumentParser(
         prog='grimagents',
-        description='CLI application that wraps Unity ML-Agents with some quality of life improvements.')
+        description='CLI application that wraps Unity ML-Agents with some quality of life improvements.',
+        parents=[options_parser],
+    )
 
-    subparsers = parser.add_subparsers(title='Commands')
+    parser.add_argument('configuration_file', type=str, help='Training help')
+    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments')
 
-    config_parser = subparsers.add_parser('config', help='Open a configuration file for editing')
-    Config.configure(config_parser)
-    config_parser.set_defaults(command=Config)
+    args, unparsed_args = options_parser.parse_known_args()
 
-    list_parser = subparsers.add_parser('list', help='List mlagents-learn training options')
-    List.configure(list_parser)
-    list_parser.set_defaults(command=List)
-
-    training_parser = subparsers.add_parser('train', help='Begins training using the specified configuration')
-    Train.configure(training_parser)
-    training_parser.set_defaults(command=Train)
-
-    args = parser.parse_args(argv)
-    if 'command' not in args:
+    if len(argv) == 0:
         parser.print_help()
-        sys.exit(2)
+        sys.exit(0)
+
+    if len(unparsed_args) > 0:
+        args = parser.parse_args(unparsed_args, args)
 
     return args
 
