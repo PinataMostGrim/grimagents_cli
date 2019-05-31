@@ -92,20 +92,20 @@ def execute_command(command: list):
 #     print(p.returncode)
 
 
-def execute_command_shell(command: str):
-    """
-    - executes a command
-    - expects commands in the format of a newline delimited string
-    """
-    print(command)
+# def execute_command_shell(command: str):
+#     """
+#     - executes a command
+#     - expects commands in the format of a newline delimited string
+#     """
+#     print(command)
 
-    with Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True) as p:
+#     with Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True) as p:
 
-        for line in p.stdout:
-            print(line, end='')
+#         for line in p.stdout:
+#             print(line, end='')
 
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    print(p.returncode)
+#     print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
+#     print(p.returncode)
 
 
 # from stack exchange (jfs)
