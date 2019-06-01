@@ -10,18 +10,20 @@ from .command_util import open_file
 
 
 # Default configuration values
+_TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
 _DEFAULT_CONFIG = {
-      'env': '',
-      'curriculum': '',
-      'keep-checkpoints': '',
-      'lesson': '',
-      'run-id': '',
-      'num-runs': '',
-      'save-freq': '',
-      'seed': '',
-      'base-port': '',
-      'num-envs': '',
-      'no-graphics': '',
+      _TRAINER_CONFIG_PATH_KEY: '',
+      '--env': '',
+      '--curriculum': '',
+      '--keep-checkpoints': '',
+      '--lesson': '',
+      '--run-id': '',
+      '--num-runs': '',
+      '--save-freq': '',
+      '--seed': '',
+      '--base-port': '',
+      '--num-envs': '',
+      '--no-graphics': '',
 }
 
 
@@ -32,9 +34,6 @@ _DEFAULT_CONFIG = {
 # slow
 # train
 # debug
-
-
-_loaded_config = None
 
 
 class ConfigurationError(Exception):
@@ -94,12 +93,13 @@ def load_config_file(config_path: Path):
     Args:
       config_path: Path: Path object for the configuration file to load into memory.
 
+    Returns
+      Configuration dictionary loaded from file.
+
     Raises:
       FileNotFoundError: An error occurred while attempting to load a configuration file.
       InvalidConfigurationError: The specified configuration file is not valid.
     """
-
-    global _loaded_config
 
     try:
         with config_path.open('r') as f:
@@ -109,9 +109,12 @@ def load_config_file(config_path: Path):
         raise exception
 
     if validate_configuration(configuration):
-        _loaded_config = configuration
+        loaded_config = configuration
     else:
-        raise InvalidConfigurationError(f'Configuration file \'{config_path}\' is invalid')
+        print(f'Configuration file \'{config_path}\' is invalid')
+        raise InvalidConfigurationError
+
+    return loaded_config
 
 
 def validate_configuration(configuration):
@@ -135,26 +138,31 @@ def validate_configuration(configuration):
         try:
             default_config[key]
         except KeyError:
-            print(f'Configuration is missing key \'{key}\'')
+            print(f'Configuration contains invalid key \'{key}\'')
             is_valid_config = False
+
+    # The only currently required key is 'trainer-config-path.'
+    try:
+        if not configuration[_TRAINER_CONFIG_PATH_KEY]:
+            raise KeyError
+
+    except KeyError:
+        print(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
+        is_valid_config = False
 
     return is_valid_config
 
 
-def get_config():
-    """Fetches the configuration dictionary loaded into memory.
+def get_training_arguments(configuration):
 
-    Returns:
-      The dictionary storing a mapping configuration keys and values.
+    command_args = list()
 
-    Raises:
-      EmptyConfigurationError: A configuration value is accessed without a configuration
-        file being loaded first.
-    """
+    for key, value in configuration.items():
+        if key == _TRAINER_CONFIG_PATH_KEY and value:
+            command_args.insert(0, value)
+            continue
 
-    global _loaded_config
-    if _loaded_config is None:
-        print(f'Unable to retrieve configuration values: A configuration file has not been loaded')
-        raise EmptyConfigurationError
+        if value:
+            command_args = command_args + [key, value]
 
-    return _loaded_config
+    return command_args
