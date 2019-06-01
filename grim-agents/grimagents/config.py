@@ -11,28 +11,29 @@ from .command_util import open_file
 
 # Default configuration values
 _TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
+_RUN_ID_KEY = '--run-id'
+
 _DEFAULT_CONFIG = {
-      _TRAINER_CONFIG_PATH_KEY: '',
-      '--env': '',
-      '--curriculum': '',
-      '--keep-checkpoints': '',
-      '--lesson': '',
-      '--run-id': '',
-      '--num-runs': '',
-      '--save-freq': '',
-      '--seed': '',
-      '--base-port': '',
-      '--num-envs': '',
-      '--no-graphics': '',
+    _TRAINER_CONFIG_PATH_KEY: '',
+    '--env': '',
+    '--curriculum': '',
+    '--keep-checkpoints': '',
+    '--lesson': '',
+    _RUN_ID_KEY: 'ppo',
+    '--num-runs': '',
+    '--save-freq': '',
+    '--seed': '',
+    '--base-port': '',
+    '--num-envs': '',
+    '--no-graphics': '',
 }
 
 
-# Options that will not add to config,
+# Options that will not be added to config,
 # but will be supported on command line
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━
 # load
 # slow
-# train
 # debug
 
 
@@ -166,3 +167,12 @@ def get_training_arguments(configuration):
             command_args = command_args + [key, value]
 
     return command_args
+
+
+def get_run_id(configuration):
+    return configuration[_RUN_ID_KEY]
+
+
+def set_run_id(value: str, configuration):
+    configuration[_RUN_ID_KEY] = value
+    return configuration

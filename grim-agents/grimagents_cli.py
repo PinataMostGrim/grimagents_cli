@@ -1,15 +1,17 @@
 """
 CLI application that wraps 'mlagents-learn' with some quality of life improvements.
-- creating a timestamped run-id
-- optionally load arguments from a configuration file
-- optionally override loaded configuration
-- logging training out put to file
+- Creating a timestamped run-id
+- Load arguments from a configuration file
+- Optionally override loaded configuration arguments
+- Log training output to file
 """
 
 import argparse
 import sys
 
+from datetime import datetime
 from pathlib import Path
+from subprocess import Popen, PIPE
 
 import grimagents.config as config_util
 import grimagents.command_util as command_util
@@ -30,22 +32,40 @@ def edit_config_file(args):
 
 
 def perform_training(args):
+
     config_path = Path(args.configuration_file)
     config = config_util.load_config_file(config_path)
 
     trainer_path = settings.get_training_wrapper_path()
 
-    command = ['pipenv', 'run', 'python', str(trainer_path)] + config_util.get_training_arguments(config) + ['--train']
+    if args.timestamp:
+        run_id = config_util.get_run_id(config)
+        timestamp = get_timestamp()
+        config = config_util.set_run_id(f'{run_id}-{timestamp}', config)
 
-    # TODO: Override configuration file commands with any arguments passed into grimagents_cli
+    training_arguments = config_util.get_training_arguments(config)
 
-    command_util.execute_command(command)
+    command = (
+        ['pipenv', 'run', 'python', str(trainer_path)]
+        + training_arguments
+        + args.args
+        + ['--train']
+    )
+
     # print(command)
 
-    # TODO: Execute command from the project's root working directory
-    # cwd = settings.get_project_folder_absolute()
+    # TODO: Override configuration file commands with any arguments passed into cli
+    # TODO: open new window
 
-    # TODO: Execute command in new cmd / shell
+    cwd = settings.get_project_folder_absolute()
+    with Popen(command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+        for line in p.stdout:
+            print(line, end='')
+
+
+def get_timestamp():
+    now = datetime.now()
+    return now.strftime('%Y-%m-%d_%H-%M-%S')
 
 
 def main():
@@ -74,6 +94,8 @@ def parse_args(argv):
         type=str,
         help='Open a configuration file for editing',
     )
+
+    options_parser.add_argument('--timestamp', '-t', action='store_true', help='Timestamp help')
 
     parser = argparse.ArgumentParser(
         prog='grimagents',
