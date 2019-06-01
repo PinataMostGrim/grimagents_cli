@@ -32,10 +32,10 @@ def main():
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
 
-    trainer_path = _TRAINER_RELATIVE_PATH
-    command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
+    # trainer_path = _TRAINER_RELATIVE_PATH
+    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
 
-    # command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
+    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 

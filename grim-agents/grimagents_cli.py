@@ -11,8 +11,9 @@ import sys
 
 from pathlib import Path
 
-import grimagents.config as config
+import grimagents.config as config_util
 import grimagents.command_util as command_util
+import grimagents.settings as settings
 
 
 def list_training_options():
@@ -24,13 +25,27 @@ def edit_config_file(args):
 
     print('')
     config_path = Path(args.edit_config)
-    config.edit_config_file(config_path)
+    config_util.edit_config_file(config_path)
     print('')
 
 
 def perform_training(args):
-    print('Training...')
-    print(args)
+    config_path = Path(args.configuration_file)
+    config = config_util.load_config_file(config_path)
+
+    trainer_path = settings.get_training_wrapper_path()
+
+    command = ['pipenv', 'run', 'python', str(trainer_path)] + config_util.get_training_arguments(config) + ['--train']
+
+    # TODO: Override configuration file commands with any arguments passed into grimagents_cli
+
+    command_util.execute_command(command)
+    # print(command)
+
+    # TODO: Execute command from the project's root working directory
+    # cwd = settings.get_project_folder_absolute()
+
+    # TODO: Execute command in new cmd / shell
 
 
 def main():
