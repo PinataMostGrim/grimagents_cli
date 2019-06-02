@@ -7,11 +7,12 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 """
 
 import argparse
+import subprocess
 import sys
 
 from datetime import datetime
 from pathlib import Path
-from subprocess import Popen, PIPE
+from subprocess import CREATE_NEW_CONSOLE
 
 import grimagents.config as config_util
 import grimagents.command_util as command_util
@@ -19,6 +20,7 @@ import grimagents.settings as settings
 
 
 def list_training_options():
+
     command = ['pipenv', 'run', 'mlagents-learn', '--help']
     command_util.execute_command(command)
 
@@ -46,21 +48,16 @@ def perform_training(args):
     training_arguments = config_util.get_training_arguments(config)
 
     command = (
-        ['pipenv', 'run', 'python', str(trainer_path)]
+        ['cmd', '/K', 'pipenv', 'run', 'python', str(trainer_path)]
         + training_arguments
         + args.args
         + ['--train']
     )
 
-    # print(command)
-
     # TODO: Override configuration file commands with any arguments passed into cli
-    # TODO: open new window
 
     cwd = settings.get_project_folder_absolute()
-    with Popen(command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
-        for line in p.stdout:
-            print(line, end='')
+    subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
 
 
 def get_timestamp():
