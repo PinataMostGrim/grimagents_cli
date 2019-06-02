@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-from grimagents.command import execute_command
-from grimagents.command import execute_command_shell
+import logging
+import grimagents.settings as settings
+
+from grimagents.command_util import execute_command
 
 # start cmd /K pipenv run mlagents-learn config\mkv_config.yaml --run-id=MKV_04 --train
 # /C carry out command and close
@@ -9,9 +11,31 @@ from grimagents.command import execute_command_shell
 
 
 def main():
-    # command = ['python', 'mock_trainer.py']
-    command = ['pipenv', 'run', 'python', 'mock_trainer.py']
-    execute_command(command)
+
+    # example:
+    # handler = logging.StreamHandler(sys.stdout)
+    # handler.setLevel(logging.DEBUG)
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # handler.setFormatter(formatter)
+    # root.addHandler(handler)
+
+    # handler = logging.StreamHandler(sys.stdout)
+
+    # handler = logging.FileHandler('file.log')
+    # handler.setLevel(logging.INFO)
+    # formatter = logging.Formatter('%(levelname)s: %(message)s')
+    # handler.setFormatter(formatter)
+
+    # trainer_logger = logging.getLogger('grimagents.mocktrainer')
+    # trainer_logger.addHandler(handler)
+
+    cwd = settings.get_project_folder_absolute()
+    command = ['pipenv', 'run', 'python', 'grim-agents\mock_trainer.py']
+    output = execute_command(command, cwd)
+
+    print('')
+    print('MOCK WRAPPER'.center(40, '='))
+    print(output)
 
 
 if __name__ == '__main__':
