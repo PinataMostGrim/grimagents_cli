@@ -26,30 +26,8 @@ def open_file(file_path: Path):
         command = ['open', str(file_path)]
         execute_command(command)
 
-# from hard_pi
-# - prints stdout to terminal, displays stream in realtime
-# def execute_command(command: list):
-#     """
-#     - executes command
-#     - does not consume stderr
 
-#     source: https://stackoverflow.com/a/17698359
-#     """
-#     print(' '.join(command))
-
-#     with Popen(
-#         command, stdout=PIPE, bufsize=1, universal_newlines=True
-#     ) as p:
-#         for line in p.stdout:
-#             print(line, end='')
-
-#     print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-#     print(p.returncode)
-
-
-# from stack exchange (jfs)
-# - prints stdout to terminal, displays stream in realtime, and saves to variable
-def execute_command(command: list):
+def execute_command(command: list, cwd=None):
     """
     - executes a command
     - prints stdout to terminal
@@ -57,39 +35,21 @@ def execute_command(command: list):
 
     source: https://stackoverflow.com/a/25755038
     """
+
     print(' '.join(command))
 
-    with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True) as p, StringIO() as buf:
+    with Popen(command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True) as p, StringIO() as buf:
+
         for line in p.stdout:
             print(line, end='')
             buf.write(line)
+
         output = buf.getvalue()
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
     print(p.returncode)
 
     return output
-
-
-# from stack exchange
-# - currently not working
-# def execute_commands(commands: str):
-#     """
-#     source: https://stackoverflow.com/a/43697819
-#     """
-
-#     with Popen(
-#         "cmd.exe", shell=False, universal_newlines=True, stdin=PIPE, stdout=PIPE, stderr=PIPE
-#     ) as p:
-#         out, err = p.communicate(commands)
-
-#         print(out.encode('utf-8'))
-
-#         # for line in p.stdout:
-#         #     print(line, end='')
-
-#     print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-#     print(p.returncode)
 
 
 # def execute_command_shell(command: str):
