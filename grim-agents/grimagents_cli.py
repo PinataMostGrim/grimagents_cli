@@ -43,14 +43,19 @@ def perform_training(args):
 
     training_arguments = config_util.get_training_arguments(config)
     command = (
-        ['cmd', '/K', 'pipenv', 'run', 'python', str(trainer_path)]
+        ['pipenv', 'run', 'python', str(trainer_path)]
         + training_arguments
         + args.args
         + ['--train']
     )
 
     cwd = settings.get_project_folder_absolute()
-    subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
+
+    if args.new_window:
+        command = ['cmd', '/K'] + command
+        subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
+    else:
+        subprocess.run(command, cwd=cwd)
 
 
 def override_configuration_values(configuration: dict, args: Namespace):
@@ -95,6 +100,7 @@ def parse_args(argv):
         type=str,
         help='Open a configuration file for editing',
     )
+    options_parser.add_argument('--new-window', action='store_true', help='Run training process in a new console window.')
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
