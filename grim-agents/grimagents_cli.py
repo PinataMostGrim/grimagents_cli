@@ -1,9 +1,10 @@
 """
 CLI application that wraps 'mlagents-learn' with some quality of life improvements.
-- Creating a timestamped run-id
 - Load arguments from a configuration file
-- Optionally override loaded configuration arguments
 - Log training output to file
+- Optionally timestamp the training run-id
+- Optionally override loaded configuration arguments
+- Optionally launch training in a new console window
 """
 
 import argparse
@@ -20,12 +21,18 @@ import grimagents.settings as settings
 
 
 def list_training_options():
+    """Outputs mlagents-learn usage options."""
 
     command = ['pipenv', 'run', 'mlagents-learn', '--help']
     command_util.execute_command(command)
 
 
 def edit_config_file(args):
+    """Opens a configuration file for editing.
+
+    Args:
+      args: Namespace: A Namespace object containing parsed arguments.
+    """
 
     print('')
     config_path = Path(args.edit_config)
@@ -34,6 +41,11 @@ def edit_config_file(args):
 
 
 def perform_training(args):
+    """Launches the training wrapper script with arguments loaded from a configuration file.
+
+    Args:
+      args: Namespace: A Namespace object containing parsed arguments.
+    """
 
     trainer_path = settings.get_training_wrapper_path()
 
@@ -59,6 +71,15 @@ def perform_training(args):
 
 
 def override_configuration_values(configuration: dict, args: Namespace):
+    """Replaces values in the configuration dictionary with those stored in args.
+
+    Args:
+      configuration: dict: Configuration with values to override.
+      args: Namespace: Values to insert into the configuration dict.
+
+    Returns:
+      A configuration dictionary.
+    """
 
     if args.lesson:
         configuration = config_util.set_lesson(args.lesson, configuration)
@@ -73,6 +94,7 @@ def override_configuration_values(configuration: dict, args: Namespace):
 
 
 def main():
+
     args = parse_args(sys.argv[1:])
 
     if args.list:
@@ -87,6 +109,14 @@ def main():
 
 
 def parse_args(argv):
+    """Builds a Namespace object with parsed arguments.
+
+    Args:
+      argv: List of arguments to parse.
+
+    Returns:
+      A Namespace object containing parsed arguments.
+    """
 
     # Parser for arguments that apply exclusively to the grimagents cli
     options_parser = argparse.ArgumentParser(add_help=False)

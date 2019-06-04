@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
-"""CLI application that wraps 'mlagents-learn' and logs training output.
+"""
+CLI application that wraps 'mlagents-learn' with quality of life improvements.
+- Initiates training with mlagents-learn
+- Logs training output to file
+- Optionally timestamps run-id
+- Optionally exports trained models to another location
 
-Executes training with the current working directory set to the the project's root folder.
+Notes:
+- The training process is executed with the project's root folder set as the current working directory.
 """
 
 import argparse
@@ -34,12 +40,8 @@ def main():
         timestamp = get_timestamp()
         run_id = f'{run_id}-{timestamp}'
 
-    # We use run_id from args in order to exclude the optional timestamp from the log file name.
+    # Note: We use run_id from args in order to exclude the optional timestamp from the log file name.
     configure_log(args.run_id)
-
-    # Note: As these arguments are being passed directly into popen,
-    # the trainer path does not need to be enclosed in quotes to support
-    # paths with spaces in them.
 
     # trainer_path = _TRAINER_RELATIVE_PATH
     # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path, '--run-id', run_id] + args.args
@@ -47,6 +49,9 @@ def main():
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
 
+    # Note: As these arguments are being passed directly into popen,
+    # the trainer path does not need to be enclosed in quotes to support
+    # paths with spaces in them.
     command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path, '--run-id', run_id] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
@@ -58,9 +63,10 @@ def main():
             start_time = time.perf_counter()
 
             for line in p.stdout:
-                training_log.info(line.rstrip())
+                line = line.rstrip()
+                training_log.info(line)
 
-                match = brain_regex.search(line.rstrip())
+                match = brain_regex.search(line)
                 if match:
                     exported_brains.append(match.group(1))
 
@@ -89,11 +95,24 @@ def main():
 
 
 def get_timestamp():
+    """Fetch the current time as a string.
+
+    Returns:
+      The current time as a string.
+    """
+
     now = datetime.now()
     return now.strftime('%Y-%m-%d_%H-%M-%S')
 
 
 def export_brains(brains: list, export_path: Path):
+    """Exports a list of trained models to a path.
+
+    Args:
+      brains: list: Trained models to export.
+      export_path: Path: Destination folder to export brains into.
+    """
+
     training_log.info('Exporting brains')
 
     if not export_path.exists():
@@ -111,8 +130,16 @@ def export_brains(brains: list, export_path: Path):
 
 
 def parse_args(argv):
+    """Builds a Namespace object with parsed arguments.
 
-    # It is important to keep command line argument parity with mlagents-learn.
+    Args:
+      argv: list: Arguments to parse.
+
+    Returns:
+      A Namespace object containing parsed arguments.
+    """
+
+    # It is important to keep command line argument in parity with mlagents-learn.
     # As intermixed parsing was not introduced into ArgParser until Python 3.7,
     # we need to separate parsing into two parsers to accomplish this.
 
@@ -144,7 +171,11 @@ def parse_args(argv):
 
 
 def configure_log(run_id: str):
-    """Configures logging for a training session."""
+    """Configures logging for a training session.
+
+    Args:
+      run_id: str: The training session's run-id
+    """
 
     log_config = {
         "version": 1,

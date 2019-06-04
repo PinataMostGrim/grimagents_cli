@@ -1,6 +1,9 @@
 """Loads configuration files and fetches loaded configuration values.
 
-See mlagents-learn for a description of each option.
+See mlagents-learn for a description of most options.
+
+The `--timestamp` and `--export-path` options apply to training_wrapper.
+See `training_wrapper.py -h` for usage options.
 """
 
 import json
@@ -44,7 +47,8 @@ class InvalidConfigurationError(ConfigurationError):
 
 class EmptyConfigurationError(ConfigurationError):
     """An error occurred because configuration values were accessed before a
-    configuration was loaded."""
+    configuration was loaded.
+    """
 
 
 def edit_config_file(config_path: Path):
@@ -91,7 +95,7 @@ def load_config_file(config_path: Path):
     Args:
       config_path: Path: Path object for the configuration file to load into memory.
 
-    Returns
+    Returns:
       Configuration dictionary loaded from file.
 
     Raises:
@@ -152,22 +156,31 @@ def validate_configuration(configuration):
 
 
 def get_training_arguments(configuration):
+    """Converts a configuration dictionary into command line arguments
+    for mlagents-learn.
+
+    Args:
+      configuration: A configuration dictionary
+
+    Returns:
+      A list of command line arguments.
+    """
 
     command_args = list()
 
     for key, value in configuration.items():
-        # mlagents-learn requires trainer config path be the first argument.
+        # Note: mlagents-learn requires trainer config path be the first argument.
         if key == _TRAINER_CONFIG_PATH_KEY and value:
             command_args.insert(0, value)
             continue
 
-        # The --no-graphics argument does not accept a value.
+        # Note: The --no-graphics argument does not accept a value.
         if key == _NO_GRAPHICS_KEY:
             if value is True:
                 command_args = command_args + [key]
             continue
 
-        # The --timestamp argument does not accept a value.
+        # Note: The --timestamp argument does not accept a value.
         if key == _TIMESTAMP_KEY:
             if value is True:
                 command_args = command_args + [key]
@@ -180,25 +193,30 @@ def get_training_arguments(configuration):
 
 
 def set_lesson(value: int, configuration):
+
     configuration[_LESSON_KEY] = value
     return configuration
 
 
 def get_run_id(configuration):
+
     return configuration[_RUN_ID_KEY]
 
 
 def set_run_id(value: str, configuration):
+
     configuration[_RUN_ID_KEY] = value
     return configuration
 
 
 def set_no_graphics_enabled(value: bool, configuration):
+
     configuration[_NO_GRAPHICS_KEY] = value
     return configuration
 
 
 def get_timestamp_enabled(configuration):
+
     try:
         return configuration['--timestamp']
     except KeyError:
@@ -206,5 +224,6 @@ def get_timestamp_enabled(configuration):
 
 
 def set_timestamp_enabled(value: bool, configuration):
+
     configuration[_TIMESTAMP_KEY] = value
     return configuration
