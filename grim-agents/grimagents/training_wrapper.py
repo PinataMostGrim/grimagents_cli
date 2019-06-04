@@ -24,9 +24,6 @@ from subprocess import Popen, PIPE
 import settings as settings
 
 
-_TRAINER_RELATIVE_PATH = 'grim-agents\\mock_trainer.py'
-
-
 training_log = logging.getLogger('training_wrapper')
 
 
@@ -42,9 +39,6 @@ def main():
 
     # Note: We use run_id from args in order to exclude the optional timestamp from the log file name.
     configure_log(args.run_id)
-
-    # trainer_path = _TRAINER_RELATIVE_PATH
-    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path, '--run-id', run_id] + args.args
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
