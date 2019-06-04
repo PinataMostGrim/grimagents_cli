@@ -10,6 +10,7 @@ import logging.config
 import sys
 import time
 
+from datetime import datetime
 from pathlib import Path
 from subprocess import Popen, PIPE
 
@@ -23,9 +24,14 @@ def main():
 
     args = parse_args(sys.argv[1:])
     cwd = settings.get_project_folder_absolute()
-    run_id = Path(args.run_id)
+    run_id = args.run_id
 
-    configure_log(run_id)
+    if args.timestamp:
+        timestamp = get_timestamp()
+        run_id = f'{run_id}-{timestamp}'
+
+    # We use run_id from args in order to exclude the optional timestamp from the log file name.
+    configure_log(args.run_id)
     training_log = logging.getLogger('training_wrapper')
 
     # Note: As these arguments are being passed directly into popen,
@@ -33,9 +39,9 @@ def main():
     # paths with spaces in them.
 
     # trainer_path = _TRAINER_RELATIVE_PATH
-    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path] + args.args
+    # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path, '--run-id', run_id] + args.args
 
-    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path] + args.args
+    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path, '--run-id', run_id] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
@@ -69,6 +75,11 @@ def main():
         logging.shutdown()
 
 
+def get_timestamp():
+    now = datetime.now()
+    return now.strftime('%Y-%m-%d_%H-%M-%S')
+
+
 def parse_args(argv):
 
     # It is important to keep command line argument parity with mlagents-learn.
@@ -82,8 +93,9 @@ def parse_args(argv):
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
-        '--run-id', metavar='<run-id>', default='ppo', type=str, help='Run-id help'
+        '--run-id', metavar='<run-id>', type=str, default='ppo', help='Run-id help'
     )
+    wrapper_parser.add_argument('--timestamp', action='store_true', help='Timestamp help')
     # wrapper_parser.add_argument('--log-path', type=str, help='Log-path help')
 
     parser = argparse.ArgumentParser(
@@ -95,8 +107,8 @@ def parse_args(argv):
     parser.add_argument('trainer_config_path', type=str, help='Trainer config path help')
     parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments help')
 
-    wrapper_args, _ = wrapper_parser.parse_known_args(argv)
-    args = parser.parse_args(argv, wrapper_args)
+    wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
+    args = parser.parse_args(extra_args, wrapper_args)
 
     return args
 
@@ -127,6 +139,7 @@ def configure_log(run_id: str):
     if not log_folder.exists():
         log_folder.mkdir(parents=True, exist_ok=True)
 
+    run_id = Path(run_id)
     if not run_id.suffix == '.log':
         run_id = run_id.with_suffix('.log')
 

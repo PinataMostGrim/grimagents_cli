@@ -11,7 +11,6 @@ import subprocess
 import sys
 
 from argparse import Namespace
-from datetime import datetime
 from pathlib import Path
 from subprocess import CREATE_NEW_CONSOLE
 
@@ -36,19 +35,13 @@ def edit_config_file(args):
 
 def perform_training(args):
 
+    trainer_path = settings.get_training_wrapper_path()
+
     config_path = Path(args.configuration_file)
     config = config_util.load_config_file(config_path)
-
-    trainer_path = settings.get_training_wrapper_path()
     config = override_configuration_values(config, args)
 
-    if config_util.get_timestamp_enabled(config):
-        run_id = config_util.get_run_id(config)
-        timestamp = get_timestamp()
-        config = config_util.set_run_id(f'{run_id}-{timestamp}', config)
-
     training_arguments = config_util.get_training_arguments(config)
-
     command = (
         ['cmd', '/K', 'pipenv', 'run', 'python', str(trainer_path)]
         + training_arguments
@@ -72,11 +65,6 @@ def override_configuration_values(configuration: dict, args: Namespace):
         configuration = config_util.set_timestamp_enabled(True, configuration)
 
     return configuration
-
-
-def get_timestamp():
-    now = datetime.now()
-    return now.strftime('%Y-%m-%d_%H-%M-%S')
 
 
 def main():

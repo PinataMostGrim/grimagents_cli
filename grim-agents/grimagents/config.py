@@ -160,14 +160,16 @@ def get_training_arguments(configuration):
             command_args.insert(0, value)
             continue
 
-        # The --no-graphics argument does not accept an argument value.
+        # The --no-graphics argument does not accept a value.
         if key == _NO_GRAPHICS_KEY:
             if value is True:
                 command_args = command_args + [key]
             continue
 
-        # the --timestamp argument is meant for grimagents_cli only.
+        # The --timestamp argument does not accept a value.
         if key == _TIMESTAMP_KEY:
+            if value is True:
+                command_args = command_args + [key]
             continue
 
         if value:
