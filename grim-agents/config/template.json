@@ -1,0 +1,16 @@
+{
+    "trainer-config-path": "",
+    "--env": "",
+    "--export-path": "",
+    "--curriculum": "",
+    "--keep-checkpoints": "",
+    "--lesson": "",
+    "--run-id": "ppo",
+    "--num-runs": "",
+    "--save-freq": "",
+    "--seed": "",
+    "--base-port": "",
+    "--num-envs": "",
+    "--no-graphics": "",
+    "--timestamp": ""
+}
