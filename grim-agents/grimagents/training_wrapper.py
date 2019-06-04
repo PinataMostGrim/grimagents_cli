@@ -52,7 +52,7 @@ def main():
 
             training_log.info('')
             training_log.info(
-                f'Training run \'{run_id}\' completed in {end_time - start_time:.0f} seconds'
+                f'Training run \'{run_id}\' ended after {end_time - start_time:.0f} seconds'
             )
 
     except KeyboardInterrupt:
@@ -60,8 +60,12 @@ def main():
         raise
 
     finally:
+        if p.returncode == 0:
+            training_log.info('Training completed successfully.')
+        else:
+            training_log.warning(f'Training was not completed successfully. (error code {p.returncode})')
+
         training_log.info('==================================================')
-        print(f'Exit code: {p.returncode}')
         logging.shutdown()
 
 
