@@ -52,7 +52,14 @@ def main():
     # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
-    command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path, '--run-id', run_id] + args.args
+    command = [
+        'pipenv',
+        'run',
+        'mlagents-learn',
+        args.trainer_config_path,
+        '--run-id',
+        run_id,
+    ] + args.args
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
@@ -88,7 +95,9 @@ def main():
         if p.returncode == 0:
             training_log.info('Training completed successfully.')
         else:
-            training_log.warning(f'Training was not completed successfully. (error code {p.returncode})')
+            training_log.warning(
+                f'Training was not completed successfully. (error code {p.returncode})'
+            )
 
         training_log.info('==================================================')
         logging.shutdown()
@@ -150,10 +159,20 @@ def parse_args(argv):
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
-        '--run-id', metavar='<run-id>', type=str, default='ppo', help='Run id for the training session'
+        '--run-id',
+        metavar='<run-id>',
+        type=str,
+        default='ppo',
+        help='Run id for the training session',
     )
-    wrapper_parser.add_argument('--timestamp', action='store_true', help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.')
-    wrapper_parser.add_argument('--export-path', type=str, help='Export trained models to this path')
+    wrapper_parser.add_argument(
+        '--timestamp',
+        action='store_true',
+        help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.',
+    )
+    wrapper_parser.add_argument(
+        '--export-path', type=str, help='Export trained models to this path'
+    )
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
@@ -161,8 +180,14 @@ def parse_args(argv):
         parents=[wrapper_parser],
     )
 
-    parser.add_argument('trainer_config_path', type=str, help='Configuration file that holds brain hyperparameters.')
-    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load).')
+    parser.add_argument(
+        'trainer_config_path', type=str, help='Configuration file that holds brain hyperparameters.'
+    )
+    parser.add_argument(
+        'args',
+        nargs=argparse.REMAINDER,
+        help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load).',
+    )
 
     wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
     args = parser.parse_args(extra_args, wrapper_args)

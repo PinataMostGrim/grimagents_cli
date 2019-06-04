@@ -130,14 +130,18 @@ def parse_args(argv):
         type=str,
         help='Open a configuration file for editing',
     )
-    options_parser.add_argument('--new-window', action='store_true', help='Run training process in a new console window.')
+    options_parser.add_argument(
+        '--new-window', action='store_true', help='Run training process in a new console window.'
+    )
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
     overrides_parser.add_argument('--lesson', type=int, default=0)
     overrides_parser.add_argument('--run-id', type=str, default=None)
     overrides_parser.add_argument('--no-graphics', action='store_true')
-    overrides_parser.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id')
+    overrides_parser.add_argument(
+        '--timestamp', action='store_true', help='Append timestamp to run-id'
+    )
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
@@ -146,8 +150,14 @@ def parse_args(argv):
         parents=[options_parser, overrides_parser],
     )
 
-    parser.add_argument('configuration_file', type=str, help='Configuration file to load training arguments from.')
-    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments applied to training (ex. --slow, --debug, --load).')
+    parser.add_argument(
+        'configuration_file', type=str, help='Configuration file to load training arguments from.'
+    )
+    parser.add_argument(
+        'args',
+        nargs=argparse.REMAINDER,
+        help='Additional arguments applied to training (ex. --slow, --debug, --load).',
+    )
 
     args, unparsed_args = options_parser.parse_known_args()
     args, unparsed_args = overrides_parser.parse_known_args(unparsed_args, args)
