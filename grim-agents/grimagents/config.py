@@ -11,15 +11,17 @@ from .command_util import open_file
 
 # Default configuration values
 _TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
+_LESSON_KEY = '--lesson'
 _RUN_ID_KEY = '--run-id'
 _NO_GRAPHICS_KEY = '--no-graphics'
+_TIMESTAMP_KEY = '--timestamp'
 
 _DEFAULT_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
     '--env': '',
     '--curriculum': '',
     '--keep-checkpoints': '',
-    '--lesson': '',
+    _LESSON_KEY: '',
     _RUN_ID_KEY: 'ppo',
     '--num-runs': '',
     '--save-freq': '',
@@ -27,25 +29,8 @@ _DEFAULT_CONFIG = {
     '--base-port': '',
     '--num-envs': '',
     _NO_GRAPHICS_KEY: '',
-
+    _TIMESTAMP_KEY: '',
 }
-
-
-# special case options
-# --no-graphics - doesn't support True or False, is present or not
-# --time-stamp - doesn't support True or False, is present or not
-
-# Options that will not be added to config,
-# but will be supported on command line
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━
-# load
-# slow
-# debug
-
-# options that will need override support
-# --run-id
-# --lesson
-# --no-graphics
 
 
 class ConfigurationError(Exception):
@@ -177,8 +162,12 @@ def get_training_arguments(configuration):
 
         # The --no-graphics argument does not accept an argument value.
         if key == _NO_GRAPHICS_KEY:
-            if value.lower() == 'true':
+            if value is True:
                 command_args = command_args + [key]
+            continue
+
+        # the --timestamp argument is meant for grimagents_cli only.
+        if key == _TIMESTAMP_KEY:
             continue
 
         if value:
@@ -187,10 +176,32 @@ def get_training_arguments(configuration):
     return command_args
 
 
+def set_lesson(value: int, configuration):
+    configuration[_LESSON_KEY] = value
+    return configuration
+
+
 def get_run_id(configuration):
     return configuration[_RUN_ID_KEY]
 
 
 def set_run_id(value: str, configuration):
     configuration[_RUN_ID_KEY] = value
+    return configuration
+
+
+def set_no_graphics_enabled(value: bool, configuration):
+    configuration[_NO_GRAPHICS_KEY] = value
+    return configuration
+
+
+def get_timestamp_enabled(configuration):
+    try:
+        return configuration['--timestamp']
+    except KeyError:
+        return False
+
+
+def set_timestamp_enabled(value: bool, configuration):
+    configuration[_TIMESTAMP_KEY] = value
     return configuration

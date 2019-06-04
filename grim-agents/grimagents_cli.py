@@ -10,6 +10,7 @@ import argparse
 import subprocess
 import sys
 
+from argparse import Namespace
 from datetime import datetime
 from pathlib import Path
 from subprocess import CREATE_NEW_CONSOLE
@@ -39,8 +40,9 @@ def perform_training(args):
     config = config_util.load_config_file(config_path)
 
     trainer_path = settings.get_training_wrapper_path()
+    config = override_configuration_values(config, args)
 
-    if args.timestamp:
+    if config_util.get_timestamp_enabled(config):
         run_id = config_util.get_run_id(config)
         timestamp = get_timestamp()
         config = config_util.set_run_id(f'{run_id}-{timestamp}', config)
@@ -54,10 +56,22 @@ def perform_training(args):
         + ['--train']
     )
 
-    # TODO: Override configuration file commands with any arguments passed into cli
-
     cwd = settings.get_project_folder_absolute()
     subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
+
+
+def override_configuration_values(configuration: dict, args: Namespace):
+
+    if args.lesson:
+        configuration = config_util.set_lesson(args.lesson, configuration)
+    if args.run_id:
+        configuration = config_util.set_run_id(args.run_id, configuration)
+    if args.no_graphics:
+        configuration = config_util.set_no_graphics_enabled(True, configuration)
+    if args.timestamp:
+        configuration = config_util.set_timestamp_enabled(True, configuration)
+
+    return configuration
 
 
 def get_timestamp():
@@ -80,6 +94,8 @@ def main():
 
 
 def parse_args(argv):
+
+    # Parser for arguments that apply exclusively to the grimagents cli
     options_parser = argparse.ArgumentParser(add_help=False)
     options_parser.add_argument(
         '--list', action='store_true', help='List mlagents-learn training options'
@@ -92,18 +108,25 @@ def parse_args(argv):
         help='Open a configuration file for editing',
     )
 
-    options_parser.add_argument('--timestamp', '-t', action='store_true', help='Timestamp help')
+    # Parser for arguments that may override configuration values
+    overrides_parser = argparse.ArgumentParser(add_help=False)
+    overrides_parser.add_argument('--lesson', type=int, default=0)
+    overrides_parser.add_argument('--run-id', type=str, default=None)
+    overrides_parser.add_argument('--no-graphics', action='store_true')
+    overrides_parser.add_argument('--timestamp', '-t', action='store_true', help='Timestamp help')
 
+    # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
         prog='grimagents',
         description='CLI application that wraps Unity ML-Agents with some quality of life improvements.',
-        parents=[options_parser],
+        parents=[options_parser, overrides_parser],
     )
 
     parser.add_argument('configuration_file', type=str, help='Training help')
     parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments')
 
     args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = overrides_parser.parse_known_args(unparsed_args, args)
 
     if len(argv) == 0:
         parser.print_help()
