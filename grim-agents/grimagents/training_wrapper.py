@@ -93,19 +93,19 @@ def parse_args(argv):
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
-        '--run-id', metavar='<run-id>', type=str, default='ppo', help='Run-id help'
+        '--run-id', metavar='<run-id>', type=str, default='ppo', help='Run id for the training session'
     )
-    wrapper_parser.add_argument('--timestamp', action='store_true', help='Timestamp help')
+    wrapper_parser.add_argument('--timestamp', action='store_true', help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.')
     # wrapper_parser.add_argument('--log-path', type=str, help='Log-path help')
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
-        description='CLI application that wraps mlagents-learn with logging',
+        description='CLI application that wraps mlagents-learn with quality of life improvements.',
         parents=[wrapper_parser],
     )
 
-    parser.add_argument('trainer_config_path', type=str, help='Trainer config path help')
-    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments help')
+    parser.add_argument('trainer_config_path', type=str, help='Configuration file that holds brain hyperparameters.')
+    parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load).')
 
     wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
     args = parser.parse_args(extra_args, wrapper_args)
