@@ -12,6 +12,7 @@ from .command_util import open_file
 # Default configuration values
 _TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
 _RUN_ID_KEY = '--run-id'
+_NO_GRAPHICS_KEY = '--no-graphics'
 
 _DEFAULT_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
@@ -25,9 +26,14 @@ _DEFAULT_CONFIG = {
     '--seed': '',
     '--base-port': '',
     '--num-envs': '',
-    '--no-graphics': '',
+    _NO_GRAPHICS_KEY: '',
+
 }
 
+
+# special case options
+# --no-graphics - doesn't support True or False, is present or not
+# --time-stamp - doesn't support True or False, is present or not
 
 # Options that will not be added to config,
 # but will be supported on command line
@@ -35,6 +41,11 @@ _DEFAULT_CONFIG = {
 # load
 # slow
 # debug
+
+# options that will need override support
+# --run-id
+# --lesson
+# --no-graphics
 
 
 class ConfigurationError(Exception):
@@ -159,8 +170,15 @@ def get_training_arguments(configuration):
     command_args = list()
 
     for key, value in configuration.items():
+        # mlagents-learn requires trainer config path be the first argument.
         if key == _TRAINER_CONFIG_PATH_KEY and value:
             command_args.insert(0, value)
+            continue
+
+        # The --no-graphics argument does not accept an argument value.
+        if key == _NO_GRAPHICS_KEY:
+            if value.lower() == 'true':
+                command_args = command_args + [key]
             continue
 
         if value:
