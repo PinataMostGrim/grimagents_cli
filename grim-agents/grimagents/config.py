@@ -19,6 +19,7 @@ _TIMESTAMP_KEY = '--timestamp'
 _DEFAULT_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
     '--env': '',
+    '--export-path': '',
     '--curriculum': '',
     '--keep-checkpoints': '',
     _LESSON_KEY: '',

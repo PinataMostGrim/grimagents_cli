@@ -101,7 +101,7 @@ def parse_args(argv):
     overrides_parser.add_argument('--lesson', type=int, default=0)
     overrides_parser.add_argument('--run-id', type=str, default=None)
     overrides_parser.add_argument('--no-graphics', action='store_true')
-    overrides_parser.add_argument('--timestamp', '-t', action='store_true', help='Append timestamp to run-id')
+    overrides_parser.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id')
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(

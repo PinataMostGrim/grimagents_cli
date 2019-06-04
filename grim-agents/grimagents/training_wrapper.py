@@ -7,6 +7,7 @@ Executes training with the current working directory set to the the project's ro
 import argparse
 import logging
 import logging.config
+import re
 import sys
 import time
 
@@ -18,6 +19,9 @@ import settings as settings
 
 
 _TRAINER_RELATIVE_PATH = 'grim-agents\\mock_trainer.py'
+
+
+training_log = logging.getLogger('training_wrapper')
 
 
 def main():
@@ -32,7 +36,6 @@ def main():
 
     # We use run_id from args in order to exclude the optional timestamp from the log file name.
     configure_log(args.run_id)
-    training_log = logging.getLogger('training_wrapper')
 
     # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
@@ -40,6 +43,9 @@ def main():
 
     # trainer_path = _TRAINER_RELATIVE_PATH
     # command = ['pipenv', 'run', 'python', f"{trainer_path}", args.trainer_config_path, '--run-id', run_id] + args.args
+
+    brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
+    exported_brains = []
 
     command = ['pipenv', 'run', 'mlagents-learn', args.trainer_config_path, '--run-id', run_id] + args.args
     try:
@@ -54,12 +60,19 @@ def main():
             for line in p.stdout:
                 training_log.info(line.rstrip())
 
+                match = brain_regex.search(line.rstrip())
+                if match:
+                    exported_brains.append(match.group(1))
+
             end_time = time.perf_counter()
 
             training_log.info('')
             training_log.info(
                 f'Training run \'{run_id}\' ended after {end_time - start_time:.0f} seconds'
             )
+
+        if args.export_path:
+            export_brains(exported_brains, Path(args.export_path))
 
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
@@ -80,6 +93,23 @@ def get_timestamp():
     return now.strftime('%Y-%m-%d_%H-%M-%S')
 
 
+def export_brains(brains: list, export_path: Path):
+    training_log.info('Exporting brains')
+
+    if not export_path.exists():
+        export_path.mkdir(parents=True, exist_ok=True)
+
+    for brain in brains:
+        source = Path(brain)
+        if not source.exists():
+            continue
+
+        destination = export_path / source.name
+        destination.write_bytes(source.read_bytes())
+
+        training_log.info(f'Exported {destination}')
+
+
 def parse_args(argv):
 
     # It is important to keep command line argument parity with mlagents-learn.
@@ -96,7 +126,7 @@ def parse_args(argv):
         '--run-id', metavar='<run-id>', type=str, default='ppo', help='Run id for the training session'
     )
     wrapper_parser.add_argument('--timestamp', action='store_true', help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.')
-    # wrapper_parser.add_argument('--log-path', type=str, help='Log-path help')
+    wrapper_parser.add_argument('--export-path', type=str, help='Export trained models to this path')
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
