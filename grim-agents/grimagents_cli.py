@@ -84,11 +84,11 @@ def override_configuration_values(configuration: dict, args: Namespace):
     if args.env is not None:
         configuration = config_util.set_env(args.env, configuration)
     if args.lesson is not None:
-        configuration = config_util.set_lesson(args.lesson, configuration)
+        configuration = config_util.set_lesson(str(args.lesson), configuration)
     if args.run_id is not None:
         configuration = config_util.set_run_id(args.run_id, configuration)
     if args.num_envs is not None:
-        configuration = config_util.set_num_envs(args.num_envs, configuration)
+        configuration = config_util.set_num_envs(str(args.num_envs), configuration)
     if args.no_graphics is not None:
         configuration = config_util.set_no_graphics_enabled(True, configuration)
     if args.timestamp is not None:
