@@ -37,7 +37,8 @@ def main():
         timestamp = get_timestamp()
         run_id = f'{run_id}-{timestamp}'
 
-    # Note: We use run_id from args in order to exclude the optional timestamp from the log file name.
+    # Note: We use run_id from args in order to exclude the optional timestamp
+    # from the log file name.
     configure_log(args.run_id)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
