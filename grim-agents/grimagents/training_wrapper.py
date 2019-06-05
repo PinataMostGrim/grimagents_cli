@@ -94,6 +94,7 @@ def main():
             )
 
         training_log.info('==================================================')
+        training_log.info('')
         logging.shutdown()
 
 
