@@ -90,9 +90,9 @@ def override_configuration_values(configuration: dict, args: Namespace):
     if args.num_envs is not None:
         configuration = config_util.set_num_envs(str(args.num_envs), configuration)
     if args.no_graphics is not None:
-        configuration = config_util.set_no_graphics_enabled(True, configuration)
+        configuration = config_util.set_no_graphics_enabled(str(args.no_graphics), configuration)
     if args.timestamp is not None:
-        configuration = config_util.set_timestamp_enabled(True, configuration)
+        configuration = config_util.set_timestamp_enabled(str(args.timestamp), configuration)
 
     return configuration
 
