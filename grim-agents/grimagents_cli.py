@@ -81,18 +81,15 @@ def override_configuration_values(configuration: dict, args: Namespace):
       A configuration dictionary.
     """
 
-    # Note: We check against the string "null" in order to support training with the
-    # Editor training by supplying an empty string for this argument.
-    if args.env != "null":
+    if args.env is not None:
         configuration = config_util.set_env(args.env, configuration)
-
-    if args.lesson > 0:
+    if args.lesson is not None:
         configuration = config_util.set_lesson(args.lesson, configuration)
-    if args.run_id:
+    if args.run_id is not None:
         configuration = config_util.set_run_id(args.run_id, configuration)
-    if args.no_graphics:
+    if args.no_graphics is not None:
         configuration = config_util.set_no_graphics_enabled(True, configuration)
-    if args.timestamp:
+    if args.timestamp is not None:
         configuration = config_util.set_timestamp_enabled(True, configuration)
 
     return configuration
@@ -141,12 +138,12 @@ def parse_args(argv):
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
-    overrides_parser.add_argument('--env', type=str, default="null")
-    overrides_parser.add_argument('--lesson', type=int, default=0)
-    overrides_parser.add_argument('--run-id', type=str, default=None)
-    overrides_parser.add_argument('--no-graphics', action='store_true')
+    overrides_parser.add_argument('--env', type=str)
+    overrides_parser.add_argument('--lesson', type=int)
+    overrides_parser.add_argument('--run-id', type=str)
+    overrides_parser.add_argument('--no-graphics', type=bool)
     overrides_parser.add_argument(
-        '--timestamp', action='store_true', help='Append timestamp to run-id'
+        '--timestamp', type=bool, help='Append timestamp to run-id'
     )
 
     # Parser for arguments that are passed on to the training wrapper
