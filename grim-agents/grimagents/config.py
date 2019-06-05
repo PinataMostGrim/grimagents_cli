@@ -17,6 +17,7 @@ _TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
 _ENV_KEY = '--env'
 _LESSON_KEY = '--lesson'
 _RUN_ID_KEY = '--run-id'
+_NUM_ENVS_KEY = '--num-envs'
 _NO_GRAPHICS_KEY = '--no-graphics'
 _TIMESTAMP_KEY = '--timestamp'
 
@@ -32,7 +33,7 @@ _DEFAULT_CONFIG = {
     '--save-freq': '',
     '--seed': '',
     '--base-port': '',
-    '--num-envs': '',
+    _NUM_ENVS_KEY: '',
     _NO_GRAPHICS_KEY: False,
     _TIMESTAMP_KEY: False,
 }
@@ -212,6 +213,11 @@ def get_run_id(configuration):
 def set_run_id(value: str, configuration):
 
     configuration[_RUN_ID_KEY] = value
+    return configuration
+
+
+def set_num_envs(value: int, configuration):
+    configuration[_NUM_ENVS_KEY] = value
     return configuration
 
 
