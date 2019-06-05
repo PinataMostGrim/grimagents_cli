@@ -14,6 +14,7 @@ from .command_util import open_file
 
 # Default configuration values
 _TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
+_ENV_KEY = '--env'
 _LESSON_KEY = '--lesson'
 _RUN_ID_KEY = '--run-id'
 _NO_GRAPHICS_KEY = '--no-graphics'
@@ -21,7 +22,7 @@ _TIMESTAMP_KEY = '--timestamp'
 
 _DEFAULT_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
-    '--env': '',
+    _ENV_KEY: '',
     '--export-path': '',
     '--curriculum': '',
     '--keep-checkpoints': '',
@@ -32,8 +33,8 @@ _DEFAULT_CONFIG = {
     '--seed': '',
     '--base-port': '',
     '--num-envs': '',
-    _NO_GRAPHICS_KEY: '',
-    _TIMESTAMP_KEY: '',
+    _NO_GRAPHICS_KEY: False,
+    _TIMESTAMP_KEY: False,
 }
 
 
@@ -190,6 +191,11 @@ def get_training_arguments(configuration):
             command_args = command_args + [key, value]
 
     return command_args
+
+
+def set_env(value: str, configuration):
+    configuration[_ENV_KEY] = value
+    return configuration
 
 
 def set_lesson(value: int, configuration):

@@ -81,7 +81,12 @@ def override_configuration_values(configuration: dict, args: Namespace):
       A configuration dictionary.
     """
 
-    if args.lesson:
+    # Note: We check against the string "null" in order to support training with the
+    # Editor training by supplying an empty string for this argument.
+    if args.env != "null":
+        configuration = config_util.set_env(args.env, configuration)
+
+    if args.lesson > 0:
         configuration = config_util.set_lesson(args.lesson, configuration)
     if args.run_id:
         configuration = config_util.set_run_id(args.run_id, configuration)
@@ -136,6 +141,7 @@ def parse_args(argv):
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
+    overrides_parser.add_argument('--env', type=str, default="null")
     overrides_parser.add_argument('--lesson', type=int, default=0)
     overrides_parser.add_argument('--run-id', type=str, default=None)
     overrides_parser.add_argument('--no-graphics', action='store_true')

@@ -11,6 +11,6 @@
     "--seed": "",
     "--base-port": "",
     "--num-envs": "",
-    "--no-graphics": "",
-    "--timestamp": ""
+    "--no-graphics": false,
+    "--timestamp": false
 }
