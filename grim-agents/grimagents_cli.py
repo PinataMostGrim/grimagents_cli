@@ -87,6 +87,8 @@ def override_configuration_values(configuration: dict, args: Namespace):
         configuration = config_util.set_lesson(args.lesson, configuration)
     if args.run_id is not None:
         configuration = config_util.set_run_id(args.run_id, configuration)
+    if args.num_envs is not None:
+        configuration = config_util.set_num_envs(args.num_envs, configuration)
     if args.no_graphics is not None:
         configuration = config_util.set_no_graphics_enabled(True, configuration)
     if args.timestamp is not None:
@@ -141,6 +143,7 @@ def parse_args(argv):
     overrides_parser.add_argument('--env', type=str)
     overrides_parser.add_argument('--lesson', type=int)
     overrides_parser.add_argument('--run-id', type=str)
+    overrides_parser.add_argument('--num-envs', type=int)
     overrides_parser.add_argument('--no-graphics', type=bool)
     overrides_parser.add_argument(
         '--timestamp', type=bool, help='Append timestamp to run-id'
