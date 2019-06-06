@@ -37,7 +37,8 @@ def main():
         timestamp = get_timestamp()
         run_id = f'{run_id}-{timestamp}'
 
-    # Note: We use run_id from args in order to exclude the optional timestamp from the log file name.
+    # Note: We use run_id from args in order to exclude the optional timestamp
+    # from the log file name.
     configure_log(args.run_id)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
@@ -72,10 +73,11 @@ def main():
                     exported_brains.append(match.group(1))
 
             end_time = time.perf_counter()
+            training_duration = get_human_readable_duration(end_time - start_time)
 
             training_log.info('')
             training_log.info(
-                f'Training run \'{run_id}\' ended after {end_time - start_time:.0f} seconds'
+                f'Training run \'{run_id}\' ended after {training_duration}.'
             )
 
         if args.export_path:
@@ -107,6 +109,33 @@ def get_timestamp():
 
     now = datetime.now()
     return now.strftime('%Y-%m-%d_%H-%M-%S')
+
+
+def get_human_readable_duration(seconds):
+    """Parses seconds into a human readable string.
+
+    Returns:
+      A human readable string.
+    """
+
+    seconds = int(seconds)
+    days, rem = divmod(seconds, 86400)
+    hours, rem = divmod(rem, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    if seconds < 1:
+        seconds = 1
+
+    locals_ = locals()
+    magnitudes_str = (
+        f'{int(locals_[magnitude])} {magnitude}'
+        for magnitude in ('days', 'hours', 'minutes', 'seconds')
+        if locals_[magnitude]
+    )
+
+    result = ", ".join(magnitudes_str)
+
+    return result
 
 
 def export_brains(brains: list, export_path: Path):
