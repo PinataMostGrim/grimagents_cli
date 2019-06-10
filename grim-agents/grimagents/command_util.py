@@ -26,10 +26,12 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
-def execute_command(command: list, cwd=None, new_window=False):
+def execute_command(command: list, cwd=None, new_window=False, show_command=True):
     """ """
 
-    print(' '.join(command))
+    if show_command:
+        print(' '.join(command))
+
     if new_window:
         command = ['cmd', '/K'] + command
         subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
@@ -37,14 +39,16 @@ def execute_command(command: list, cwd=None, new_window=False):
         subprocess.run(command, cwd=cwd)
 
 
-def execute_command_and_capture(command: list, cwd=None):
+def execute_command_and_capture(command: list, cwd=None, show_command=True):
     """Executes a command in terminal, captures output,
     prints it, and returns it.
 
     source: https://stackoverflow.com/a/25755038
     """
 
-    print(' '.join(command))
+    if show_command:
+        print(' '.join(command))
+
     with subprocess.Popen(
         command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True
     ) as p, StringIO() as buf:
