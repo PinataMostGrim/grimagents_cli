@@ -59,8 +59,8 @@ def main():
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
-            training_log.info('==================================================')
             training_log.info(f'{" ".join(command[2:])}')
+            training_log.info('==================================================')
             training_log.info(f'Initiating training run \'{run_id}\'')
 
             start_time = time.perf_counter()
