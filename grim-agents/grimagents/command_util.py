@@ -1,10 +1,11 @@
 """Facilitates executing system commands and opening files."""
 
 import os
+import subprocess
 
 from io import StringIO
 from pathlib import Path
-from subprocess import Popen, PIPE
+from subprocess import PIPE, CREATE_NEW_CONSOLE
 
 
 def open_file(file_path: Path):
@@ -14,7 +15,8 @@ def open_file(file_path: Path):
       file_path: Path: The file to open.
     """
 
-    print(f'Opening \'{file_path}\'')
+    print(f'\nOpening \'{file_path}\'\n')
+
     try:
         # Note: Open file in Windows
         os.startfile(str(file_path))
@@ -24,24 +26,33 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
-def execute_command(command: list, cwd=None):
-    """Executes a command in terminal, captures its output,
+def execute_command(command: list, cwd=None, new_window=False):
+    """ """
+
+    print(' '.join(command))
+    if new_window:
+        command = ['cmd', '/K'] + command
+        subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
+    else:
+        subprocess.run(command, cwd=cwd)
+
+
+def execute_command_and_capture(command: list, cwd=None):
+    """Executes a command in terminal, captures output,
     prints it, and returns it.
 
     source: https://stackoverflow.com/a/25755038
     """
 
     print(' '.join(command))
-
-    with Popen(command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True) as p, StringIO() as buf:
+    with subprocess.Popen(
+        command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True
+    ) as p, StringIO() as buf:
 
         for line in p.stdout:
             print(line, end='')
             buf.write(line)
 
         output = buf.getvalue()
-
-    # print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    # print(p.returncode)
 
     return output

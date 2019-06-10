@@ -8,12 +8,10 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 """
 
 import argparse
-import subprocess
 import sys
 
 from argparse import Namespace
 from pathlib import Path
-from subprocess import CREATE_NEW_CONSOLE
 
 import grimagents.config as config_util
 import grimagents.command_util as command_util
@@ -23,8 +21,9 @@ import grimagents.settings as settings
 def list_training_options():
     """Outputs mlagents-learn usage options."""
 
+    cwd = settings.get_project_folder_absolute()
     command = ['pipenv', 'run', 'mlagents-learn', '--help']
-    command_util.execute_command(command)
+    command_util.execute_command(command, cwd)
 
 
 def edit_config_file(args):
@@ -34,10 +33,8 @@ def edit_config_file(args):
       args: Namespace: A Namespace object containing parsed arguments.
     """
 
-    print('')
     config_path = Path(args.edit_config)
     config_util.edit_config_file(config_path)
-    print('')
 
 
 def perform_training(args):
@@ -62,12 +59,7 @@ def perform_training(args):
     )
 
     cwd = settings.get_project_folder_absolute()
-
-    if args.new_window:
-        command = ['cmd', '/K'] + command
-        subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
-    else:
-        subprocess.run(command, cwd=cwd)
+    command_util.execute_command(command, cwd, args.new_window)
 
 
 def override_configuration_values(configuration: dict, args: Namespace):
