@@ -38,7 +38,7 @@ def edit_config_file(args):
 
 
 def start_tensorboard(args):
-    """ """
+    """Starts a new instance of tensorboard server in a new terminal window."""
 
     cwd = settings.get_project_folder_absolute()
     log_dir = f'--logdir={settings.get_summaries_folder()}'

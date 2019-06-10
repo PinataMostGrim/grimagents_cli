@@ -27,7 +27,8 @@ def open_file(file_path: Path):
 
 
 def execute_command(command: list, cwd=None, new_window=False, show_command=True):
-    """ """
+    """Executes a command in terminal. Optionally opens a new window or
+    echos the provided command."""
 
     if show_command:
         print(' '.join(command))
