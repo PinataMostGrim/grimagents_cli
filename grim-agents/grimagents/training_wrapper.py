@@ -55,6 +55,7 @@ def main():
         '--run-id',
         run_id,
     ] + args.args
+
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
@@ -72,14 +73,6 @@ def main():
                 if match:
                     exported_brains.append(match.group(1))
 
-            end_time = time.perf_counter()
-            training_duration = get_human_readable_duration(end_time - start_time)
-
-            training_log.info('')
-            training_log.info(
-                f'Training run \'{run_id}\' ended after {training_duration}.'
-            )
-
         if args.export_path:
             export_brains(exported_brains, Path(args.export_path))
 
@@ -88,6 +81,13 @@ def main():
         raise
 
     finally:
+        end_time = time.perf_counter()
+        training_duration = get_human_readable_duration(end_time - start_time)
+
+        training_log.info(
+            f'\nTraining run \'{run_id}\' ended after {training_duration}.'
+        )
+
         if p.returncode == 0:
             training_log.info('Training completed successfully.')
         else:
@@ -97,6 +97,7 @@ def main():
 
         training_log.info('==================================================')
         training_log.info('')
+
         logging.shutdown()
 
 
