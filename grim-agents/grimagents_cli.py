@@ -35,10 +35,8 @@ def edit_config_file(args):
       args: Namespace: A Namespace object containing parsed arguments.
     """
 
-    print('')
     config_path = Path(args.edit_config)
     config_util.edit_config_file(config_path)
-    print('')
 
 
 def perform_training(args):

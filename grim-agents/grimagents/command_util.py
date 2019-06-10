@@ -15,7 +15,8 @@ def open_file(file_path: Path):
       file_path: Path: The file to open.
     """
 
-    print(f'Opening \'{file_path}\'')
+    print(f'\nOpening \'{file_path}\'\n')
+
     try:
         # Note: Open file in Windows
         os.startfile(str(file_path))
