@@ -3,12 +3,14 @@
 from pathlib import Path
 
 
-# Relative path to the project's root folder from setting.py's location
+# Relative path to the project's root folder from setting.py's location.
 _PROJECT_ROOT_RELATIVE_PATH = '..\\..'
 
-# Relative path to the grim-agents log folder
-_LOG_FOLDER_PATH = 'grim-agents\\logs'
+# Project relative path to the summaries folder.
+_SUMMARIES_RELATIVE_PATH = 'summaries'
 
+# Relative path to the grim-agents log folder.
+_LOG_FOLDER_PATH = 'grim-agents\\logs'
 
 # Relative path to the grim-agents trainer wrapper script.
 _TRAINING_WRAPPER_PATH = 'grim-agents\\grimagents\\training_wrapper.py'
@@ -19,6 +21,12 @@ def get_project_folder_absolute():
 
     relative_path = Path(__file__).parent / _PROJECT_ROOT_RELATIVE_PATH
     return relative_path.resolve()
+
+
+def get_summaries_folder():
+    """Returns project relative path to the summaries folder"""
+
+    return Path(_SUMMARIES_RELATIVE_PATH)
 
 
 def get_log_folder():
