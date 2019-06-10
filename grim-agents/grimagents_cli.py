@@ -23,8 +23,9 @@ import grimagents.settings as settings
 def list_training_options():
     """Outputs mlagents-learn usage options."""
 
+    cwd = settings.get_project_folder_absolute()
     command = ['pipenv', 'run', 'mlagents-learn', '--help']
-    command_util.execute_command(command)
+    command_util.execute_command(command, cwd)
 
 
 def edit_config_file(args):
