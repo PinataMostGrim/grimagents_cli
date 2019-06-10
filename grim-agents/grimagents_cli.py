@@ -37,6 +37,16 @@ def edit_config_file(args):
     config_util.edit_config_file(config_path)
 
 
+def start_tensorboard(args):
+    """ """
+
+    cwd = settings.get_project_folder_absolute()
+    log_dir = f'--logdir={settings.get_summaries_folder()}'
+    command = ['pipenv', 'run', 'tensorboard', log_dir]
+
+    command_util.execute_command(command, cwd, new_window=True)
+
+
 def perform_training(args):
     """Launches the training wrapper script with arguments loaded from a configuration file.
 
@@ -101,6 +111,10 @@ def main():
         edit_config_file(args)
         return
 
+    if args.tensorboard_start:
+        start_tensorboard(args)
+        return
+
     perform_training(args)
 
 
@@ -129,6 +143,8 @@ def parse_args(argv):
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window.'
     )
+    options_parser.add_argument(
+        '--tensorboard-start', action='store_true', help='Start tensorboard server')
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
