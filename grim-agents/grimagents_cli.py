@@ -38,7 +38,7 @@ def edit_config_file(args):
 
 
 def start_tensorboard(args):
-    """ """
+    """Starts a new instance of tensorboard server in a new terminal window."""
 
     cwd = settings.get_project_folder_absolute()
     log_dir = f'--logdir={settings.get_summaries_folder()}'
@@ -69,7 +69,7 @@ def perform_training(args):
     )
 
     cwd = settings.get_project_folder_absolute()
-    command_util.execute_command(command, cwd, args.new_window)
+    command_util.execute_command(command, cwd, args.new_window, show_command=False)
 
 
 def override_configuration_values(configuration: dict, args: Namespace):
