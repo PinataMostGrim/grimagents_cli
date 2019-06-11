@@ -13,9 +13,9 @@ import sys
 from argparse import Namespace
 from pathlib import Path
 
-import grimagents.config as config_util
-import grimagents.command_util as command_util
-import grimagents.settings as settings
+from . import config as config_util
+from . import command_util as command_util
+from . import settings as settings
 
 
 def list_training_options():
