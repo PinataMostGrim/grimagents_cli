@@ -5,6 +5,7 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 - Optionally timestamp the training run-id
 - Optionally override loaded configuration arguments
 - Optionally launch training in a new console window
+- Optionally import the trained model into Unity project
 """
 
 import argparse
