@@ -1,5 +1,5 @@
-"""
-CLI application that wraps 'mlagents-learn' with some quality of life improvements.
+"""CLI application that wraps 'mlagents-learn' with some quality of life improvements.
+
 - Load arguments from a configuration file
 - Log training output to file
 - Optionally timestamp the training run-id
