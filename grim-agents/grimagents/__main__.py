@@ -94,8 +94,14 @@ def override_configuration_values(configuration: dict, args: Namespace):
         configuration = config_util.set_run_id(args.run_id, configuration)
     if args.num_envs is not None:
         configuration = config_util.set_num_envs(str(args.num_envs), configuration)
-    if args.no_graphics is not None:
-        configuration = config_util.set_no_graphics_enabled(str(args.no_graphics), configuration)
+
+    if args.graphics:
+        # Note: As the argument is 'no-graphics', false in this case means
+        # graphics are used.
+        configuration = config_util.set_no_graphics_enabled(False, configuration)
+    if args.no_graphics:
+        configuration = config_util.set_no_graphics_enabled(True, configuration)
+
     if args.timestamp:
         configuration = config_util.set_timestamp_enabled(True, configuration)
     if args.no_timestamp:
@@ -157,11 +163,14 @@ def parse_args(argv):
     overrides_parser.add_argument('--lesson', type=int)
     overrides_parser.add_argument('--run-id', type=str)
     overrides_parser.add_argument('--num-envs', type=int)
-    overrides_parser.add_argument('--no-graphics', type=bool)
 
-    group = overrides_parser.add_mutually_exclusive_group()
-    group.add_argument('--timestamp', action="store_true", help='Append timestamp to run-id. Overrides configuration setting.')
-    group.add_argument('--no-timestamp', action="store_true", help='Do not append timestamp to run-id. Overrides configuration setting.')
+    graphics_group = overrides_parser.add_mutually_exclusive_group()
+    graphics_group.add_argument('--graphics', action='store_true')
+    graphics_group.add_argument('--no-graphics', action='store_true')
+
+    timestamp_group = overrides_parser.add_mutually_exclusive_group()
+    timestamp_group.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id. Overrides configuration setting.')
+    timestamp_group.add_argument('--no-timestamp', action='store_true', help='Do not append timestamp to run-id. Overrides configuration setting.')
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
