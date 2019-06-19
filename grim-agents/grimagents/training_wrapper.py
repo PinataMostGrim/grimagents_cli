@@ -24,7 +24,7 @@ from subprocess import Popen, PIPE
 import settings as settings
 
 
-training_log = logging.getLogger('training_wrapper')
+training_log = logging.getLogger('grimagents.training_wrapper')
 
 
 def main():
@@ -237,12 +237,12 @@ def configure_log(run_id: str):
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "stream": "ext://sys.stderr",
+                "stream": "ext://sys.stdout",
                 "formatter": "display",
             },
             "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
         },
-        "loggers": {"training_wrapper": {"handlers": ["console", "file"]}},
+        "loggers": {"grimagents.training_wrapper": {"handlers": ["console", "file"]}},
         "root": {"level": "INFO"},
     }
 

@@ -7,6 +7,7 @@ See `training_wrapper.py -h` for usage options.
 """
 
 import json
+import logging
 
 from pathlib import Path
 from .command_util import open_file
@@ -37,6 +38,9 @@ _DEFAULT_CONFIG = {
     _NO_GRAPHICS_KEY: False,
     _TIMESTAMP_KEY: False,
 }
+
+
+config_log = logging.getLogger('grimagents.config')
 
 
 class ConfigurationError(Exception):
@@ -80,7 +84,7 @@ def create_config_file(config_path: Path):
     if not config_path.parent.exists():
         config_path.parent.mkdir(parents=True)
 
-    print(f'Creating configuration file \'{config_path}\'')
+    config_log.info(f'Creating configuration file \'{config_path}\'')
     with config_path.open(mode='w') as f:
         json.dump(get_default_config(), f, indent=4)
 
@@ -109,13 +113,13 @@ def load_config_file(config_path: Path):
         with config_path.open('r') as f:
             configuration = json.load(f)
     except FileNotFoundError as exception:
-        print(f'Configuration file \'{config_path}\' not found')
+        config_log.error(f'Configuration file \'{config_path}\' not found')
         raise exception
 
     if validate_configuration(configuration):
         loaded_config = configuration
     else:
-        print(f'Configuration file \'{config_path}\' is invalid')
+        config_log.error(f'Configuration file \'{config_path}\' is invalid')
         raise InvalidConfigurationError
 
     return loaded_config
@@ -142,7 +146,7 @@ def validate_configuration(configuration):
         try:
             default_config[key]
         except KeyError:
-            print(f'Configuration contains invalid key \'{key}\'')
+            config_log.error(f'Configuration contains invalid key \'{key}\'')
             is_valid_config = False
 
     # The only currently required key is 'trainer-config-path.'
@@ -151,7 +155,7 @@ def validate_configuration(configuration):
             raise KeyError
 
     except KeyError:
-        print(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
+        config_log.error(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
         is_valid_config = False
 
     return is_valid_config

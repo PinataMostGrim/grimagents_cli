@@ -1,5 +1,5 @@
-"""
-CLI application that wraps 'mlagents-learn' with some quality of life improvements.
+"""CLI application that wraps 'mlagents-learn' with some quality of life improvements.
+
 - Load arguments from a configuration file
 - Log training output to file
 - Optionally timestamp the training run-id
@@ -9,6 +9,8 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 """
 
 import argparse
+import logging
+import logging.config
 import sys
 
 from argparse import Namespace
@@ -163,7 +165,7 @@ def parse_args(argv):
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
-        prog='grimagents',
+        prog='grim-agents',
         description='CLI application that wraps Unity ML-Agents with some quality of life improvements.',
         parents=[options_parser, overrides_parser],
     )
@@ -190,5 +192,43 @@ def parse_args(argv):
     return args
 
 
+def configure_log():
+    """Configures logging for the grim-agents CLI.
+    """
+
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "display": {"style": "{", "format": "{levelname}: {message}"},
+            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "display",
+            },
+            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+        },
+        "loggers": {
+            "grimagents.config": {"handlers": ["console", "file"]},
+            "grimagents.command_util": {"handlers": ["console", "file"]},
+        },
+        "root": {"level": "INFO"},
+    }
+
+    log_folder = settings.get_log_folder_absolute()
+    if not log_folder.exists():
+        log_folder.mkdir(parents=True, exist_ok=True)
+
+    log_path = log_folder / 'grim-agents.log'
+
+    log_config['handlers']['file']['filename'] = log_path
+    logging.config.dictConfig(log_config)
+
+
 if __name__ == '__main__':
+    configure_log()
     main()
+    logging.shutdown()
