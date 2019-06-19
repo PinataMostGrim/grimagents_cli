@@ -237,7 +237,7 @@ def configure_log(run_id: str):
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "stream": "ext://sys.stderr",
+                "stream": "ext://sys.stdout",
                 "formatter": "display",
             },
             "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
