@@ -9,6 +9,7 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 """
 
 import argparse
+import logging
 import sys
 
 from argparse import Namespace
@@ -105,6 +106,7 @@ def override_configuration_values(configuration: dict, args: Namespace):
 def main():
 
     args = parse_args(sys.argv[1:])
+    configure_log()
 
     if args.list:
         list_training_options()
@@ -188,6 +190,42 @@ def parse_args(argv):
         args = parser.parse_args(unparsed_args, args)
 
     return args
+
+
+def configure_log():
+    """Configures logging for the grim-agents CLI.
+    """
+
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "display": {"style": "{", "format": "{message}"},
+            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "display",
+            },
+            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+        },
+        "loggers": {
+            "config": {"handlers": ["console", "file"]},
+            "command_util": {"handlers": ["console", "file"]},
+        },
+        "root": {"level": "INFO"},
+    }
+
+    log_folder = settings.get_log_folder_absolute()
+    if not log_folder.exists():
+        log_folder.mkdir(parents=True, exist_ok=True)
+
+    log_path = log_folder / 'grim-agents.log'
+
+    log_config['handlers']['file']['filename'] = log_path
+    logging.config.dictConfig(log_config)
 
 
 if __name__ == '__main__':
