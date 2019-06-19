@@ -24,7 +24,7 @@ from subprocess import Popen, PIPE
 import settings as settings
 
 
-training_log = logging.getLogger('training_wrapper')
+training_log = logging.getLogger(__name__)
 
 
 def main():

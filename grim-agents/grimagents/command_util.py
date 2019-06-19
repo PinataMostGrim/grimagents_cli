@@ -1,11 +1,15 @@
 """Facilitates executing system commands and opening files."""
 
+import logging
 import os
 import subprocess
 
 from io import StringIO
 from pathlib import Path
 from subprocess import PIPE, CREATE_NEW_CONSOLE
+
+
+command_log = logging.getLogger(__name__)
 
 
 def open_file(file_path: Path):
@@ -15,7 +19,7 @@ def open_file(file_path: Path):
       file_path: Path: The file to open.
     """
 
-    print(f'\nOpening \'{file_path}\'\n')
+    command_log.info(f'\nOpening \'{file_path}\'\n')
 
     try:
         # Note: Open file in Windows
@@ -31,7 +35,7 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     echos the provided command."""
 
     if show_command:
-        print(' '.join(command))
+        command_log.info(' '.join(command))
 
     if new_window:
         command = ['cmd', '/K'] + command
@@ -48,14 +52,14 @@ def execute_command_and_capture(command: list, cwd=None, show_command=True):
     """
 
     if show_command:
-        print(' '.join(command))
+        command_log.info(' '.join(command))
 
     with subprocess.Popen(
         command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True
     ) as p, StringIO() as buf:
 
         for line in p.stdout:
-            print(line, end='')
+            command_log.info(line, end='')
             buf.write(line)
 
         output = buf.getvalue()
