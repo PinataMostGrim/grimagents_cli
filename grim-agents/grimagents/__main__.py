@@ -10,6 +10,7 @@ CLI application that wraps 'mlagents-learn' with some quality of life improvemen
 
 import argparse
 import logging
+import logging.config
 import sys
 
 from argparse import Namespace
@@ -106,7 +107,6 @@ def override_configuration_values(configuration: dict, args: Namespace):
 def main():
 
     args = parse_args(sys.argv[1:])
-    configure_log()
 
     if args.list:
         list_training_options()
@@ -200,7 +200,7 @@ def configure_log():
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "display": {"style": "{", "format": "{message}"},
+            "display": {"style": "{", "format": "{levelname}: {message}"},
             "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
         },
         "handlers": {
@@ -212,8 +212,8 @@ def configure_log():
             "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
         },
         "loggers": {
-            "config": {"handlers": ["console", "file"]},
-            "command_util": {"handlers": ["console", "file"]},
+            "grimagents.config": {"handlers": ["console", "file"]},
+            "grimagents.command_util": {"handlers": ["console", "file"]},
         },
         "root": {"level": "INFO"},
     }
@@ -229,4 +229,6 @@ def configure_log():
 
 
 if __name__ == '__main__':
+    configure_log()
     main()
+    logging.shutdown()

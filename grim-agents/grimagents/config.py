@@ -40,7 +40,7 @@ _DEFAULT_CONFIG = {
 }
 
 
-config_log = logging.getLogger(__name__)
+config_log = logging.getLogger('grimagents.config')
 
 
 class ConfigurationError(Exception):

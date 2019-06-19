@@ -9,7 +9,7 @@ from pathlib import Path
 from subprocess import PIPE, CREATE_NEW_CONSOLE
 
 
-command_log = logging.getLogger(__name__)
+command_log = logging.getLogger('grimagents.command_util')
 
 
 def open_file(file_path: Path):
@@ -19,7 +19,7 @@ def open_file(file_path: Path):
       file_path: Path: The file to open.
     """
 
-    command_log.info(f'\nOpening \'{file_path}\'\n')
+    command_log.info(f'Opening \'{file_path}\'')
 
     try:
         # Note: Open file in Windows
