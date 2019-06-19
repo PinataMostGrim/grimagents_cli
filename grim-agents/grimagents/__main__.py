@@ -93,8 +93,10 @@ def override_configuration_values(configuration: dict, args: Namespace):
         configuration = config_util.set_num_envs(str(args.num_envs), configuration)
     if args.no_graphics is not None:
         configuration = config_util.set_no_graphics_enabled(str(args.no_graphics), configuration)
-    if args.timestamp is not None:
-        configuration = config_util.set_timestamp_enabled(str(args.timestamp), configuration)
+    if args.timestamp:
+        configuration = config_util.set_timestamp_enabled(True, configuration)
+    if args.no_timestamp:
+        configuration = config_util.set_timestamp_enabled(False, configuration)
 
     return configuration
 
@@ -153,7 +155,10 @@ def parse_args(argv):
     overrides_parser.add_argument('--run-id', type=str)
     overrides_parser.add_argument('--num-envs', type=int)
     overrides_parser.add_argument('--no-graphics', type=bool)
-    overrides_parser.add_argument('--timestamp', type=bool, help='Append timestamp to run-id')
+
+    group = overrides_parser.add_mutually_exclusive_group()
+    group.add_argument('--timestamp', action="store_true", help='Append timestamp to run-id. Overrides configuration setting.')
+    group.add_argument('--no-timestamp', action="store_true", help='Do not append timestamp to run-id. Overrides configuration setting.')
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
