@@ -1,11 +1,17 @@
-"""CLI application that wraps 'mlagents-learn' with some quality of life improvements.
+"""CLI application that loads training arguments from a configuration file and sends
+them to the mlagents-learn training wrapper. This script aims to automate several
+repetitive training tasks.
 
-- Load arguments from a configuration file
-- Log training output to file
-- Optionally timestamp the training run-id
-- Optionally override loaded configuration arguments
+- Load training arguments from a configuration file
+- Optionally override loaded configuration arguments with command line arguments
+- Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
-- Optionally import the trained model into Unity project
+
+See training_wrapper for the features it provides.
+
+Requirements:
+- Windows
+- Pipenv and a virtual environment setup for the MLAgents project
 """
 
 import argparse
@@ -152,7 +158,7 @@ def parse_args(argv):
         help='Open a configuration file for editing',
     )
     options_parser.add_argument(
-        '--new-window', action='store_true', help='Run training process in a new console window.'
+        '--new-window', action='store_true', help='Run training process in a new console window'
     )
     options_parser.add_argument(
         '--tensorboard-start', action='store_true', help='Start tensorboard server')
@@ -180,12 +186,12 @@ def parse_args(argv):
     )
 
     parser.add_argument(
-        'configuration_file', type=str, help='Configuration file to load training arguments from.'
+        'configuration_file', type=str, help='Configuration file to load training arguments from'
     )
     parser.add_argument(
         'args',
         nargs=argparse.REMAINDER,
-        help='Additional arguments applied to training (ex. --slow, --debug, --load).',
+        help='Additional arguments applied to training (ex. --slow, --debug, --load)',
     )
 
     args, unparsed_args = options_parser.parse_known_args()

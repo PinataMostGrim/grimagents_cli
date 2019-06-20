@@ -1,9 +1,10 @@
 """Loads configuration files and fetches loaded configuration values.
 
-See mlagents-learn for a description of most options.
+# Relative path from MLAgents' project root folder to the summaries folder.
 
-The `--timestamp` and `--export-path` options apply to training_wrapper.
-See `training_wrapper.py -h` for usage options.
+Notes:
+- All path configuration values should be a relative path from MLAgents' project root folder to the target asset or folder
+- The `--timestamp` and `--export-path` options apply to training_wrapper.
 """
 
 import json

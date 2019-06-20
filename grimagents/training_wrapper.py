@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""
-CLI application that wraps 'mlagents-learn' with quality of life improvements.
+"""CLI application that wraps 'mlagents-learn' with several quality of life improvements.
+
 - Initiates training with mlagents-learn
-- Logs training output to file
-- Optionally timestamps run-id
-- Optionally exports trained models to another location
+- Logs mlagents-learn output to file
+- Optionally exports trained models to another location after training finishes (for example, into a Unity project)
 
 Notes:
-- The training process is executed with the project's root folder set as the current working directory.
+- training_wrapper can be executed as a stand-alone script for logging and export features
+- The training process is executed with the project's root folder set as the current working directory
+- Potentially works with Linux (untested)
 """
 
 import argparse
@@ -37,7 +38,7 @@ def main():
         timestamp = get_timestamp()
         run_id = f'{run_id}-{timestamp}'
 
-    # Note: We use run_id from args in order to exclude the optional timestamp
+    # Note: We use run_id from args in order to exclude the potential timestamp
     # from the log file name.
     configure_log(args.run_id)
 
@@ -206,12 +207,12 @@ def parse_args(argv):
     )
 
     parser.add_argument(
-        'trainer_config_path', type=str, help='Configuration file that holds brain hyperparameters.'
+        'trainer_config_path', type=str, help='Configuration file that holds brain hyperparameters'
     )
     parser.add_argument(
         'args',
         nargs=argparse.REMAINDER,
-        help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load).',
+        help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load)',
     )
 
     wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
