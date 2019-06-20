@@ -1,0 +1,16 @@
+{
+    "trainer-config-path": "config\\3DBall.yaml",
+    "--env": "builds\\3DBall\\Unity Environment.exe",
+    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+    "--curriculum": "",
+    "--keep-checkpoints": "",
+    "--lesson": "",
+    "--run-id": "ball001",
+    "--num-runs": "",
+    "--save-freq": "",
+    "--seed": "",
+    "--base-port": "",
+    "--num-envs": "",
+    "--no-graphics": false,
+    "--timestamp": true
+}
