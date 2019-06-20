@@ -3,28 +3,28 @@
 from pathlib import Path
 
 
-# Relative path to the project's root folder from setting.py's location.
+# Relative path from settings.py to the MLAgents' project root folder.
 _PROJECT_ROOT_RELATIVE_PATH = '..\\..'
 
-# Project relative path to the summaries folder.
+# Relative path from MLAgents' project root folder to the summaries folder.
 _SUMMARIES_RELATIVE_PATH = 'summaries'
 
-# Relative path to the grim-agents log folder.
+# Relative path from MLAgents' project root folder to the log folder.
 _LOG_FOLDER_PATH = 'grim-agents\\logs'
 
-# Relative path to the grim-agents trainer wrapper script.
+# Relative path from MLAgents' project root folder to trainer_wrapper.py.
 _TRAINING_WRAPPER_PATH = 'grim-agents\\grimagents\\training_wrapper.py'
 
 
 def get_project_folder_absolute():
-    """Returns the absolute path for the project's root folder."""
+    """Returns an absolute path for the MLAgents' project root folder."""
 
     relative_path = Path(__file__).parent / _PROJECT_ROOT_RELATIVE_PATH
     return relative_path.resolve()
 
 
 def get_summaries_folder():
-    """Returns project relative path to the summaries folder"""
+    """Returns project relative path to the summaries folder."""
 
     return Path(_SUMMARIES_RELATIVE_PATH)
 
