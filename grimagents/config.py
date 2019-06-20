@@ -52,12 +52,6 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-class EmptyConfigurationError(ConfigurationError):
-    """An error occurred because configuration values were accessed before a
-    configuration was loaded.
-    """
-
-
 def edit_config_file(config_path: Path):
     """Opens the specified configuration file with the system's default editor.
 
