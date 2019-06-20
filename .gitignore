@@ -1,0 +1,13 @@
+# Python files
+__pycache__/
+
+# Sublime Text files
+*.sublime-project
+*.sublime-workspace
+
+# VSCode files
+*.vscode/
+*.code-workspace
+
+# Misc files
+logs/*
