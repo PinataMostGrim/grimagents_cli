@@ -3,16 +3,16 @@
 from pathlib import Path
 
 
-# Relative path from settings.py to the MLAgents' project root folder.
+# Relative path from settings.py to the MLAgents project root folder.
 _PROJECT_ROOT_RELATIVE_PATH = '..\\..'
 
-# Relative path from MLAgents' project root folder to the summaries folder.
+# Relative path from project root to the summaries folder.
 _SUMMARIES_RELATIVE_PATH = 'summaries'
 
-# Relative path from MLAgents' project root folder to the log folder.
+# Relative path from project root to the log folder.
 _LOG_FOLDER_PATH = 'grim-agents\\logs'
 
-# Relative path from MLAgents' project root folder to trainer_wrapper.py.
+# Relative path from project root to trainer_wrapper.py.
 _TRAINING_WRAPPER_PATH = 'grim-agents\\grimagents\\training_wrapper.py'
 
 # Relative path from project root to the file that stores the last run command.

@@ -57,8 +57,6 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
 def execute_command_and_capture(command: list, cwd=None, show_command=True):
     """Executes a command in terminal, captures output,
     prints it, and returns it.
-
-    source: https://stackoverflow.com/a/25755038
     """
 
     if show_command:
@@ -78,6 +76,7 @@ def execute_command_and_capture(command: list, cwd=None, show_command=True):
 
 
 def create_history_file():
+    """Creates or overwrites the training command history file."""
 
     history_file = settings.get_history_file_path()
     history = {"history": []}
@@ -87,6 +86,11 @@ def create_history_file():
 
 
 def load_history():
+    """Loads a list of training commands executed from the history file.
+
+    Returns:
+      The training command history list.
+    """
 
     history_file = settings.get_history_file_path()
 
@@ -100,6 +104,11 @@ def load_history():
 
 
 def save_to_history(command: list):
+    """Saves a training command to the history file.
+
+    Args:
+      command: list: Training command to save.
+    """
 
     history_file = settings.get_history_file_path()
     dict = load_history()
@@ -114,6 +123,14 @@ def save_to_history(command: list):
 
 
 def load_last_history():
+    """Loads the last training command executed from the history file.
+
+    Returns:
+      The last training command executed as a list of arguments.
+
+    Raises:
+      CommandUtilError: The history file is empty.
+    """
 
     dict = load_history()
     try:

@@ -6,6 +6,7 @@ repetitive training tasks.
 - Optionally override loaded configuration arguments with command line arguments
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Resume the last training run
 
 See training_wrapper for the features it provides.
 
@@ -117,15 +118,30 @@ def override_configuration_values(configuration: dict, args: Namespace):
 
 
 def resume_training(args):
+    """Launches the training wrapper script with the arguments used by the
+    last training command executed.
+
+    Args:
+      args: Namespace: A Namespace object containing parsed arguments.
+    """
 
     command = command_util.load_last_history()
-    command = prepare_history_command()
+    command = prepare_resume_command()
 
     cwd = settings.get_project_folder_absolute()
     command_util.execute_command(command, cwd, args.new_window, show_command=False)
 
 
-def prepare_history_command(command: list):
+def prepare_resume_command(command: list):
+    """Processes a command loaded from history and prepares it as a
+    resume training command.
+
+    Args:
+      command: list: A command list loaded from history.
+
+    Returns:
+      A configured resume training command.
+    """
 
     if '--timestamp' in command:
         command.remove('--timestamp')
