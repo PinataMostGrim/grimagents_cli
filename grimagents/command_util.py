@@ -111,3 +111,13 @@ def save_to_history(command: list):
 
     with history_file.open(mode='w') as file:
         json.dump(dict, file, indent=4)
+
+
+def load_last_history():
+
+    dict = load_history()
+    try:
+        return dict['history'][0]
+    except IndexError:
+        command_log.error('History file is empty')
+        raise CommandUtilError('History file is empty')

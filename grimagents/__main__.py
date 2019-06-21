@@ -116,6 +116,32 @@ def override_configuration_values(configuration: dict, args: Namespace):
     return configuration
 
 
+def resume_training(args):
+
+    command = command_util.load_last_history()
+    command = prepare_history_command()
+
+    cwd = settings.get_project_folder_absolute()
+    command_util.execute_command(command, cwd, args.new_window, show_command=False)
+
+
+def prepare_history_command(command: list):
+
+    if '--timestamp' in command:
+        command.remove('--timestamp')
+
+    if '--load' not in command:
+        command.append('--load')
+
+    # Note: We slice off the first three elements as they represent a call
+    # to mlagents-learn and construct a call to training_wrapper instead.
+    command = command[3:]
+    trainer_path = settings.get_training_wrapper_path()
+    command = ['pipenv', 'run', 'python', str(trainer_path)] + command
+
+    return command
+
+
 def main():
 
     args = parse_args(sys.argv[1:])
@@ -130,6 +156,10 @@ def main():
 
     if args.tensorboard_start:
         start_tensorboard(args)
+        return
+
+    if args.resume:
+        resume_training(args)
         return
 
     perform_training(args)
@@ -162,6 +192,8 @@ def parse_args(argv):
     )
     options_parser.add_argument(
         '--tensorboard-start', action='store_true', help='Start tensorboard server')
+    options_parser.add_argument(
+        '--resume', action='store_true', help='Resume the last training run')
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
