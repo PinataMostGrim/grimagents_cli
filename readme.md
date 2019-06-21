@@ -101,9 +101,35 @@ optional arguments:
 ```
 
 
+## Configuration
+Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` is the only mandatory configuration value. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+
+All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
+
+The `--timestamp` argument is consumed by `training_wrapper` and not passed on to `mlagents-learn`.
+
+#### Example configuration file
+```json
+{
+    "trainer-config-path": "config\\3DBall.yaml",
+    "--env": "builds\\3DBall\\Unity Environment.exe",
+    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+    "--curriculum": "",
+    "--keep-checkpoints": "",
+    "--lesson": "",
+    "--run-id": "3DBall",
+    "--num-runs": "",
+    "--save-freq": "",
+    "--seed": "",
+    "--base-port": "",
+    "--num-envs": "",
+    "--no-graphics": false,
+    "--timestamp": true
+}
+```
+
+
 ## Notes
 Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the project's root folder set as the current working directory. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
-
-All paths stored in configuration files should be relative paths from the MLAgents' project root folder to the target asset or folder. An example configuration file is provided at `config\3DBall.json`.
 
 Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of mlagent-learn's output is sent to stdout so only that portion will be captured in the log file.
