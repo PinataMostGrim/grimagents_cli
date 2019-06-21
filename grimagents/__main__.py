@@ -78,8 +78,6 @@ def perform_training(args):
     )
 
     cwd = settings.get_project_folder_absolute()
-
-    command_util.save_to_history(command)
     command_util.execute_command(command, cwd, args.new_window, show_command=False)
 
 
