@@ -15,6 +15,9 @@ _LOG_FOLDER_PATH = 'grim-agents\\logs'
 # Relative path from MLAgents' project root folder to trainer_wrapper.py.
 _TRAINING_WRAPPER_PATH = 'grim-agents\\grimagents\\training_wrapper.py'
 
+# Relative path from project root to the file that stores the last run command.
+_RUN_HISTORY_FILE = 'grim-agents\\grimagents\\history'
+
 
 def get_project_folder_absolute():
     """Returns an absolute path for the MLAgents' project root folder."""
@@ -45,3 +48,7 @@ def get_training_wrapper_path():
     """Returns project relative path to the training wrapper."""
 
     return Path(_TRAINING_WRAPPER_PATH)
+
+
+def get_history_file_path():
+    return get_project_folder_absolute() / _RUN_HISTORY_FILE
