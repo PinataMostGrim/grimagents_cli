@@ -90,9 +90,7 @@ def main():
         end_time = time.perf_counter()
         training_duration = get_human_readable_duration(end_time - start_time)
 
-        training_log.info(
-            f'\nTraining run \'{run_id}\' ended after {training_duration}.'
-        )
+        training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 
         if p.returncode == 0:
             training_log.info('Training completed successfully.')

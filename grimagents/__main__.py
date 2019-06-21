@@ -191,9 +191,11 @@ def parse_args(argv):
         '--new-window', action='store_true', help='Run training process in a new console window'
     )
     options_parser.add_argument(
-        '--tensorboard-start', action='store_true', help='Start tensorboard server')
+        '--tensorboard-start', action='store_true', help='Start tensorboard server'
+    )
     options_parser.add_argument(
-        '--resume', action='store_true', help='Resume the last training run')
+        '--resume', action='store_true', help='Resume the last training run'
+    )
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
@@ -207,8 +209,16 @@ def parse_args(argv):
     graphics_group.add_argument('--no-graphics', action='store_true')
 
     timestamp_group = overrides_parser.add_mutually_exclusive_group()
-    timestamp_group.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id. Overrides configuration setting.')
-    timestamp_group.add_argument('--no-timestamp', action='store_true', help='Do not append timestamp to run-id. Overrides configuration setting.')
+    timestamp_group.add_argument(
+        '--timestamp',
+        action='store_true',
+        help='Append timestamp to run-id. Overrides configuration setting.',
+    )
+    timestamp_group.add_argument(
+        '--no-timestamp',
+        action='store_true',
+        help='Do not append timestamp to run-id. Overrides configuration setting.',
+    )
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(

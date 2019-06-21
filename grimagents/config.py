@@ -11,6 +11,7 @@ import json
 import logging
 
 from pathlib import Path
+
 from .command_util import open_file
 
 
