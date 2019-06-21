@@ -10,4 +10,5 @@ __pycache__/
 *.code-workspace
 
 # Misc files
+grimagents/history
 logs/*

@@ -30,8 +30,8 @@ Training can be initiated several ways:
 ### grimagents
 ```
 usage: grim-agents [-h] [--list] [--edit-config FILE] [--new-window]
-                   [--tensorboard-start] [--env ENV] [--lesson LESSON]
-                   [--run-id RUN_ID] [--num-envs NUM_ENVS]
+                   [--tensorboard-start] [--resume] [--env ENV]
+                   [--lesson LESSON] [--run-id RUN_ID] [--num-envs NUM_ENVS]
                    [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                    configuration_file ...
 
@@ -49,6 +49,7 @@ optional arguments:
   --edit-config FILE   Open a configuration file for editing
   --new-window         Run training process in a new console window
   --tensorboard-start  Start tensorboard server
+  --resume             Resume the last training run
   --env ENV
   --lesson LESSON
   --run-id RUN_ID

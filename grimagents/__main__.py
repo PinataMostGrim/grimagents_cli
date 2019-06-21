@@ -6,6 +6,7 @@ repetitive training tasks.
 - Optionally override loaded configuration arguments with command line arguments
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Resume the last training run
 
 See training_wrapper for the features it provides.
 
@@ -116,6 +117,47 @@ def override_configuration_values(configuration: dict, args: Namespace):
     return configuration
 
 
+def resume_training(args):
+    """Launches the training wrapper script with the arguments used by the
+    last training command executed.
+
+    Args:
+      args: Namespace: A Namespace object containing parsed arguments.
+    """
+
+    command = command_util.load_last_history()
+    command = prepare_resume_command()
+
+    cwd = settings.get_project_folder_absolute()
+    command_util.execute_command(command, cwd, args.new_window, show_command=False)
+
+
+def prepare_resume_command(command: list):
+    """Processes a command loaded from history and prepares it as a
+    resume training command.
+
+    Args:
+      command: list: A command list loaded from history.
+
+    Returns:
+      A configured resume training command.
+    """
+
+    if '--timestamp' in command:
+        command.remove('--timestamp')
+
+    if '--load' not in command:
+        command.append('--load')
+
+    # Note: We slice off the first three elements as they represent a call
+    # to mlagents-learn and construct a call to training_wrapper instead.
+    command = command[3:]
+    trainer_path = settings.get_training_wrapper_path()
+    command = ['pipenv', 'run', 'python', str(trainer_path)] + command
+
+    return command
+
+
 def main():
 
     args = parse_args(sys.argv[1:])
@@ -130,6 +172,10 @@ def main():
 
     if args.tensorboard_start:
         start_tensorboard(args)
+        return
+
+    if args.resume:
+        resume_training(args)
         return
 
     perform_training(args)
@@ -161,7 +207,11 @@ def parse_args(argv):
         '--new-window', action='store_true', help='Run training process in a new console window'
     )
     options_parser.add_argument(
-        '--tensorboard-start', action='store_true', help='Start tensorboard server')
+        '--tensorboard-start', action='store_true', help='Start tensorboard server'
+    )
+    options_parser.add_argument(
+        '--resume', action='store_true', help='Resume the last training run'
+    )
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
@@ -175,8 +225,16 @@ def parse_args(argv):
     graphics_group.add_argument('--no-graphics', action='store_true')
 
     timestamp_group = overrides_parser.add_mutually_exclusive_group()
-    timestamp_group.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id. Overrides configuration setting.')
-    timestamp_group.add_argument('--no-timestamp', action='store_true', help='Do not append timestamp to run-id. Overrides configuration setting.')
+    timestamp_group.add_argument(
+        '--timestamp',
+        action='store_true',
+        help='Append timestamp to run-id. Overrides configuration setting.',
+    )
+    timestamp_group.add_argument(
+        '--no-timestamp',
+        action='store_true',
+        help='Do not append timestamp to run-id. Overrides configuration setting.',
+    )
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(

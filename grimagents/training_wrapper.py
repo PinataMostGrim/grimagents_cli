@@ -23,6 +23,7 @@ from pathlib import Path
 from subprocess import Popen, PIPE
 
 import settings as settings
+import grimagents.command_util as command_util
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -31,7 +32,6 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 def main():
 
     args = parse_args(sys.argv[1:])
-    cwd = settings.get_project_folder_absolute()
     run_id = args.run_id
 
     if args.timestamp:
@@ -57,6 +57,11 @@ def main():
         run_id,
     ] + args.args
 
+    # Note: Training run history must be saved from training_wrapper as this is where
+    # the potential time-stamp value is decided.
+    command_util.save_to_history(command)
+
+    cwd = settings.get_project_folder_absolute()
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
@@ -85,9 +90,7 @@ def main():
         end_time = time.perf_counter()
         training_duration = get_human_readable_duration(end_time - start_time)
 
-        training_log.info(
-            f'\nTraining run \'{run_id}\' ended after {training_duration}.'
-        )
+        training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 
         if p.returncode == 0:
             training_log.info('Training completed successfully.')
