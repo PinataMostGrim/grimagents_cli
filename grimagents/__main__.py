@@ -126,7 +126,7 @@ def resume_training(args):
     """
 
     command = command_util.load_last_history()
-    command = prepare_resume_command()
+    command = prepare_resume_command(command)
 
     cwd = settings.get_project_folder_absolute()
     command_util.execute_command(command, cwd, args.new_window, show_command=False)
