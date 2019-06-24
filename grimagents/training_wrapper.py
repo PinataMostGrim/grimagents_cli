@@ -69,14 +69,14 @@ def main():
                 if match:
                     exported_brains.append(match.group(1))
 
-        if args.export_path:
-            export_brains(exported_brains, Path(args.export_path))
-
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
         raise
 
     finally:
+        if args.export_path:
+            export_brains(exported_brains, Path(args.export_path))
+
         end_time = time.perf_counter()
         training_duration = helpers.get_human_readable_duration(end_time - start_time)
 
