@@ -31,7 +31,7 @@ from . import helpers as helpers
 from . import settings as settings
 
 
-class Command():
+class Command:
     def __init__(self):
         self.cwd = settings.get_project_folder_absolute()
         self.new_window = False
@@ -39,7 +39,9 @@ class Command():
 
     def execute(self, args: Namespace):
         self.command = self.create_command(args)
-        command_util.execute_command(self.command, self.cwd, new_window=self.new_window, show_command=self.show_command)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
 
     def create_command(self, args):
         return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
@@ -71,11 +73,14 @@ class StartTensorboard(Command):
 
 class PerformTraining(Command):
     """Launches the training wrapper script with arguments loaded from a configuration file."""
+
     def execute(self, args: Namespace):
         self.command = self.create_command(args)
 
         command_util.save_to_history(self.command)
-        command_util.execute_command(self.command, self.cwd, new_window=self.new_window, show_command=self.show_command)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
 
     def create_command(self, args):
 
