@@ -18,11 +18,11 @@ import re
 import sys
 import time
 
-from datetime import datetime
 from pathlib import Path
 from subprocess import Popen, PIPE
 
 import settings as settings
+import helpers as helpers
 import grimagents.command_util as command_util
 
 
@@ -35,7 +35,7 @@ def main():
     run_id = args.run_id
 
     if args.timestamp:
-        timestamp = get_timestamp()
+        timestamp = helpers.get_timestamp()
         run_id = f'{run_id}-{timestamp}'
 
     # Note: We use run_id from args in order to exclude the potential timestamp
@@ -88,7 +88,7 @@ def main():
 
     finally:
         end_time = time.perf_counter()
-        training_duration = get_human_readable_duration(end_time - start_time)
+        training_duration = helpers.get_human_readable_duration(end_time - start_time)
 
         training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 
@@ -103,44 +103,6 @@ def main():
         training_log.info('')
 
         logging.shutdown()
-
-
-def get_timestamp():
-    """Fetch the current time as a string.
-
-    Returns:
-      The current time as a string.
-    """
-
-    now = datetime.now()
-    return now.strftime('%Y-%m-%d_%H-%M-%S')
-
-
-def get_human_readable_duration(seconds):
-    """Parses seconds into a human readable string.
-
-    Returns:
-      A human readable string.
-    """
-
-    seconds = int(seconds)
-    days, rem = divmod(seconds, 86400)
-    hours, rem = divmod(rem, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    if seconds < 1:
-        seconds = 1
-
-    locals_ = locals()
-    magnitudes_str = (
-        f'{int(locals_[magnitude])} {magnitude}'
-        for magnitude in ('days', 'hours', 'minutes', 'seconds')
-        if locals_[magnitude]
-    )
-
-    result = ", ".join(magnitudes_str)
-
-    return result
 
 
 def export_brains(brains: list, export_path: Path):
