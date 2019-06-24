@@ -1,10 +1,9 @@
-"""Loads configuration files and fetches loaded configuration values.
-
-# Relative path from MLAgents' project root folder to the summaries folder.
+"""Loads configuration files, fetches loaded configuration values and parses
+training arguments from configuration values.
 
 Notes:
 - All path configuration values should be a relative path from MLAgents' project root folder to the target asset or folder
-- The `--timestamp` and `--export-path` options apply to training_wrapper.
+- `--export-path` and `--logname` configuration values apply to training_wrapper
 """
 
 import json
@@ -23,6 +22,7 @@ _RUN_ID_KEY = '--run-id'
 _NUM_ENVS_KEY = '--num-envs'
 _NO_GRAPHICS_KEY = '--no-graphics'
 _TIMESTAMP_KEY = '--timestamp'
+_LOG_FILE_NAME = '--log-filename'
 
 _DEFAULT_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
@@ -39,6 +39,7 @@ _DEFAULT_CONFIG = {
     _NUM_ENVS_KEY: '',
     _NO_GRAPHICS_KEY: False,
     _TIMESTAMP_KEY: False,
+    _LOG_FILE_NAME: None,
 }
 
 
@@ -237,4 +238,16 @@ def get_timestamp_enabled(configuration):
 def set_timestamp_enabled(value: bool, configuration):
 
     configuration[_TIMESTAMP_KEY] = value
+    return configuration
+
+
+def get_log_filename(configuration):
+    try:
+        return configuration[_LOG_FILE_NAME]
+    except KeyError:
+        return None
+
+
+def set_log_filename(value: str, configuration):
+    configuration[_LOG_FILE_NAME] = value
     return configuration
