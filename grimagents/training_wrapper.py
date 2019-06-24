@@ -23,7 +23,6 @@ from subprocess import Popen, PIPE
 
 import settings as settings
 import helpers as helpers
-import grimagents.command_util as command_util
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -34,8 +33,8 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    # TODO: Parse out log name from args. Log name shouldn't have a timestamp.
-    configure_log(args.run_id)
+    log_filename = args.log_filename if args.log_filename else run_id
+    configure_logging(log_filename)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
@@ -92,7 +91,6 @@ def main():
 
         training_log.info('---------------------------------------------------------------')
         training_log.info('')
-
         logging.shutdown()
 
 
@@ -150,6 +148,9 @@ def parse_args(argv):
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'
     )
+    wrapper_parser.add_argument(
+        '--log-filename', type=str, help='Write log output to this file. Defaults to run-id.'
+    )
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
@@ -172,11 +173,11 @@ def parse_args(argv):
     return args
 
 
-def configure_log(run_id: str):
+def configure_logging(log_filename: str):
     """Configures logging for a training session.
 
     Args:
-      run_id: str: The training session's run-id
+      log_filename: str: The training session's run-id
     """
 
     log_config = {
@@ -202,11 +203,11 @@ def configure_log(run_id: str):
     if not log_folder.exists():
         log_folder.mkdir(parents=True, exist_ok=True)
 
-    run_id = Path(run_id)
-    if not run_id.suffix == '.log':
-        run_id = run_id.with_suffix('.log')
+    log_filename = Path(log_filename)
+    if not log_filename.suffix == '.log':
+        log_filename = log_filename.with_suffix('.log')
 
-    log_path = log_folder / run_id.name
+    log_path = log_folder / log_filename.name
 
     log_config['handlers']['file']['filename'] = log_path
     logging.config.dictConfig(log_config)

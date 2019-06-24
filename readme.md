@@ -81,8 +81,8 @@ grimagents grim-agents\config\3DBall.json --run-id 3DBall-2019-06-20_19-23-58 --
 
 ### training_wrapper
 ```
-usage: training_wrapper [-h] [--run-id <run-id>] [--timestamp]
-                        [--export-path EXPORT_PATH]
+usage: training_wrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
+                        [--log-filename LOG_FILENAME]
                         trainer_config_path ...
 
 CLI application that wraps mlagents-learn with quality of life improvements.
@@ -95,15 +95,15 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --run-id <run-id>     Run id for the training session
-  --timestamp           Append a timestamp to the run-id. Timestamp will not
-                        be applied to log file name.
   --export-path EXPORT_PATH
                         Export trained models to this path
+  --log-filename LOG_FILENAME
+                        Write log output to this file. Defaults to run-id.
 ```
 
 
 ## Configuration
-Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` is the only mandatory configuration value. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
 All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
 

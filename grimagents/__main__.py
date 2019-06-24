@@ -91,8 +91,14 @@ class PerformTraining(Command):
         config = self.override_configuration_values(config, args)
 
         if config_util.get_timestamp_enabled(config):
-            timestamp = helpers.get_timestamp()
             run_id = config_util.get_run_id(config)
+            # Note: If a log filename isn't configured, we explicitly set it
+            # to the run_id before appending a timestamp to reduce the
+            # number of log files being generated.
+            if not config_util.get_log_filename(config):
+                config = config_util.set_log_filename(run_id, config)
+
+            timestamp = helpers.get_timestamp()
             run_id = f'{run_id}-{timestamp}'
             config = config_util.set_run_id(run_id, config)
 
@@ -241,7 +247,7 @@ def parse_args(argv):
     return args
 
 
-def configure_log():
+def configure_logging():
     """Configures logging for the grim-agents CLI.
     """
 
@@ -278,6 +284,6 @@ def configure_log():
 
 
 if __name__ == '__main__':
-    configure_log()
+    configure_logging()
     main()
     logging.shutdown()
