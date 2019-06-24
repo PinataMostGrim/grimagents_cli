@@ -28,134 +28,108 @@ from . import command_util as command_util
 from . import settings as settings
 
 
-def list_training_options():
+class Command():
+    def __init__(self):
+        self.cwd = settings.get_project_folder_absolute()
+        self.new_window = False
+
+    def execute(self, args: Namespace):
+        self.command = self.create_command(args)
+        command_util.execute_command(self.command, self.cwd, new_window=self.new_window)
+
+    def create_command(self, args):
+        return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
+
+
+class ListTrainingOptions(Command):
     """Outputs mlagents-learn usage options."""
 
-    cwd = settings.get_project_folder_absolute()
-    command = ['pipenv', 'run', 'mlagents-learn', '--help']
-    command_util.execute_command(command, cwd)
+    def create_command(self, args):
+        return ['pipenv', 'run', 'mlagents-learn', '--help']
 
 
-def edit_config_file(args):
-    """Opens a configuration file for editing.
+class EditConfigFile(Command):
+    """Opens a configuration file for editing."""
 
-    Args:
-      args: Namespace: A Namespace object containing parsed arguments.
-    """
-
-    config_path = Path(args.edit_config)
-    config_util.edit_config_file(config_path)
+    def execute(self, args):
+        config_path = Path(args.edit_config)
+        config_util.edit_config_file(config_path)
 
 
-def start_tensorboard(args):
+class StartTensorboard(Command):
     """Starts a new instance of tensorboard server in a new terminal window."""
 
-    cwd = settings.get_project_folder_absolute()
-    log_dir = f'--logdir={settings.get_summaries_folder()}'
-    command = ['pipenv', 'run', 'tensorboard', log_dir]
-
-    command_util.execute_command(command, cwd, new_window=True)
-
-
-def perform_training(args):
-    """Launches the training wrapper script with arguments loaded from a configuration file.
-
-    Args:
-      args: Namespace: A Namespace object containing parsed arguments.
-    """
-
-    trainer_path = settings.get_training_wrapper_path()
-
-    config_path = Path(args.configuration_file)
-    config = config_util.load_config_file(config_path)
-    config = override_configuration_values(config, args)
-
-    training_arguments = config_util.get_training_arguments(config)
-    command = (
-        ['pipenv', 'run', 'python', str(trainer_path)]
-        + training_arguments
-        + args.args
-        + ['--train']
-    )
-
-    cwd = settings.get_project_folder_absolute()
-    command_util.execute_command(command, cwd, args.new_window, show_command=False)
+    def create_command(self, args):
+        self.new_window = True
+        log_dir = f'--logdir={settings.get_summaries_folder()}'
+        return ['pipenv', 'run', 'tensorboard', log_dir]
 
 
-def override_configuration_values(configuration: dict, args: Namespace):
-    """Replaces values in the configuration dictionary with those stored in args.
+class PerformTraining(Command):
+    """Launches the training wrapper script with arguments loaded from a configuration file."""
 
-    Args:
-      configuration: dict: Configuration with values to override.
-      args: Namespace: Values to insert into the configuration dict.
+    def create_command(self, args):
 
-    Returns:
-      A configuration dictionary.
-    """
+        trainer_path = settings.get_training_wrapper_path()
+        config_path = Path(args.configuration_file)
+        config = config_util.load_config_file(config_path)
+        config = self.override_configuration_values(config, args)
 
-    if args.env is not None:
-        configuration = config_util.set_env(args.env, configuration)
-    if args.lesson is not None:
-        configuration = config_util.set_lesson(str(args.lesson), configuration)
-    if args.run_id is not None:
-        configuration = config_util.set_run_id(args.run_id, configuration)
-    if args.num_envs is not None:
-        configuration = config_util.set_num_envs(str(args.num_envs), configuration)
+        training_arguments = config_util.get_training_arguments(config)
+        return (
+            ['pipenv', 'run', 'python', str(trainer_path)]
+            + training_arguments
+            + args.args
+            + ['--train']
+        )
 
-    if args.graphics:
-        # Note: As the argument is 'no-graphics', false in this case means
-        # graphics are used.
-        configuration = config_util.set_no_graphics_enabled(False, configuration)
-    if args.no_graphics:
-        configuration = config_util.set_no_graphics_enabled(True, configuration)
+    def override_configuration_values(self, configuration: dict, args: Namespace):
+        """Replaces values in the configuration dictionary with those stored in args."""
 
-    if args.timestamp:
-        configuration = config_util.set_timestamp_enabled(True, configuration)
-    if args.no_timestamp:
-        configuration = config_util.set_timestamp_enabled(False, configuration)
+        if args.env is not None:
+            configuration = config_util.set_env(args.env, configuration)
+        if args.lesson is not None:
+            configuration = config_util.set_lesson(str(args.lesson), configuration)
+        if args.run_id is not None:
+            configuration = config_util.set_run_id(args.run_id, configuration)
+        if args.num_envs is not None:
+            configuration = config_util.set_num_envs(str(args.num_envs), configuration)
 
-    return configuration
+        if args.graphics:
+            # Note: As the argument is 'no-graphics', false in this case means
+            # graphics are used.
+            configuration = config_util.set_no_graphics_enabled(False, configuration)
+        if args.no_graphics:
+            configuration = config_util.set_no_graphics_enabled(True, configuration)
 
+        if args.timestamp:
+            configuration = config_util.set_timestamp_enabled(True, configuration)
+        if args.no_timestamp:
+            configuration = config_util.set_timestamp_enabled(False, configuration)
 
-def resume_training(args):
-    """Launches the training wrapper script with the arguments used by the
-    last training command executed.
-
-    Args:
-      args: Namespace: A Namespace object containing parsed arguments.
-    """
-
-    command = command_util.load_last_history()
-    command = prepare_resume_command(command)
-
-    cwd = settings.get_project_folder_absolute()
-    command_util.execute_command(command, cwd, args.new_window, show_command=False)
+        return configuration
 
 
-def prepare_resume_command(command: list):
-    """Processes a command loaded from history and prepares it as a
-    resume training command.
+class ResumeTraining(Command):
+    """Launches the training wrapper script with the arguments used
+    by the last training command executed."""
 
-    Args:
-      command: list: A command list loaded from history.
+    def create_command(self, args):
 
-    Returns:
-      A configured resume training command.
-    """
+        command = command_util.load_last_history()
 
-    if '--timestamp' in command:
-        command.remove('--timestamp')
+        if '--timestamp' in command:
+            command.remove('--timestamp')
 
-    if '--load' not in command:
-        command.append('--load')
+        if '--load' not in command:
+            command.append('--load')
 
-    # Note: We slice off the first three elements as they represent a call
-    # to mlagents-learn and construct a call to training_wrapper instead.
-    command = command[3:]
-    trainer_path = settings.get_training_wrapper_path()
-    command = ['pipenv', 'run', 'python', str(trainer_path)] + command
+        # Note: We slice off the first three elements as they represent a call
+        # to mlagents-learn and construct a call to training_wrapper instead.
+        command = command[3:]
+        trainer_path = settings.get_training_wrapper_path()
 
-    return command
+        return ['pipenv', 'run', 'python', str(trainer_path)] + command
 
 
 def main():
@@ -163,22 +137,15 @@ def main():
     args = parse_args(sys.argv[1:])
 
     if args.list:
-        list_training_options()
-        return
-
-    if args.edit_config:
-        edit_config_file(args)
-        return
-
-    if args.tensorboard_start:
-        start_tensorboard(args)
-        return
-
-    if args.resume:
-        resume_training(args)
-        return
-
-    perform_training(args)
+        ListTrainingOptions().execute(args)
+    elif args.edit_config:
+        EditConfigFile().execute(args)
+    elif args.tensorboard_start:
+        StartTensorboard().execute(args)
+    elif args.resume:
+        ResumeTraining().execute(args)
+    else:
+        PerformTraining().execute(args)
 
 
 def parse_args(argv):
