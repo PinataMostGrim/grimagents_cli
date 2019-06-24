@@ -159,7 +159,8 @@ def validate_configuration(configuration):
 
 def get_training_arguments(configuration):
     """Converts a configuration dictionary into command line arguments
-    for mlagents-learn.
+    for mlagents-learn and filters out values that should not be sent to
+    the training process.
 
     Args:
       configuration: A configuration dictionary
@@ -182,10 +183,8 @@ def get_training_arguments(configuration):
                 command_args = command_args + [key]
             continue
 
-        # Note: The --timestamp argument does not accept a value.
+        # Note: The --timestamp argument does not get sent to training_wrapper.
         if key == _TIMESTAMP_KEY:
-            if value is True:
-                command_args = command_args + [key]
             continue
 
         if value:

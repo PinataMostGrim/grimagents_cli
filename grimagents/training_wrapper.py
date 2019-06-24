@@ -18,11 +18,11 @@ import re
 import sys
 import time
 
-from datetime import datetime
 from pathlib import Path
 from subprocess import Popen, PIPE
 
 import settings as settings
+import helpers as helpers
 import grimagents.command_util as command_util
 
 
@@ -34,12 +34,7 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    if args.timestamp:
-        timestamp = get_timestamp()
-        run_id = f'{run_id}-{timestamp}'
-
-    # Note: We use run_id from args in order to exclude the potential timestamp
-    # from the log file name.
+    # TODO: Parse out log name from args. Log name shouldn't have a timestamp.
     configure_log(args.run_id)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
@@ -56,10 +51,6 @@ def main():
         '--run-id',
         run_id,
     ] + args.args
-
-    # Note: Training run history must be saved from training_wrapper as this is where
-    # the potential time-stamp value is decided.
-    command_util.save_to_history(command)
 
     cwd = settings.get_project_folder_absolute()
     try:
@@ -88,7 +79,7 @@ def main():
 
     finally:
         end_time = time.perf_counter()
-        training_duration = get_human_readable_duration(end_time - start_time)
+        training_duration = helpers.get_human_readable_duration(end_time - start_time)
 
         training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 
@@ -103,44 +94,6 @@ def main():
         training_log.info('')
 
         logging.shutdown()
-
-
-def get_timestamp():
-    """Fetch the current time as a string.
-
-    Returns:
-      The current time as a string.
-    """
-
-    now = datetime.now()
-    return now.strftime('%Y-%m-%d_%H-%M-%S')
-
-
-def get_human_readable_duration(seconds):
-    """Parses seconds into a human readable string.
-
-    Returns:
-      A human readable string.
-    """
-
-    seconds = int(seconds)
-    days, rem = divmod(seconds, 86400)
-    hours, rem = divmod(rem, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    if seconds < 1:
-        seconds = 1
-
-    locals_ = locals()
-    magnitudes_str = (
-        f'{int(locals_[magnitude])} {magnitude}'
-        for magnitude in ('days', 'hours', 'minutes', 'seconds')
-        if locals_[magnitude]
-    )
-
-    result = ", ".join(magnitudes_str)
-
-    return result
 
 
 def export_brains(brains: list, export_path: Path):
@@ -193,11 +146,6 @@ def parse_args(argv):
         type=str,
         default='ppo',
         help='Run id for the training session',
-    )
-    wrapper_parser.add_argument(
-        '--timestamp',
-        action='store_true',
-        help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.',
     )
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'

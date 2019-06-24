@@ -27,10 +27,11 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
+from . import helpers as helpers
 from . import settings as settings
 
 
-class Command():
+class Command:
     def __init__(self):
         self.cwd = settings.get_project_folder_absolute()
         self.new_window = False
@@ -38,7 +39,9 @@ class Command():
 
     def execute(self, args: Namespace):
         self.command = self.create_command(args)
-        command_util.execute_command(self.command, self.cwd, new_window=self.new_window, show_command=self.show_command)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
 
     def create_command(self, args):
         return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
@@ -71,6 +74,14 @@ class StartTensorboard(Command):
 class PerformTraining(Command):
     """Launches the training wrapper script with arguments loaded from a configuration file."""
 
+    def execute(self, args: Namespace):
+        self.command = self.create_command(args)
+
+        command_util.save_to_history(self.command)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
+
     def create_command(self, args):
 
         self.show_command = False
@@ -78,6 +89,12 @@ class PerformTraining(Command):
         config_path = Path(args.configuration_file)
         config = config_util.load_config_file(config_path)
         config = self.override_configuration_values(config, args)
+
+        if config_util.get_timestamp_enabled(config):
+            timestamp = helpers.get_timestamp()
+            run_id = config_util.get_run_id(config)
+            run_id = f'{run_id}-{timestamp}'
+            config = config_util.set_run_id(run_id, config)
 
         training_arguments = config_util.get_training_arguments(config)
         return (
@@ -128,12 +145,7 @@ class ResumeTraining(Command):
         if '--load' not in command:
             command.append('--load')
 
-        # Note: We slice off the first three elements as they represent a call
-        # to mlagents-learn and construct a call to training_wrapper instead.
-        command = command[3:]
-        trainer_path = settings.get_training_wrapper_path()
-
-        return ['pipenv', 'run', 'python', str(trainer_path)] + command
+        return command
 
 
 def main():
