@@ -32,10 +32,11 @@ class Command():
     def __init__(self):
         self.cwd = settings.get_project_folder_absolute()
         self.new_window = False
+        self.show_command = True
 
     def execute(self, args: Namespace):
         self.command = self.create_command(args)
-        command_util.execute_command(self.command, self.cwd, new_window=self.new_window)
+        command_util.execute_command(self.command, self.cwd, new_window=self.new_window, show_command=self.show_command)
 
     def create_command(self, args):
         return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
@@ -70,6 +71,7 @@ class PerformTraining(Command):
 
     def create_command(self, args):
 
+        self.show_command = False
         trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
         config = config_util.load_config_file(config_path)
@@ -116,11 +118,11 @@ class ResumeTraining(Command):
 
     def create_command(self, args):
 
+        self.show_command = False
         command = command_util.load_last_history()
 
         if '--timestamp' in command:
             command.remove('--timestamp')
-
         if '--load' not in command:
             command.append('--load')
 
