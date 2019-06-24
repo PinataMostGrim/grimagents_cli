@@ -148,7 +148,9 @@ def parse_args(argv):
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'
     )
-    wrapper_parser.add_argument('--log-filename', type=str, help='Write log output to this file. Defaults to run-id.')
+    wrapper_parser.add_argument(
+        '--log-filename', type=str, help='Write log output to this file. Defaults to run-id.'
+    )
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
