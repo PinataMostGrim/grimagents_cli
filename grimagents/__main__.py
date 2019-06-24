@@ -237,7 +237,7 @@ def configure_log():
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "display": {"style": "{", "format": "{levelname}: {message}"},
+            "display": {"style": "{", "format": "{message}"},
             "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
         },
         "handlers": {
