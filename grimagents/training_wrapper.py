@@ -34,12 +34,7 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    if args.timestamp:
-        timestamp = helpers.get_timestamp()
-        run_id = f'{run_id}-{timestamp}'
-
-    # Note: We use run_id from args in order to exclude the potential timestamp
-    # from the log file name.
+    # TODO: Parse out log name from args. Log name shouldn't have a timestamp.
     configure_log(args.run_id)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
@@ -56,10 +51,6 @@ def main():
         '--run-id',
         run_id,
     ] + args.args
-
-    # Note: Training run history must be saved from training_wrapper as this is where
-    # the potential time-stamp value is decided.
-    command_util.save_to_history(command)
 
     cwd = settings.get_project_folder_absolute()
     try:
@@ -155,11 +146,6 @@ def parse_args(argv):
         type=str,
         default='ppo',
         help='Run id for the training session',
-    )
-    wrapper_parser.add_argument(
-        '--timestamp',
-        action='store_true',
-        help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.',
     )
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'
