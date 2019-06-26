@@ -174,9 +174,15 @@ def edit_trainer_configuration_file(file_path: Path):
         file_path = file_path.with_suffix('.yaml')
 
     if not file_path.exists():
-        command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
+        create_trainer_configuration_file(file_path)
 
     command_util.open_file(file_path)
+
+
+def create_trainer_configuration_file(file_path: Path):
+    """Creates a trainer configuration file with default values at the specified path."""
+
+    command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
 
 
 def edit_curriculum_file(file_path: Path):
