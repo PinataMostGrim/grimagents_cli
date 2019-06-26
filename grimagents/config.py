@@ -6,12 +6,11 @@ Notes:
 - `--export-path` and `--logname` configuration values apply to training_wrapper
 """
 
-import json
 import logging
 
 from pathlib import Path
 
-from .command_util import open_file
+from . import command_util as command_util
 
 
 # Default configuration values
@@ -24,7 +23,7 @@ _NO_GRAPHICS_KEY = '--no-graphics'
 _TIMESTAMP_KEY = '--timestamp'
 _LOG_FILE_NAME = '--log-filename'
 
-_DEFAULT_CONFIG = {
+_DEFAULT_GRIM_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
     _ENV_KEY: '',
     '--export-path': '',
@@ -54,7 +53,7 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_config_file(config_path: Path):
+def edit_grim_config_file(config_path: Path):
     """Opens the specified configuration file with the system's default editor.
 
     Args:
@@ -65,31 +64,25 @@ def edit_config_file(config_path: Path):
         config_path = config_path.with_suffix('.json')
 
     if not config_path.exists():
-        create_config_file(config_path)
+        create_grim_config_file(config_path)
 
-    open_file(config_path)
+    command_util.open_file(config_path)
 
 
-def create_config_file(config_path: Path):
+def create_grim_config_file(config_path: Path):
     """Creates a configuration file with default values at the specified path.
 
     Args:
       config_path: Path: Path object for the configuration file to create.
     """
 
-    # Note: If directory doesn't exist, create it.
-    if not config_path.parent.exists():
-        config_path.parent.mkdir(parents=True)
-
-    config_log.info(f'Creating configuration file \'{config_path}\'')
-    with config_path.open(mode='w') as f:
-        json.dump(get_default_config(), f, indent=4)
+    command_util.write_json_file(get_default_config(), config_path)
 
 
 def get_default_config():
     """Fetches a copy of the default configuration dictionary."""
 
-    return _DEFAULT_CONFIG.copy()
+    return _DEFAULT_GRIM_CONFIG.copy()
 
 
 def load_config_file(config_path: Path):
@@ -106,20 +99,13 @@ def load_config_file(config_path: Path):
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
-    try:
-        with config_path.open('r') as f:
-            configuration = json.load(f)
-    except FileNotFoundError as exception:
-        config_log.error(f'Configuration file \'{config_path}\' not found')
-        raise exception
+    configuration = command_util.load_json_file(config_path)
 
-    if validate_configuration(configuration):
-        loaded_config = configuration
-    else:
+    if not validate_configuration(configuration):
         config_log.error(f'Configuration file \'{config_path}\' is invalid')
         raise InvalidConfigurationError
 
-    return loaded_config
+    return configuration
 
 
 def validate_configuration(configuration):
@@ -146,14 +132,15 @@ def validate_configuration(configuration):
             config_log.error(f'Configuration contains invalid key \'{key}\'')
             is_valid_config = False
 
-    # The only currently required key is 'trainer-config-path.'
-    try:
-        if not configuration[_TRAINER_CONFIG_PATH_KEY]:
-            raise KeyError
+    # The only required keys are 'trainer-config-path' and '--run-id'
+    for key in {_TRAINER_CONFIG_PATH_KEY, _RUN_ID_KEY}:
+        try:
+            if not configuration[key]:
+                raise KeyError
 
-    except KeyError:
-        config_log.error(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
-        is_valid_config = False
+        except KeyError:
+            config_log.error(f'Configuration is missing required key \'{key}\'')
+            is_valid_config = False
 
     return is_valid_config
 

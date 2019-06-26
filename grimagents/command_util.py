@@ -22,24 +22,6 @@ class CommandUtilError(Exception):
     pass
 
 
-def open_file(file_path: Path):
-    """Opens a file using the default system application.
-
-    Args:
-      file_path: Path: The file to open.
-    """
-
-    command_log.info(f'Opening \'{file_path}\'')
-
-    try:
-        # Note: Open file in Windows
-        os.startfile(str(file_path))
-    except AttributeError:
-        # Note: Open file in OSX / Linux
-        command = ['open', str(file_path)]
-        execute_command(command)
-
-
 def execute_command(command: list, cwd=None, new_window=False, show_command=True):
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
@@ -75,14 +57,54 @@ def execute_command_and_capture(command: list, cwd=None, show_command=True):
     return output
 
 
+def open_file(file_path: Path):
+    """Opens a file using the default system application.
+
+    Args:
+      file_path: Path: The file to open.
+    """
+
+    command_log.info(f'Opening \'{file_path}\'')
+
+    try:
+        # Note: Open file in Windows
+        os.startfile(str(file_path))
+    except AttributeError:
+        # Note: Open file in OSX / Linux
+        command = ['open', str(file_path)]
+        execute_command(command)
+
+
+def write_json_file(json_data, file_path: Path):
+    """Write json data to a file."""
+
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    command_log.info(f'Creating file \'{file_path}\'')
+    with file_path.open(mode='w') as f:
+        json.dump(json_data, f, indent=4)
+
+
+def load_json_file(file_path: Path):
+    """Load json data from a file."""
+
+    try:
+        with file_path.open('r') as f:
+            data = json.load(f)
+    except FileNotFoundError as exception:
+        command_log.error(f'File \'{file_path}\' not found')
+        raise exception
+
+    return data
+
+
 def create_history_file():
     """Creates or overwrites the training command history file."""
 
     history_file = settings.get_history_file_path()
     history = {"history": []}
-
-    with history_file.open(mode='w') as file:
-        json.dump(history, file, indent=4)
+    write_json_file(history, history_file)
 
 
 def load_history():
@@ -97,10 +119,7 @@ def load_history():
     if not history_file.exists():
         create_history_file()
 
-    with history_file.open(mode='r') as file:
-        dict = json.load(file)
-
-    return dict
+    return load_json_file(history_file)
 
 
 def save_to_history(command: list):
