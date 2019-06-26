@@ -29,7 +29,8 @@ Training can be initiated several ways:
 
 ### grimagents
 ```
-usage: grim-agents [-h] [--list] [--edit-config FILE] [--new-window]
+usage: grim-agents [-h] [--list] [--edit-config FILE]
+                   [--edit-trainer-config FILE] [--new-window]
                    [--tensorboard-start] [--resume] [--env ENV]
                    [--lesson LESSON] [--run-id RUN_ID] [--num-envs NUM_ENVS]
                    [--graphics | --no-graphics] [--timestamp | --no-timestamp]
@@ -39,27 +40,29 @@ CLI application that wraps Unity ML-Agents with some quality of life
 improvements.
 
 positional arguments:
-  configuration_file   Configuration file to load training arguments from
-  args                 Additional arguments applied to training (ex. --slow,
-                       --debug, --load)
+  configuration_file    Configuration file to extract training arguments from
+  args                  Additional arguments applied to training (ex. --slow,
+                        --debug, --load)
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --list               List mlagents-learn training options
-  --edit-config FILE   Open a configuration file for editing
-  --new-window         Run training process in a new console window
-  --tensorboard-start  Start tensorboard server
-  --resume             Resume the last training run
+  -h, --help            show this help message and exit
+  --list                List mlagents-learn training options
+  --edit-config FILE    Open a grimagents configuration file for editing
+  --edit-trainer-config FILE
+                        Open a trainer configuration file for editing
+  --new-window          Run training process in a new console window
+  --tensorboard-start   Start tensorboard server
+  --resume              Resume the last training run
   --env ENV
   --lesson LESSON
   --run-id RUN_ID
   --num-envs NUM_ENVS
   --graphics
   --no-graphics
-  --timestamp          Append timestamp to run-id. Overrides configuration
-                       setting.
-  --no-timestamp       Do not append timestamp to run-id. Overrides
-                       configuration setting.
+  --timestamp           Append timestamp to run-id. Overrides configuration
+                        setting.
+  --no-timestamp        Do not append timestamp to run-id. Overrides
+                        configuration setting.
 ```
 
 #### Example usages
