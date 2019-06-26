@@ -65,6 +65,17 @@ _DEFAULT_TRAINER_CONFIG = """default:
     curiosity_enc_size: 128
 """
 
+_DEFAULT_CURRICULUM = {
+    "measure": "progress",
+    "thresholds": [0.1],
+    "min_lesson_length": 100,
+    "signal_smoothing": True,
+    "parameters":
+    {
+        "example_reset_parameter": [1.5, 2.0]
+    }
+}
+
 
 config_log = logging.getLogger('grimagents.config')
 
@@ -166,6 +177,20 @@ def edit_trainer_configuration_file(config_path: Path):
         command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
 
     command_util.open_file(config_path)
+
+
+def edit_curriculum_file(file_path: Path):
+    """Opens a curriculum file for editing. Creates a curriculum file with
+    default values if file does not already exit.
+    """
+
+    if not file_path.suffix == '.json':
+        file_path = file_path.with_suffix('.json')
+
+    if not file_path.exists():
+        command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
+
+    command_util.open_file(file_path)
 
 
 def get_training_arguments(configuration):

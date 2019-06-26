@@ -70,6 +70,16 @@ class EditTrainerConfigFile(Command):
         config_util.edit_trainer_configuration_file(config_path)
 
 
+class EditCurriculumFile(Command):
+    """Opens a curriculum file for editing or creates one if a file does
+    not already exist.
+    """
+
+    def execute(self, args):
+        file_path = Path(args.edit_curriculum)
+        config_util.edit_curriculum_file(file_path)
+
+
 class StartTensorboard(Command):
     """Starts a new instance of tensorboard server in a new terminal window."""
 
@@ -172,6 +182,8 @@ def main():
         EditGrimConfigFile().execute(args)
     elif args.edit_trainer_config:
         EditTrainerConfigFile().execute(args)
+    elif args.edit_curriculum:
+        EditCurriculumFile().execute(args)
     elif args.tensorboard_start:
         StartTensorboard().execute(args)
     elif args.resume:
@@ -200,6 +212,8 @@ def parse_args(argv):
         metavar='FILE',
         type=str,
         help='Open a trainer configuration file for editing',
+    )
+    options_parser.add_argument('--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
