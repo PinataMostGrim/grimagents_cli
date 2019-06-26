@@ -58,11 +58,7 @@ def execute_command_and_capture(command: list, cwd=None, show_command=True):
 
 
 def open_file(file_path: Path):
-    """Opens a file using the default system application.
-
-    Args:
-      file_path: Path: The file to open.
-    """
+    """Opens a file using the default system application."""
 
     command_log.info(f'Opening \'{file_path}\'')
 
@@ -134,11 +130,7 @@ def load_history():
 
 
 def save_to_history(command: list):
-    """Saves a training command to the history file.
-
-    Args:
-      command: list: Training command to save.
-    """
+    """Saves a training command to the history file."""
 
     history_file = settings.get_history_file_path()
     dict = load_history()

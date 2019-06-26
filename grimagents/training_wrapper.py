@@ -95,12 +95,7 @@ def main():
 
 
 def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained models to a path.
-
-    Args:
-      brains: list: Trained models to export.
-      export_path: Path: Destination folder to export brains into.
-    """
+    """Exports a list of trained policies into a folder."""
 
     training_log.info('Exporting brains')
 
@@ -119,14 +114,7 @@ def export_brains(brains: list, export_path: Path):
 
 
 def parse_args(argv):
-    """Builds a Namespace object with parsed arguments.
-
-    Args:
-      argv: list: Arguments to parse.
-
-    Returns:
-      A Namespace object containing parsed arguments.
-    """
+    """Builds a Namespace object with parsed arguments."""
 
     # It is important to keep command line argument in parity with mlagents-learn.
     # As intermixed parsing was not introduced into ArgParser until Python 3.7,
@@ -174,11 +162,7 @@ def parse_args(argv):
 
 
 def configure_logging(log_filename: str):
-    """Configures logging for a training session.
-
-    Args:
-      log_filename: str: The training session's run-id
-    """
+    """Configures logging for a training session."""
 
     log_config = {
         "version": 1,
