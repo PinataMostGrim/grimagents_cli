@@ -75,6 +75,12 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
+def write_file(text, file_path: Path):
+    """Write text to a file."""
+
+    file_path.write_text(text)
+
+
 def write_json_file(json_data, file_path: Path):
     """Write json data to a file."""
 

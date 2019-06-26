@@ -41,6 +41,30 @@ _DEFAULT_GRIM_CONFIG = {
     _LOG_FILE_NAME: None,
 }
 
+_DEFAULT_TRAINER_CONFIG = """default:
+    trainer: ppo
+    batch_size: 1024
+    beta: 5.0e-3
+    buffer_size: 10240
+    epsilon: 0.2
+    gamma: 0.99
+    hidden_units: 128
+    lambd: 0.95
+    learning_rate: 3.0e-4
+    max_steps: 5.0e4
+    memory_size: 256
+    normalize: false
+    num_epoch: 3
+    num_layers: 2
+    time_horizon: 64
+    sequence_length: 64
+    summary_freq: 1000
+    use_recurrent: false
+    use_curiosity: false
+    curiosity_strength: 0.01
+    curiosity_enc_size: 128
+"""
+
 
 config_log = logging.getLogger('grimagents.config')
 
@@ -143,6 +167,15 @@ def validate_grim_configuration(configuration):
             is_valid_config = False
 
     return is_valid_config
+
+
+def create_trainer_configuration_file(config_path: Path):
+    """Write a default trainer configuration file to the provided location."""
+
+    if not config_path.suffix == '.yaml':
+        config_path = config_path.with_suffix('.yaml')
+
+    command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
 
 
 def get_training_arguments(configuration):

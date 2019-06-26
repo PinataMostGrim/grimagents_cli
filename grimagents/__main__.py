@@ -62,6 +62,15 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(config_path)
 
 
+class CreateTrainerConfigFile(Command):
+    """Creates a default configuration file."""
+
+    def execute(self, args):
+        config_path = Path(args.create_trainer_config)
+        config_util.create_trainer_configuration_file(config_path)
+        command_util.open_file(config_path)
+
+
 class StartTensorboard(Command):
     """Starts a new instance of tensorboard server in a new terminal window."""
 
@@ -162,6 +171,8 @@ def main():
         ListTrainingOptions().execute(args)
     elif args.edit_config:
         EditGrimConfigFile().execute(args)
+    elif args.create_trainer_config:
+        CreateTrainerConfigFile().execute(args)
     elif args.tensorboard_start:
         StartTensorboard().execute(args)
     elif args.resume:
@@ -184,6 +195,8 @@ def parse_args(argv):
         metavar='FILE',
         type=str,
         help='Open a grimagents configuration file for editing',
+    )
+    options_parser.add_argument('--create-trainer-config', metavar='FILE', type=str, help='Create a default trainer configuration file'
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
