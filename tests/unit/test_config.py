@@ -72,3 +72,14 @@ def test_invalid_configuration_error(fixture_grim_config_file):
         config.load_config_file(path)
 
 
+def test_configuration_validation():
+    """Test for validating or rejecting grimagent configurations."""
+
+    configuration = {"--env": "builds\\3DBall\\Unity Environment.exe"}
+    assert config.validate_configuration(configuration) is False
+
+    configuration['trainer-config-path'] = 'config\\3DBall.yaml'
+    assert config.validate_configuration(configuration) is False
+
+    configuration['--run-id'] = '3DBall'
+    assert config.validate_configuration(configuration) is True
