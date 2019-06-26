@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import pytest
 
@@ -29,3 +30,11 @@ def test_create_grim_config_file(fixture_grim_config_file):
     path = get_grim_config_file_path()
     config.create_grim_config_file(path)
     assert path.exists()
+
+    data = config.get_default_config()
+    with path.open('r') as f:
+        file_data = json.load(f)
+
+    assert data == file_data
+
+
