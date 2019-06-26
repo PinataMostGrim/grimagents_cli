@@ -100,20 +100,13 @@ def load_config_file(config_path: Path):
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
-    try:
-        with config_path.open('r') as f:
-            configuration = json.load(f)
-    except FileNotFoundError as exception:
-        config_log.error(f'Configuration file \'{config_path}\' not found')
-        raise exception
+    configuration = command_util.load_json_file(config_path)
 
-    if validate_configuration(configuration):
-        loaded_config = configuration
-    else:
+    if not validate_configuration(configuration):
         config_log.error(f'Configuration file \'{config_path}\' is invalid')
         raise InvalidConfigurationError
 
-    return loaded_config
+    return configuration
 
 
 def validate_configuration(configuration):

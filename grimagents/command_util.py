@@ -52,6 +52,18 @@ def write_json_file(json_data, file_path: Path):
         json.dump(json_data, f, indent=4)
 
 
+def load_json_file(file_path: Path):
+
+    try:
+        with file_path.open('r') as f:
+            data = json.load(f)
+    except FileNotFoundError as exception:
+        command_log.error(f'File \'{file_path}\' not found')
+        raise exception
+
+    return data
+
+
 def execute_command(command: list, cwd=None, new_window=False, show_command=True):
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
