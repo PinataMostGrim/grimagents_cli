@@ -11,7 +11,7 @@ import logging
 
 from pathlib import Path
 
-from .command_util import open_file
+from . import command_util as command_util
 
 
 # Default configuration values
@@ -24,7 +24,7 @@ _NO_GRAPHICS_KEY = '--no-graphics'
 _TIMESTAMP_KEY = '--timestamp'
 _LOG_FILE_NAME = '--log-filename'
 
-_DEFAULT_CONFIG = {
+_DEFAULT_GRIM_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
     _ENV_KEY: '',
     '--export-path': '',
@@ -54,7 +54,7 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_config_file(config_path: Path):
+def edit_grim_config_file(config_path: Path):
     """Opens the specified configuration file with the system's default editor.
 
     Args:
@@ -65,31 +65,25 @@ def edit_config_file(config_path: Path):
         config_path = config_path.with_suffix('.json')
 
     if not config_path.exists():
-        create_config_file(config_path)
+        create_grim_config_file(config_path)
 
-    open_file(config_path)
+    command_util.open_file(config_path)
 
 
-def create_config_file(config_path: Path):
+def create_grim_config_file(config_path: Path):
     """Creates a configuration file with default values at the specified path.
 
     Args:
       config_path: Path: Path object for the configuration file to create.
     """
 
-    # Note: If directory doesn't exist, create it.
-    if not config_path.parent.exists():
-        config_path.parent.mkdir(parents=True)
-
-    config_log.info(f'Creating configuration file \'{config_path}\'')
-    with config_path.open(mode='w') as f:
-        json.dump(get_default_config(), f, indent=4)
+    command_util.write_json_file(get_default_config(), config_path)
 
 
 def get_default_config():
     """Fetches a copy of the default configuration dictionary."""
 
-    return _DEFAULT_CONFIG.copy()
+    return _DEFAULT_GRIM_CONFIG.copy()
 
 
 def load_config_file(config_path: Path):

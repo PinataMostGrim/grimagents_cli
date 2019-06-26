@@ -40,6 +40,18 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
+
+
+def write_json_file(json_data, file_path: Path):
+
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    command_log.info(f'Creating file \'{file_path}\'')
+    with file_path.open(mode='w') as f:
+        json.dump(json_data, f, indent=4)
+
+
 def execute_command(command: list, cwd=None, new_window=False, show_command=True):
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""

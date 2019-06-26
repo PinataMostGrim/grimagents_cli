@@ -54,12 +54,12 @@ class ListTrainingOptions(Command):
         return ['pipenv', 'run', 'mlagents-learn', '--help']
 
 
-class EditConfigFile(Command):
-    """Opens a configuration file for editing."""
+class EditGrimConfigFile(Command):
+    """Opens a GrimAgents configuration file for editing."""
 
     def execute(self, args):
         config_path = Path(args.edit_config)
-        config_util.edit_config_file(config_path)
+        config_util.edit_grim_config_file(config_path)
 
 
 class StartTensorboard(Command):
@@ -161,7 +161,7 @@ def main():
     if args.list:
         ListTrainingOptions().execute(args)
     elif args.edit_config:
-        EditConfigFile().execute(args)
+        EditGrimConfigFile().execute(args)
     elif args.tensorboard_start:
         StartTensorboard().execute(args)
     elif args.resume:
@@ -183,7 +183,7 @@ def parse_args(argv):
         dest='edit_config',
         metavar='FILE',
         type=str,
-        help='Open a configuration file for editing',
+        help='Open a grimagents configuration file for editing',
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
