@@ -78,10 +78,8 @@ class InvalidConfigurationError(ConfigurationError):
 
 
 def edit_grim_config_file(config_path: Path):
-    """Opens the specified configuration file with the system's default editor.
-
-    Args:
-      config_path: Path: Path object for the configuration file to edit.
+    """Opens a grimagents configuration file with the system's default editor.
+    Creates a configuration file with default values if file does not already exist.
     """
 
     if not config_path.suffix == '.json':
@@ -94,11 +92,7 @@ def edit_grim_config_file(config_path: Path):
 
 
 def create_grim_config_file(config_path: Path):
-    """Creates a configuration file with default values at the specified path.
-
-    Args:
-      config_path: Path: Path object for the configuration file to create.
-    """
+    """Creates a configuration file with default values at the specified path."""
 
     command_util.write_json_file(get_default_grim_config(), config_path)
 
@@ -110,13 +104,7 @@ def get_default_grim_config():
 
 
 def load_grim_config_file(config_path: Path):
-    """Loads a configuration file into the loaded configuration global dictionary.
-
-    Args:
-      config_path: Path: Path object for the configuration file to load into memory.
-
-    Returns:
-      Configuration dictionary loaded from file.
+    """Loads a grimagents configuration dictionary from file.
 
     Raises:
       FileNotFoundError: An error occurred while attempting to load a configuration file.
@@ -134,9 +122,6 @@ def load_grim_config_file(config_path: Path):
 
 def validate_grim_configuration(configuration):
     """Checks the specified configuration dictionary for all required keys and conditions.
-
-    Args:
-      configuration: The configuration dictionary to validate.
 
     Returns:
       True if the configuration is valid and False if it is not.
@@ -187,12 +172,6 @@ def get_training_arguments(configuration):
     """Converts a configuration dictionary into command line arguments
     for mlagents-learn and filters out values that should not be sent to
     the training process.
-
-    Args:
-      configuration: A configuration dictionary
-
-    Returns:
-      A list of command line arguments.
     """
 
     command_args = list()
