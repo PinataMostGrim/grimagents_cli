@@ -2,16 +2,19 @@
 them to the mlagents-learn training wrapper. This script aims to automate several
 repetitive training tasks.
 
+Features:
 - Load training arguments from a configuration file
-- Optionally override loaded configuration arguments with command line arguments
+- Override loaded configuration arguments with command line arguments
+- Easily resume the last training run
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
 
-See training_wrapper for the features it provides.
+See training_wrapper.py for its feature list.
 
 Requirements:
 - Windows
-- Pipenv and a virtual environment setup for the MLAgents project
+- Pipenv accessible through the PATH environment variable
+- Virtual environment setup for the MLAgents project
 """
 
 import argparse
@@ -24,96 +27,152 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
+from . import common as common
 from . import settings as settings
 
 
-def list_training_options():
+class Command:
+    def __init__(self):
+        self.cwd = settings.get_project_folder_absolute()
+        self.new_window = False
+        self.show_command = True
+
+    def execute(self, args: Namespace):
+        self.command = self.create_command(args)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
+
+    def create_command(self, args):
+        return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
+
+
+class ListTrainingOptions(Command):
     """Outputs mlagents-learn usage options."""
 
-    cwd = settings.get_project_folder_absolute()
-    command = ['pipenv', 'run', 'mlagents-learn', '--help']
-    command_util.execute_command(command, cwd)
+    def create_command(self, args):
+        return ['pipenv', 'run', 'mlagents-learn', '--help']
 
 
-def edit_config_file(args):
-    """Opens a configuration file for editing.
+class EditGrimConfigFile(Command):
+    """Opens a GrimAgents configuration file for editing or creatse one if
+    a file does not already exist."""
 
-    Args:
-      args: Namespace: A Namespace object containing parsed arguments.
+    def execute(self, args):
+        file_path = Path(args.edit_config)
+        config_util.edit_grim_config_file(file_path)
+
+
+class EditTrainerConfigFile(Command):
+    """Opens a trainer configuration file for editing or creates one if
+    a file does not already exist.
     """
 
-    config_path = Path(args.edit_config)
-    config_util.edit_config_file(config_path)
+    def execute(self, args):
+        file_path = Path(args.edit_trainer_config)
+        config_util.edit_trainer_configuration_file(file_path)
 
 
-def start_tensorboard(args):
+class EditCurriculumFile(Command):
+    """Opens a curriculum file for editing or creates one if a file does
+    not already exist.
+    """
+
+    def execute(self, args):
+        file_path = Path(args.edit_curriculum)
+        config_util.edit_curriculum_file(file_path)
+
+
+class StartTensorboard(Command):
     """Starts a new instance of tensorboard server in a new terminal window."""
 
-    cwd = settings.get_project_folder_absolute()
-    log_dir = f'--logdir={settings.get_summaries_folder()}'
-    command = ['pipenv', 'run', 'tensorboard', log_dir]
-
-    command_util.execute_command(command, cwd, new_window=True)
-
-
-def perform_training(args):
-    """Launches the training wrapper script with arguments loaded from a configuration file.
-
-    Args:
-      args: Namespace: A Namespace object containing parsed arguments.
-    """
-
-    trainer_path = settings.get_training_wrapper_path()
-
-    config_path = Path(args.configuration_file)
-    config = config_util.load_config_file(config_path)
-    config = override_configuration_values(config, args)
-
-    training_arguments = config_util.get_training_arguments(config)
-    command = (
-        ['pipenv', 'run', 'python', str(trainer_path)]
-        + training_arguments
-        + args.args
-        + ['--train']
-    )
-
-    cwd = settings.get_project_folder_absolute()
-    command_util.execute_command(command, cwd, args.new_window, show_command=False)
+    def create_command(self, args):
+        self.new_window = True
+        log_dir = f'--logdir={settings.get_summaries_folder()}'
+        return ['pipenv', 'run', 'tensorboard', log_dir]
 
 
-def override_configuration_values(configuration: dict, args: Namespace):
-    """Replaces values in the configuration dictionary with those stored in args.
+class PerformTraining(Command):
+    """Launches the training wrapper script with arguments loaded from a configuration file."""
 
-    Args:
-      configuration: dict: Configuration with values to override.
-      args: Namespace: Values to insert into the configuration dict.
+    def execute(self, args: Namespace):
+        self.command = self.create_command(args)
 
-    Returns:
-      A configuration dictionary.
-    """
+        command_util.save_to_history(self.command)
+        command_util.execute_command(
+            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+        )
 
-    if args.env is not None:
-        configuration = config_util.set_env(args.env, configuration)
-    if args.lesson is not None:
-        configuration = config_util.set_lesson(str(args.lesson), configuration)
-    if args.run_id is not None:
-        configuration = config_util.set_run_id(args.run_id, configuration)
-    if args.num_envs is not None:
-        configuration = config_util.set_num_envs(str(args.num_envs), configuration)
+    def create_command(self, args):
 
-    if args.graphics:
-        # Note: As the argument is 'no-graphics', false in this case means
-        # graphics are used.
-        configuration = config_util.set_no_graphics_enabled(False, configuration)
-    if args.no_graphics:
-        configuration = config_util.set_no_graphics_enabled(True, configuration)
+        self.show_command = False
+        trainer_path = settings.get_training_wrapper_path()
+        config_path = Path(args.configuration_file)
+        config = config_util.load_grim_config_file(config_path)
+        config = self.override_configuration_values(config, args)
 
-    if args.timestamp:
-        configuration = config_util.set_timestamp_enabled(True, configuration)
-    if args.no_timestamp:
-        configuration = config_util.set_timestamp_enabled(False, configuration)
+        if config_util.get_timestamp_enabled(config):
+            run_id = config_util.get_run_id(config)
+            # Note: If a log filename isn't configured, we explicitly set it
+            # to the run_id before appending a timestamp to reduce the
+            # number of log files being generated.
+            if not config_util.get_log_filename(config):
+                config = config_util.set_log_filename(run_id, config)
 
-    return configuration
+            timestamp = common.get_timestamp()
+            run_id = f'{run_id}-{timestamp}'
+            config = config_util.set_run_id(run_id, config)
+
+        training_arguments = config_util.get_training_arguments(config)
+        return (
+            ['pipenv', 'run', 'python', str(trainer_path)]
+            + training_arguments
+            + args.args
+            + ['--train']
+        )
+
+    def override_configuration_values(self, configuration: dict, args: Namespace):
+        """Replaces values in the configuration dictionary with those stored in args."""
+
+        if args.env is not None:
+            configuration = config_util.set_env(args.env, configuration)
+        if args.lesson is not None:
+            configuration = config_util.set_lesson(str(args.lesson), configuration)
+        if args.run_id is not None:
+            configuration = config_util.set_run_id(args.run_id, configuration)
+        if args.num_envs is not None:
+            configuration = config_util.set_num_envs(str(args.num_envs), configuration)
+
+        if args.graphics:
+            # Note: As the argument is 'no-graphics', false in this case means
+            # graphics are used.
+            configuration = config_util.set_no_graphics_enabled(False, configuration)
+        if args.no_graphics:
+            configuration = config_util.set_no_graphics_enabled(True, configuration)
+
+        if args.timestamp:
+            configuration = config_util.set_timestamp_enabled(True, configuration)
+        if args.no_timestamp:
+            configuration = config_util.set_timestamp_enabled(False, configuration)
+
+        return configuration
+
+
+class ResumeTraining(Command):
+    """Launches the training wrapper script with the arguments used
+    by the last training command executed."""
+
+    def create_command(self, args):
+
+        self.show_command = False
+        command = command_util.load_last_history()
+
+        if '--timestamp' in command:
+            command.remove('--timestamp')
+        if '--load' not in command:
+            command.append('--load')
+
+        return command
 
 
 def main():
@@ -121,29 +180,23 @@ def main():
     args = parse_args(sys.argv[1:])
 
     if args.list:
-        list_training_options()
-        return
-
-    if args.edit_config:
-        edit_config_file(args)
-        return
-
-    if args.tensorboard_start:
-        start_tensorboard(args)
-        return
-
-    perform_training(args)
+        ListTrainingOptions().execute(args)
+    elif args.edit_config:
+        EditGrimConfigFile().execute(args)
+    elif args.edit_trainer_config:
+        EditTrainerConfigFile().execute(args)
+    elif args.edit_curriculum:
+        EditCurriculumFile().execute(args)
+    elif args.tensorboard_start:
+        StartTensorboard().execute(args)
+    elif args.resume:
+        ResumeTraining().execute(args)
+    else:
+        PerformTraining().execute(args)
 
 
 def parse_args(argv):
-    """Builds a Namespace object with parsed arguments.
-
-    Args:
-      argv: List of arguments to parse.
-
-    Returns:
-      A Namespace object containing parsed arguments.
-    """
+    """Builds a Namespace object out of parsed arguments."""
 
     # Parser for arguments that apply exclusively to the grimagents cli
     options_parser = argparse.ArgumentParser(add_help=False)
@@ -155,13 +208,26 @@ def parse_args(argv):
         dest='edit_config',
         metavar='FILE',
         type=str,
-        help='Open a configuration file for editing',
+        help='Open a grimagents configuration file for editing',
+    )
+    options_parser.add_argument(
+        '--edit-trainer-config',
+        metavar='FILE',
+        type=str,
+        help='Open a trainer configuration file for editing',
+    )
+    options_parser.add_argument(
+        '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
     )
     options_parser.add_argument(
-        '--tensorboard-start', action='store_true', help='Start tensorboard server')
+        '--tensorboard-start', action='store_true', help='Start tensorboard server'
+    )
+    options_parser.add_argument(
+        '--resume', action='store_true', help='Resume the last training run'
+    )
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
@@ -175,8 +241,16 @@ def parse_args(argv):
     graphics_group.add_argument('--no-graphics', action='store_true')
 
     timestamp_group = overrides_parser.add_mutually_exclusive_group()
-    timestamp_group.add_argument('--timestamp', action='store_true', help='Append timestamp to run-id. Overrides configuration setting.')
-    timestamp_group.add_argument('--no-timestamp', action='store_true', help='Do not append timestamp to run-id. Overrides configuration setting.')
+    timestamp_group.add_argument(
+        '--timestamp',
+        action='store_true',
+        help='Append timestamp to run-id. Overrides configuration setting.',
+    )
+    timestamp_group.add_argument(
+        '--no-timestamp',
+        action='store_true',
+        help='Do not append timestamp to run-id. Overrides configuration setting.',
+    )
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
@@ -186,7 +260,7 @@ def parse_args(argv):
     )
 
     parser.add_argument(
-        'configuration_file', type=str, help='Configuration file to load training arguments from'
+        'configuration_file', type=str, help='Configuration file to extract training arguments from'
     )
     parser.add_argument(
         'args',
@@ -207,7 +281,7 @@ def parse_args(argv):
     return args
 
 
-def configure_log():
+def configure_logging():
     """Configures logging for the grim-agents CLI.
     """
 
@@ -215,7 +289,7 @@ def configure_log():
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "display": {"style": "{", "format": "{levelname}: {message}"},
+            "display": {"style": "{", "format": "{message}"},
             "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
         },
         "handlers": {
@@ -244,6 +318,6 @@ def configure_log():
 
 
 if __name__ == '__main__':
-    configure_log()
+    configure_logging()
     main()
     logging.shutdown()

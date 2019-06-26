@@ -18,11 +18,11 @@ import re
 import sys
 import time
 
-from datetime import datetime
 from pathlib import Path
 from subprocess import Popen, PIPE
 
 import settings as settings
+import common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -31,16 +31,10 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 def main():
 
     args = parse_args(sys.argv[1:])
-    cwd = settings.get_project_folder_absolute()
     run_id = args.run_id
 
-    if args.timestamp:
-        timestamp = get_timestamp()
-        run_id = f'{run_id}-{timestamp}'
-
-    # Note: We use run_id from args in order to exclude the potential timestamp
-    # from the log file name.
-    configure_log(args.run_id)
+    log_filename = args.log_filename if args.log_filename else run_id
+    configure_logging(log_filename)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
@@ -57,11 +51,12 @@ def main():
         run_id,
     ] + args.args
 
+    cwd = settings.get_project_folder_absolute()
     try:
         with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
-            training_log.info('==================================================')
+            training_log.info('---------------------------------------------------------------')
             training_log.info(f'Initiating training run \'{run_id}\'')
 
             start_time = time.perf_counter()
@@ -74,20 +69,18 @@ def main():
                 if match:
                     exported_brains.append(match.group(1))
 
-        if args.export_path:
-            export_brains(exported_brains, Path(args.export_path))
-
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
         raise
 
     finally:
-        end_time = time.perf_counter()
-        training_duration = get_human_readable_duration(end_time - start_time)
+        if args.export_path:
+            export_brains(exported_brains, Path(args.export_path))
 
-        training_log.info(
-            f'\nTraining run \'{run_id}\' ended after {training_duration}.'
-        )
+        end_time = time.perf_counter()
+        training_duration = common.get_human_readable_duration(end_time - start_time)
+
+        training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 
         if p.returncode == 0:
             training_log.info('Training completed successfully.')
@@ -96,57 +89,13 @@ def main():
                 f'Training was not completed successfully. (error code {p.returncode})'
             )
 
-        training_log.info('==================================================')
+        training_log.info('---------------------------------------------------------------')
         training_log.info('')
-
         logging.shutdown()
 
 
-def get_timestamp():
-    """Fetch the current time as a string.
-
-    Returns:
-      The current time as a string.
-    """
-
-    now = datetime.now()
-    return now.strftime('%Y-%m-%d_%H-%M-%S')
-
-
-def get_human_readable_duration(seconds):
-    """Parses seconds into a human readable string.
-
-    Returns:
-      A human readable string.
-    """
-
-    seconds = int(seconds)
-    days, rem = divmod(seconds, 86400)
-    hours, rem = divmod(rem, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    if seconds < 1:
-        seconds = 1
-
-    locals_ = locals()
-    magnitudes_str = (
-        f'{int(locals_[magnitude])} {magnitude}'
-        for magnitude in ('days', 'hours', 'minutes', 'seconds')
-        if locals_[magnitude]
-    )
-
-    result = ", ".join(magnitudes_str)
-
-    return result
-
-
 def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained models to a path.
-
-    Args:
-      brains: list: Trained models to export.
-      export_path: Path: Destination folder to export brains into.
-    """
+    """Exports a list of trained policies into a folder."""
 
     training_log.info('Exporting brains')
 
@@ -165,14 +114,7 @@ def export_brains(brains: list, export_path: Path):
 
 
 def parse_args(argv):
-    """Builds a Namespace object with parsed arguments.
-
-    Args:
-      argv: list: Arguments to parse.
-
-    Returns:
-      A Namespace object containing parsed arguments.
-    """
+    """Builds a Namespace object with parsed arguments."""
 
     # It is important to keep command line argument in parity with mlagents-learn.
     # As intermixed parsing was not introduced into ArgParser until Python 3.7,
@@ -192,12 +134,10 @@ def parse_args(argv):
         help='Run id for the training session',
     )
     wrapper_parser.add_argument(
-        '--timestamp',
-        action='store_true',
-        help='Append a timestamp to the run-id. Timestamp will not be applied to log file name.',
+        '--export-path', type=str, help='Export trained models to this path'
     )
     wrapper_parser.add_argument(
-        '--export-path', type=str, help='Export trained models to this path'
+        '--log-filename', type=str, help='Write log output to this file. Defaults to run-id.'
     )
 
     parser = argparse.ArgumentParser(
@@ -221,12 +161,8 @@ def parse_args(argv):
     return args
 
 
-def configure_log(run_id: str):
-    """Configures logging for a training session.
-
-    Args:
-      run_id: str: The training session's run-id
-    """
+def configure_logging(log_filename: str):
+    """Configures logging for a training session."""
 
     log_config = {
         "version": 1,
@@ -251,11 +187,11 @@ def configure_log(run_id: str):
     if not log_folder.exists():
         log_folder.mkdir(parents=True, exist_ok=True)
 
-    run_id = Path(run_id)
-    if not run_id.suffix == '.log':
-        run_id = run_id.with_suffix('.log')
+    log_filename = Path(log_filename)
+    if not log_filename.suffix == '.log':
+        log_filename = log_filename.with_suffix('.log')
 
-    log_path = log_folder / run_id.name
+    log_path = log_folder / log_filename.name
 
     log_config['handlers']['file']['filename'] = log_path
     logging.config.dictConfig(log_config)

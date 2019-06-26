@@ -1,17 +1,16 @@
-"""Loads configuration files and fetches loaded configuration values.
-
-# Relative path from MLAgents' project root folder to the summaries folder.
+"""Loads configuration files, fetches loaded configuration values and parses
+training arguments from configuration values.
 
 Notes:
 - All path configuration values should be a relative path from MLAgents' project root folder to the target asset or folder
-- The `--timestamp` and `--export-path` options apply to training_wrapper.
+- `--export-path` and `--logname` configuration values apply to training_wrapper
 """
 
-import json
 import logging
 
 from pathlib import Path
-from .command_util import open_file
+
+from . import command_util as command_util
 
 
 # Default configuration values
@@ -22,8 +21,9 @@ _RUN_ID_KEY = '--run-id'
 _NUM_ENVS_KEY = '--num-envs'
 _NO_GRAPHICS_KEY = '--no-graphics'
 _TIMESTAMP_KEY = '--timestamp'
+_LOG_FILE_NAME = '--log-filename'
 
-_DEFAULT_CONFIG = {
+_DEFAULT_GRIM_CONFIG = {
     _TRAINER_CONFIG_PATH_KEY: '',
     _ENV_KEY: '',
     '--export-path': '',
@@ -38,6 +38,39 @@ _DEFAULT_CONFIG = {
     _NUM_ENVS_KEY: '',
     _NO_GRAPHICS_KEY: False,
     _TIMESTAMP_KEY: False,
+    _LOG_FILE_NAME: None,
+}
+
+_DEFAULT_TRAINER_CONFIG = """default:
+    trainer: ppo
+    batch_size: 1024
+    beta: 5.0e-3
+    buffer_size: 10240
+    epsilon: 0.2
+    gamma: 0.99
+    hidden_units: 128
+    lambd: 0.95
+    learning_rate: 3.0e-4
+    max_steps: 5.0e4
+    memory_size: 256
+    normalize: false
+    num_epoch: 3
+    num_layers: 2
+    time_horizon: 64
+    sequence_length: 64
+    summary_freq: 1000
+    use_recurrent: false
+    use_curiosity: false
+    curiosity_strength: 0.01
+    curiosity_enc_size: 128
+"""
+
+_DEFAULT_CURRICULUM = {
+    "measure": "progress",
+    "thresholds": [0.1],
+    "min_lesson_length": 100,
+    "signal_smoothing": True,
+    "parameters": {"example_reset_parameter": [1.5, 2.0]},
 }
 
 
@@ -52,85 +85,57 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_config_file(config_path: Path):
-    """Opens the specified configuration file with the system's default editor.
-
-    Args:
-      config_path: Path: Path object for the configuration file to edit.
+def edit_grim_config_file(file_path: Path):
+    """Opens a grimagents configuration file with the system's default editor.
+    Creates a configuration file with default values if file does not already exist.
     """
 
-    if not config_path.suffix == '.json':
-        config_path = config_path.with_suffix('.json')
+    if not file_path.suffix == '.json':
+        file_path = file_path.with_suffix('.json')
 
-    if not config_path.exists():
-        create_config_file(config_path)
+    if not file_path.exists():
+        create_grim_config_file(file_path)
 
-    open_file(config_path)
-
-
-def create_config_file(config_path: Path):
-    """Creates a configuration file with default values at the specified path.
-
-    Args:
-      config_path: Path: Path object for the configuration file to create.
-    """
-
-    # Note: If directory doesn't exist, create it.
-    if not config_path.parent.exists():
-        config_path.parent.mkdir(parents=True)
-
-    config_log.info(f'Creating configuration file \'{config_path}\'')
-    with config_path.open(mode='w') as f:
-        json.dump(get_default_config(), f, indent=4)
+    command_util.open_file(file_path)
 
 
-def get_default_config():
+def create_grim_config_file(file_path: Path):
+    """Creates a configuration file with default values at the specified path."""
+
+    command_util.write_json_file(get_default_grim_config(), file_path)
+
+
+def get_default_grim_config():
     """Fetches a copy of the default configuration dictionary."""
 
-    return _DEFAULT_CONFIG.copy()
+    return _DEFAULT_GRIM_CONFIG.copy()
 
 
-def load_config_file(config_path: Path):
-    """Loads a configuration file into the loaded configuration global dictionary.
-
-    Args:
-      config_path: Path: Path object for the configuration file to load into memory.
-
-    Returns:
-      Configuration dictionary loaded from file.
+def load_grim_config_file(file_path: Path):
+    """Loads a grimagents configuration dictionary from file.
 
     Raises:
       FileNotFoundError: An error occurred while attempting to load a configuration file.
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
-    try:
-        with config_path.open('r') as f:
-            configuration = json.load(f)
-    except FileNotFoundError as exception:
-        config_log.error(f'Configuration file \'{config_path}\' not found')
-        raise exception
+    configuration = command_util.load_json_file(file_path)
 
-    if validate_configuration(configuration):
-        loaded_config = configuration
-    else:
-        config_log.error(f'Configuration file \'{config_path}\' is invalid')
+    if not validate_grim_configuration(configuration):
+        config_log.error(f'Configuration file \'{file_path}\' is invalid')
         raise InvalidConfigurationError
 
-    return loaded_config
+    return configuration
 
 
-def validate_configuration(configuration):
+def validate_grim_configuration(configuration):
     """Checks the specified configuration dictionary for all required keys and conditions.
-
-    Args:
-      configuration: The configuration dictionary to validate.
 
     Returns:
       True if the configuration is valid and False if it is not.
     """
 
-    default_config = get_default_config()
+    default_config = get_default_grim_config()
     is_valid_config = True
 
     # Check all keys in configuration against the default configuration.
@@ -144,27 +149,63 @@ def validate_configuration(configuration):
             config_log.error(f'Configuration contains invalid key \'{key}\'')
             is_valid_config = False
 
-    # The only currently required key is 'trainer-config-path.'
-    try:
-        if not configuration[_TRAINER_CONFIG_PATH_KEY]:
-            raise KeyError
+    # The only required keys are 'trainer-config-path' and '--run-id'
+    for key in {_TRAINER_CONFIG_PATH_KEY, _RUN_ID_KEY}:
+        try:
+            if not configuration[key]:
+                raise KeyError
 
-    except KeyError:
-        config_log.error(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
-        is_valid_config = False
+        except KeyError:
+            config_log.error(f'Configuration is missing required key \'{key}\'')
+            is_valid_config = False
 
     return is_valid_config
 
 
+def edit_trainer_configuration_file(file_path: Path):
+    """Opens a trainer configuration file for editing. Creates a configuration
+    file with default values if file does not already exit.
+    """
+
+    if not file_path.suffix == '.yaml':
+        file_path = file_path.with_suffix('.yaml')
+
+    if not file_path.exists():
+        create_trainer_configuration_file(file_path)
+
+    command_util.open_file(file_path)
+
+
+def create_trainer_configuration_file(file_path: Path):
+    """Creates a trainer configuration file with default values at the specified path."""
+
+    command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
+
+
+def edit_curriculum_file(file_path: Path):
+    """Opens a curriculum file for editing. Creates a curriculum file with
+    default values if file does not already exit.
+    """
+
+    if not file_path.suffix == '.json':
+        file_path = file_path.with_suffix('.json')
+
+    if not file_path.exists():
+        create_curriculum_file(file_path)
+
+    command_util.open_file(file_path)
+
+
+def create_curriculum_file(file_path: Path):
+    """Creates a curriculum file with default values at the specified path."""
+
+    command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
+
+
 def get_training_arguments(configuration):
     """Converts a configuration dictionary into command line arguments
-    for mlagents-learn.
-
-    Args:
-      configuration: A configuration dictionary
-
-    Returns:
-      A list of command line arguments.
+    for mlagents-learn and filters out values that should not be sent to
+    the training process.
     """
 
     command_args = list()
@@ -181,10 +222,8 @@ def get_training_arguments(configuration):
                 command_args = command_args + [key]
             continue
 
-        # Note: The --timestamp argument does not accept a value.
+        # Note: The --timestamp argument does not get sent to training_wrapper.
         if key == _TIMESTAMP_KEY:
-            if value is True:
-                command_args = command_args + [key]
             continue
 
         if value:
@@ -237,4 +276,16 @@ def get_timestamp_enabled(configuration):
 def set_timestamp_enabled(value: bool, configuration):
 
     configuration[_TIMESTAMP_KEY] = value
+    return configuration
+
+
+def get_log_filename(configuration):
+    try:
+        return configuration[_LOG_FILE_NAME]
+    except KeyError:
+        return None
+
+
+def set_log_filename(value: str, configuration):
+    configuration[_LOG_FILE_NAME] = value
     return configuration

@@ -29,9 +29,10 @@ Training can be initiated several ways:
 
 ### grimagents
 ```
-usage: grim-agents [-h] [--list] [--edit-config FILE] [--new-window]
-                   [--tensorboard-start] [--env ENV] [--lesson LESSON]
-                   [--run-id RUN_ID] [--num-envs NUM_ENVS]
+usage: grim-agents [-h] [--list] [--edit-config FILE]
+                   [--edit-trainer-config FILE] [--new-window]
+                   [--tensorboard-start] [--resume] [--env ENV]
+                   [--lesson LESSON] [--run-id RUN_ID] [--num-envs NUM_ENVS]
                    [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                    configuration_file ...
 
@@ -39,26 +40,29 @@ CLI application that wraps Unity ML-Agents with some quality of life
 improvements.
 
 positional arguments:
-  configuration_file   Configuration file to load training arguments from
-  args                 Additional arguments applied to training (ex. --slow,
-                       --debug, --load)
+  configuration_file    Configuration file to extract training arguments from
+  args                  Additional arguments applied to training (ex. --slow,
+                        --debug, --load)
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --list               List mlagents-learn training options
-  --edit-config FILE   Open a configuration file for editing
-  --new-window         Run training process in a new console window
-  --tensorboard-start  Start tensorboard server
+  -h, --help            show this help message and exit
+  --list                List mlagents-learn training options
+  --edit-config FILE    Open a grimagents configuration file for editing
+  --edit-trainer-config FILE
+                        Open a trainer configuration file for editing
+  --new-window          Run training process in a new console window
+  --tensorboard-start   Start tensorboard server
+  --resume              Resume the last training run
   --env ENV
   --lesson LESSON
   --run-id RUN_ID
   --num-envs NUM_ENVS
   --graphics
   --no-graphics
-  --timestamp          Append timestamp to run-id. Overrides configuration
-                       setting.
-  --no-timestamp       Do not append timestamp to run-id. Overrides
-                       configuration setting.
+  --timestamp           Append timestamp to run-id. Overrides configuration
+                        setting.
+  --no-timestamp        Do not append timestamp to run-id. Overrides
+                        configuration setting.
 ```
 
 #### Example usages
@@ -80,8 +84,8 @@ grimagents grim-agents\config\3DBall.json --run-id 3DBall-2019-06-20_19-23-58 --
 
 ### training_wrapper
 ```
-usage: training_wrapper [-h] [--run-id <run-id>] [--timestamp]
-                        [--export-path EXPORT_PATH]
+usage: training_wrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
+                        [--log-filename LOG_FILENAME]
                         trainer_config_path ...
 
 CLI application that wraps mlagents-learn with quality of life improvements.
@@ -94,19 +98,19 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --run-id <run-id>     Run id for the training session
-  --timestamp           Append a timestamp to the run-id. Timestamp will not
-                        be applied to log file name.
   --export-path EXPORT_PATH
                         Export trained models to this path
+  --log-filename LOG_FILENAME
+                        Write log output to this file. Defaults to run-id.
 ```
 
 
 ## Configuration
-Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` is the only mandatory configuration value. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
 All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
 
-The `--timestamp` argument is consumed by `training_wrapper` and not passed on to `mlagents-learn`.
+The `--timestamp` and `--log-filename` arguments are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
 #### Example configuration file
 ```json
