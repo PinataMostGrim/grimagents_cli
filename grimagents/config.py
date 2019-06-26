@@ -76,16 +76,16 @@ def create_grim_config_file(config_path: Path):
       config_path: Path: Path object for the configuration file to create.
     """
 
-    command_util.write_json_file(get_default_config(), config_path)
+    command_util.write_json_file(get_default_grim_config(), config_path)
 
 
-def get_default_config():
+def get_default_grim_config():
     """Fetches a copy of the default configuration dictionary."""
 
     return _DEFAULT_GRIM_CONFIG.copy()
 
 
-def load_config_file(config_path: Path):
+def load_grim_config_file(config_path: Path):
     """Loads a configuration file into the loaded configuration global dictionary.
 
     Args:
@@ -101,14 +101,14 @@ def load_config_file(config_path: Path):
 
     configuration = command_util.load_json_file(config_path)
 
-    if not validate_configuration(configuration):
+    if not validate_grim_configuration(configuration):
         config_log.error(f'Configuration file \'{config_path}\' is invalid')
         raise InvalidConfigurationError
 
     return configuration
 
 
-def validate_configuration(configuration):
+def validate_grim_configuration(configuration):
     """Checks the specified configuration dictionary for all required keys and conditions.
 
     Args:
@@ -118,7 +118,7 @@ def validate_configuration(configuration):
       True if the configuration is valid and False if it is not.
     """
 
-    default_config = get_default_config()
+    default_config = get_default_grim_config()
     is_valid_config = True
 
     # Check all keys in configuration against the default configuration.

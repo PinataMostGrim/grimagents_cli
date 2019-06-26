@@ -87,7 +87,7 @@ class PerformTraining(Command):
         self.show_command = False
         trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
-        config = config_util.load_config_file(config_path)
+        config = config_util.load_grim_config_file(config_path)
         config = self.override_configuration_values(config, args)
 
         if config_util.get_timestamp_enabled(config):

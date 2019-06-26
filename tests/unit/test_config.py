@@ -41,7 +41,7 @@ def test_create_grim_config_file(fixture_grim_config_file):
     config.create_grim_config_file(path)
     assert path.exists()
 
-    data = config.get_default_config()
+    data = config.get_default_grim_config()
     with path.open('r') as f:
         file_data = json.load(f)
 
@@ -55,7 +55,7 @@ def test_load_grim_config_file(fixture_grim_config_file):
     with path.open(mode='w') as f:
         json.dump(VALID_CONFIGURATION, f, indent=4)
 
-    file_data = config.load_config_file(path)
+    file_data = config.load_grim_config_file(path)
     assert file_data == VALID_CONFIGURATION
 
 
@@ -69,17 +69,17 @@ def test_invalid_configuration_error(fixture_grim_config_file):
         json.dump(INVALID_CONFIGURATION, f, indent=4)
 
     with pytest.raises(config.InvalidConfigurationError):
-        config.load_config_file(path)
+        config.load_grim_config_file(path)
 
 
 def test_configuration_validation():
     """Test for validating or rejecting grimagent configurations."""
 
     configuration = {"--env": "builds\\3DBall\\Unity Environment.exe"}
-    assert config.validate_configuration(configuration) is False
+    assert config.validate_grim_configuration(configuration) is False
 
     configuration['trainer-config-path'] = 'config\\3DBall.yaml'
-    assert config.validate_configuration(configuration) is False
+    assert config.validate_grim_configuration(configuration) is False
 
     configuration['--run-id'] = '3DBall'
-    assert config.validate_configuration(configuration) is True
+    assert config.validate_grim_configuration(configuration) is True
