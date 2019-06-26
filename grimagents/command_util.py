@@ -104,9 +104,7 @@ def create_history_file():
 
     history_file = settings.get_history_file_path()
     history = {"history": []}
-
-    with history_file.open(mode='w') as file:
-        json.dump(history, file, indent=4)
+    write_json_file(history, history_file)
 
 
 def load_history():
@@ -121,10 +119,7 @@ def load_history():
     if not history_file.exists():
         create_history_file()
 
-    with history_file.open(mode='r') as file:
-        dict = json.load(file)
-
-    return dict
+    return load_json_file(history_file)
 
 
 def save_to_history(command: list):
