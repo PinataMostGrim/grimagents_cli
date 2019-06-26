@@ -55,19 +55,22 @@ class ListTrainingOptions(Command):
 
 
 class EditGrimConfigFile(Command):
-    """Opens a GrimAgents configuration file for editing."""
+    """Opens a GrimAgents configuration file for editing or creatse one if
+    a file does not already exist."""
 
     def execute(self, args):
-        config_path = Path(args.edit_config)
-        config_util.edit_grim_config_file(config_path)
+        file_path = Path(args.edit_config)
+        config_util.edit_grim_config_file(file_path)
 
 
 class EditTrainerConfigFile(Command):
-    """Creates a default configuration file."""
+    """Opens a trainer configuration file for editing or creates one if
+    a file does not already exist.
+    """
 
     def execute(self, args):
-        config_path = Path(args.edit_trainer_config)
-        config_util.edit_trainer_configuration_file(config_path)
+        file_path = Path(args.edit_trainer_config)
+        config_util.edit_trainer_configuration_file(file_path)
 
 
 class EditCurriculumFile(Command):

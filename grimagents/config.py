@@ -88,24 +88,24 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_grim_config_file(config_path: Path):
+def edit_grim_config_file(file_path: Path):
     """Opens a grimagents configuration file with the system's default editor.
     Creates a configuration file with default values if file does not already exist.
     """
 
-    if not config_path.suffix == '.json':
-        config_path = config_path.with_suffix('.json')
+    if not file_path.suffix == '.json':
+        file_path = file_path.with_suffix('.json')
 
-    if not config_path.exists():
-        create_grim_config_file(config_path)
+    if not file_path.exists():
+        create_grim_config_file(file_path)
 
-    command_util.open_file(config_path)
+    command_util.open_file(file_path)
 
 
-def create_grim_config_file(config_path: Path):
+def create_grim_config_file(file_path: Path):
     """Creates a configuration file with default values at the specified path."""
 
-    command_util.write_json_file(get_default_grim_config(), config_path)
+    command_util.write_json_file(get_default_grim_config(), file_path)
 
 
 def get_default_grim_config():
@@ -114,7 +114,7 @@ def get_default_grim_config():
     return _DEFAULT_GRIM_CONFIG.copy()
 
 
-def load_grim_config_file(config_path: Path):
+def load_grim_config_file(file_path: Path):
     """Loads a grimagents configuration dictionary from file.
 
     Raises:
@@ -122,10 +122,10 @@ def load_grim_config_file(config_path: Path):
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
-    configuration = command_util.load_json_file(config_path)
+    configuration = command_util.load_json_file(file_path)
 
     if not validate_grim_configuration(configuration):
-        config_log.error(f'Configuration file \'{config_path}\' is invalid')
+        config_log.error(f'Configuration file \'{file_path}\' is invalid')
         raise InvalidConfigurationError
 
     return configuration
@@ -165,18 +165,18 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
-def edit_trainer_configuration_file(config_path: Path):
+def edit_trainer_configuration_file(file_path: Path):
     """Opens a trainer configuration file for editing. Creates a configuration
     file with default values if file does not already exit.
     """
 
-    if not config_path.suffix == '.yaml':
-        config_path = config_path.with_suffix('.yaml')
+    if not file_path.suffix == '.yaml':
+        file_path = file_path.with_suffix('.yaml')
 
-    if not config_path.exists():
-        command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
+    if not file_path.exists():
+        command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
 
-    command_util.open_file(config_path)
+    command_util.open_file(file_path)
 
 
 def edit_curriculum_file(file_path: Path):
