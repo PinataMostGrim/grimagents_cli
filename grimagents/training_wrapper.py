@@ -22,7 +22,7 @@ from pathlib import Path
 from subprocess import Popen, PIPE
 
 import settings as settings
-import helpers as helpers
+import common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -78,7 +78,7 @@ def main():
             export_brains(exported_brains, Path(args.export_path))
 
         end_time = time.perf_counter()
-        training_duration = helpers.get_human_readable_duration(end_time - start_time)
+        training_duration = common.get_human_readable_duration(end_time - start_time)
 
         training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
 

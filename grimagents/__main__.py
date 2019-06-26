@@ -27,7 +27,7 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
-from . import helpers as helpers
+from . import common as common
 from . import settings as settings
 
 
@@ -106,7 +106,7 @@ class PerformTraining(Command):
             if not config_util.get_log_filename(config):
                 config = config_util.set_log_filename(run_id, config)
 
-            timestamp = helpers.get_timestamp()
+            timestamp = common.get_timestamp()
             run_id = f'{run_id}-{timestamp}'
             config = config_util.set_run_id(run_id, config)
 

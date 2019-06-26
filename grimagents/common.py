@@ -1,25 +1,17 @@
-"""General package helper methods."""
+"""Methods useful across package modules."""
 
 from datetime import datetime
 
 
 def get_timestamp():
-    """Fetch the current time as a string.
-
-    Returns:
-      The current time as a string.
-    """
+    """Fetch the current time as a string."""
 
     now = datetime.now()
     return now.strftime('%Y-%m-%d_%H-%M-%S')
 
 
 def get_human_readable_duration(seconds):
-    """Parses seconds into a human readable string.
-
-    Returns:
-      A human readable string.
-    """
+    """Parses seconds into a human readable string."""
 
     seconds = int(seconds)
     days, rem = divmod(seconds, 86400)
