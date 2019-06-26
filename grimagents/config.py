@@ -169,13 +169,18 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
-def create_trainer_configuration_file(config_path: Path):
-    """Write a default trainer configuration file to the provided location."""
+def edit_trainer_configuration_file(config_path: Path):
+    """Opens a trainer configuration file for editing. Creates a configuration
+    file with default values if file does not already exit.
+    """
 
     if not config_path.suffix == '.yaml':
         config_path = config_path.with_suffix('.yaml')
 
-    command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
+    if not config_path.exists():
+        command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
+
+    command_util.open_file(config_path)
 
 
 def get_training_arguments(configuration):

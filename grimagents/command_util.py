@@ -82,7 +82,7 @@ def write_file(text, file_path: Path, overwrite=False):
         command_log.warning(f'File {file_path} already exists, aborting write')
         return
 
-    command_log.info(f'Writing to {file_path}')
+    command_log.debug(f'Writing to {file_path}')
     file_path.write_text(text)
 
 
@@ -92,7 +92,7 @@ def write_json_file(json_data, file_path: Path):
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
 
-    command_log.info(f'Creating file \'{file_path}\'')
+    command_log.debug(f'Creating file \'{file_path}\'')
     with file_path.open(mode='w') as f:
         json.dump(json_data, f, indent=4)
 

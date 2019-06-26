@@ -62,13 +62,12 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(config_path)
 
 
-class CreateTrainerConfigFile(Command):
+class EditTrainerConfigFile(Command):
     """Creates a default configuration file."""
 
     def execute(self, args):
-        config_path = Path(args.create_trainer_config)
-        config_util.create_trainer_configuration_file(config_path)
-        command_util.open_file(config_path)
+        config_path = Path(args.edit_trainer_config)
+        config_util.edit_trainer_configuration_file(config_path)
 
 
 class StartTensorboard(Command):
@@ -171,8 +170,8 @@ def main():
         ListTrainingOptions().execute(args)
     elif args.edit_config:
         EditGrimConfigFile().execute(args)
-    elif args.create_trainer_config:
-        CreateTrainerConfigFile().execute(args)
+    elif args.edit_trainer_config:
+        EditTrainerConfigFile().execute(args)
     elif args.tensorboard_start:
         StartTensorboard().execute(args)
     elif args.resume:
@@ -197,10 +196,10 @@ def parse_args(argv):
         help='Open a grimagents configuration file for editing',
     )
     options_parser.add_argument(
-        '--create-trainer-config',
+        '--edit-trainer-config',
         metavar='FILE',
         type=str,
-        help='Create a default trainer configuration file',
+        help='Open a trainer configuration file for editing',
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
@@ -243,7 +242,7 @@ def parse_args(argv):
     )
 
     parser.add_argument(
-        'configuration_file', type=str, help='Configuration file to load training arguments from'
+        'configuration_file', type=str, help='Configuration file to extract training arguments from'
     )
     parser.add_argument(
         'args',
