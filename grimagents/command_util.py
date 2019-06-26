@@ -58,11 +58,7 @@ def execute_command_and_capture(command: list, cwd=None, show_command=True):
 
 
 def open_file(file_path: Path):
-    """Opens a file using the default system application.
-
-    Args:
-      file_path: Path: The file to open.
-    """
+    """Opens a file using the default system application."""
 
     command_log.info(f'Opening \'{file_path}\'')
 
@@ -75,13 +71,24 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
+def write_file(text, file_path: Path, overwrite=False):
+    """Write text to a file."""
+
+    if file_path.exists() and not overwrite:
+        command_log.warning(f'File {file_path} already exists, aborting write')
+        return
+
+    command_log.debug(f'Writing to {file_path}')
+    file_path.write_text(text)
+
+
 def write_json_file(json_data, file_path: Path):
     """Write json data to a file."""
 
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
 
-    command_log.info(f'Creating file \'{file_path}\'')
+    command_log.debug(f'Creating file \'{file_path}\'')
     with file_path.open(mode='w') as f:
         json.dump(json_data, f, indent=4)
 
@@ -123,11 +130,7 @@ def load_history():
 
 
 def save_to_history(command: list):
-    """Saves a training command to the history file.
-
-    Args:
-      command: list: Training command to save.
-    """
+    """Saves a training command to the history file."""
 
     history_file = settings.get_history_file_path()
     dict = load_history()

@@ -41,6 +41,30 @@ _DEFAULT_GRIM_CONFIG = {
     _LOG_FILE_NAME: None,
 }
 
+_DEFAULT_TRAINER_CONFIG = """default:
+    trainer: ppo
+    batch_size: 1024
+    beta: 5.0e-3
+    buffer_size: 10240
+    epsilon: 0.2
+    gamma: 0.99
+    hidden_units: 128
+    lambd: 0.95
+    learning_rate: 3.0e-4
+    max_steps: 5.0e4
+    memory_size: 256
+    normalize: false
+    num_epoch: 3
+    num_layers: 2
+    time_horizon: 64
+    sequence_length: 64
+    summary_freq: 1000
+    use_recurrent: false
+    use_curiosity: false
+    curiosity_strength: 0.01
+    curiosity_enc_size: 128
+"""
+
 
 config_log = logging.getLogger('grimagents.config')
 
@@ -54,10 +78,8 @@ class InvalidConfigurationError(ConfigurationError):
 
 
 def edit_grim_config_file(config_path: Path):
-    """Opens the specified configuration file with the system's default editor.
-
-    Args:
-      config_path: Path: Path object for the configuration file to edit.
+    """Opens a grimagents configuration file with the system's default editor.
+    Creates a configuration file with default values if file does not already exist.
     """
 
     if not config_path.suffix == '.json':
@@ -70,29 +92,19 @@ def edit_grim_config_file(config_path: Path):
 
 
 def create_grim_config_file(config_path: Path):
-    """Creates a configuration file with default values at the specified path.
+    """Creates a configuration file with default values at the specified path."""
 
-    Args:
-      config_path: Path: Path object for the configuration file to create.
-    """
-
-    command_util.write_json_file(get_default_config(), config_path)
+    command_util.write_json_file(get_default_grim_config(), config_path)
 
 
-def get_default_config():
+def get_default_grim_config():
     """Fetches a copy of the default configuration dictionary."""
 
     return _DEFAULT_GRIM_CONFIG.copy()
 
 
-def load_config_file(config_path: Path):
-    """Loads a configuration file into the loaded configuration global dictionary.
-
-    Args:
-      config_path: Path: Path object for the configuration file to load into memory.
-
-    Returns:
-      Configuration dictionary loaded from file.
+def load_grim_config_file(config_path: Path):
+    """Loads a grimagents configuration dictionary from file.
 
     Raises:
       FileNotFoundError: An error occurred while attempting to load a configuration file.
@@ -101,24 +113,21 @@ def load_config_file(config_path: Path):
 
     configuration = command_util.load_json_file(config_path)
 
-    if not validate_configuration(configuration):
+    if not validate_grim_configuration(configuration):
         config_log.error(f'Configuration file \'{config_path}\' is invalid')
         raise InvalidConfigurationError
 
     return configuration
 
 
-def validate_configuration(configuration):
+def validate_grim_configuration(configuration):
     """Checks the specified configuration dictionary for all required keys and conditions.
-
-    Args:
-      configuration: The configuration dictionary to validate.
 
     Returns:
       True if the configuration is valid and False if it is not.
     """
 
-    default_config = get_default_config()
+    default_config = get_default_grim_config()
     is_valid_config = True
 
     # Check all keys in configuration against the default configuration.
@@ -145,16 +154,24 @@ def validate_configuration(configuration):
     return is_valid_config
 
 
+def edit_trainer_configuration_file(config_path: Path):
+    """Opens a trainer configuration file for editing. Creates a configuration
+    file with default values if file does not already exit.
+    """
+
+    if not config_path.suffix == '.yaml':
+        config_path = config_path.with_suffix('.yaml')
+
+    if not config_path.exists():
+        command_util.write_file(_DEFAULT_TRAINER_CONFIG, config_path)
+
+    command_util.open_file(config_path)
+
+
 def get_training_arguments(configuration):
     """Converts a configuration dictionary into command line arguments
     for mlagents-learn and filters out values that should not be sent to
     the training process.
-
-    Args:
-      configuration: A configuration dictionary
-
-    Returns:
-      A list of command line arguments.
     """
 
     command_args = list()

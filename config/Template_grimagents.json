@@ -12,5 +12,6 @@
     "--base-port": "",
     "--num-envs": "",
     "--no-graphics": false,
-    "--timestamp": false
+    "--timestamp": false,
+    "--log-filename": null
 }

@@ -27,7 +27,7 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
-from . import helpers as helpers
+from . import common as common
 from . import settings as settings
 
 
@@ -62,6 +62,14 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(config_path)
 
 
+class EditTrainerConfigFile(Command):
+    """Creates a default configuration file."""
+
+    def execute(self, args):
+        config_path = Path(args.edit_trainer_config)
+        config_util.edit_trainer_configuration_file(config_path)
+
+
 class StartTensorboard(Command):
     """Starts a new instance of tensorboard server in a new terminal window."""
 
@@ -87,7 +95,7 @@ class PerformTraining(Command):
         self.show_command = False
         trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
-        config = config_util.load_config_file(config_path)
+        config = config_util.load_grim_config_file(config_path)
         config = self.override_configuration_values(config, args)
 
         if config_util.get_timestamp_enabled(config):
@@ -98,7 +106,7 @@ class PerformTraining(Command):
             if not config_util.get_log_filename(config):
                 config = config_util.set_log_filename(run_id, config)
 
-            timestamp = helpers.get_timestamp()
+            timestamp = common.get_timestamp()
             run_id = f'{run_id}-{timestamp}'
             config = config_util.set_run_id(run_id, config)
 
@@ -162,6 +170,8 @@ def main():
         ListTrainingOptions().execute(args)
     elif args.edit_config:
         EditGrimConfigFile().execute(args)
+    elif args.edit_trainer_config:
+        EditTrainerConfigFile().execute(args)
     elif args.tensorboard_start:
         StartTensorboard().execute(args)
     elif args.resume:
@@ -184,6 +194,12 @@ def parse_args(argv):
         metavar='FILE',
         type=str,
         help='Open a grimagents configuration file for editing',
+    )
+    options_parser.add_argument(
+        '--edit-trainer-config',
+        metavar='FILE',
+        type=str,
+        help='Open a trainer configuration file for editing',
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
@@ -226,7 +242,7 @@ def parse_args(argv):
     )
 
     parser.add_argument(
-        'configuration_file', type=str, help='Configuration file to load training arguments from'
+        'configuration_file', type=str, help='Configuration file to extract training arguments from'
     )
     parser.add_argument(
         'args',
