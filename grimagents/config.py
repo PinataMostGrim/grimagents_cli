@@ -70,10 +70,7 @@ _DEFAULT_CURRICULUM = {
     "thresholds": [0.1],
     "min_lesson_length": 100,
     "signal_smoothing": True,
-    "parameters":
-    {
-        "example_reset_parameter": [1.5, 2.0]
-    }
+    "parameters": {"example_reset_parameter": [1.5, 2.0]},
 }
 
 

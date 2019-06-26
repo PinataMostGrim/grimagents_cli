@@ -216,7 +216,8 @@ def parse_args(argv):
         type=str,
         help='Open a trainer configuration file for editing',
     )
-    options_parser.add_argument('--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
+    options_parser.add_argument(
+        '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'
