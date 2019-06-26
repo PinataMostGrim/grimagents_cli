@@ -75,9 +75,14 @@ def open_file(file_path: Path):
         execute_command(command)
 
 
-def write_file(text, file_path: Path):
+def write_file(text, file_path: Path, overwrite=False):
     """Write text to a file."""
 
+    if file_path.exists() and not overwrite:
+        command_log.warning(f'File {file_path} already exists, aborting write')
+        return
+
+    command_log.info(f'Writing to {file_path}')
     file_path.write_text(text)
 
 
