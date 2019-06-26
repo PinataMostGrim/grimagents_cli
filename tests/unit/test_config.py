@@ -6,6 +6,7 @@ import grimagents.config as config
 
 
 GRIM_CONFIG_FILE = 'grim_config.json'
+TRAINER_CONFIG_FILE = 'trainer_config.yaml'
 
 VALID_CONFIGURATION = {
     "trainer-config-path": "config\\3DBall.yaml",
@@ -22,8 +23,11 @@ def get_grim_config_file_path():
     return Path(__file__).parent / GRIM_CONFIG_FILE
 
 
-def delete_grim_config_file():
-    file = get_grim_config_file_path()
+def get_trainer_config_file_path():
+    return Path(__file__).parent / TRAINER_CONFIG_FILE
+
+
+def delete_file(file: Path):
     if file.exists():
         file.unlink()
 
@@ -31,7 +35,14 @@ def delete_grim_config_file():
 @pytest.fixture
 def fixture_grim_config_file():
     yield 'fixture_grim_config_file'
-    delete_grim_config_file()
+    delete_file(get_grim_config_file_path())
+
+
+@pytest.fixture
+def fixture_trainer_config_file():
+    delete_file(get_trainer_config_file_path())
+    yield 'fixture_trainer_config_file'
+    delete_file(get_trainer_config_file_path())
 
 
 def test_create_grim_config_file(fixture_grim_config_file):
@@ -83,3 +94,11 @@ def test_configuration_validation():
 
     configuration['--run-id'] = '3DBall'
     assert config.validate_grim_configuration(configuration) is True
+
+
+def test_create_trainer_config_file(fixture_trainer_config_file):
+    """Test for creating default trainer configuration files."""
+
+    path = get_trainer_config_file_path()
+    config.create_trainer_configuration_file(path)
+    assert path.exists()
