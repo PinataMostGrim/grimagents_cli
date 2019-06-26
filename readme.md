@@ -110,7 +110,7 @@ Values that are not present in a configuration file or left empty will not be pa
 
 All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
 
-The `--timestamp` argument is consumed by `training_wrapper` and not passed on to `mlagents-learn`.
+The `--timestamp` and `--log-filename` arguments are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
 #### Example configuration file
 ```json
