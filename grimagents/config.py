@@ -194,9 +194,15 @@ def edit_curriculum_file(file_path: Path):
         file_path = file_path.with_suffix('.json')
 
     if not file_path.exists():
-        command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
+        create_curriculum_file(file_path)
 
     command_util.open_file(file_path)
+
+
+def create_curriculum_file(file_path: Path):
+    """Creates a curriculum file with default values at the specified path."""
+
+    command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
 
 
 def get_training_arguments(configuration):

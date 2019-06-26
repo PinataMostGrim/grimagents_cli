@@ -7,6 +7,7 @@ import grimagents.config as config
 
 GRIM_CONFIG_FILE = 'grim_config.json'
 TRAINER_CONFIG_FILE = 'trainer_config.yaml'
+CURRICULUM_FILE = 'curriculum.json'
 
 VALID_CONFIGURATION = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
 
@@ -19,6 +20,10 @@ def get_grim_config_file_path():
 
 def get_trainer_config_file_path():
     return Path(__file__).parent / TRAINER_CONFIG_FILE
+
+
+def get_curriculum_file_path():
+    return Path(__file__).parent / CURRICULUM_FILE
 
 
 def delete_file(file: Path):
@@ -37,6 +42,13 @@ def fixture_trainer_config_file():
     delete_file(get_trainer_config_file_path())
     yield 'fixture_trainer_config_file'
     delete_file(get_trainer_config_file_path())
+
+
+@pytest.fixture
+def fixture_curriculum_file():
+    delete_file(get_curriculum_file_path())
+    yield 'fixture_curriculum_file'
+    delete_file(get_curriculum_file_path())
 
 
 def test_create_grim_config_file(fixture_grim_config_file):
@@ -95,4 +107,12 @@ def test_create_trainer_config_file(fixture_trainer_config_file):
 
     path = get_trainer_config_file_path()
     config.create_trainer_configuration_file(path)
+    assert path.exists()
+
+
+def test_create_curriculum_file(fixture_curriculum_file):
+    """Test for creating a default curriculum file."""
+
+    path = get_curriculum_file_path()
+    config.create_curriculum_file(path)
     assert path.exists()
