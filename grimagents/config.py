@@ -6,7 +6,6 @@ Notes:
 - `--export-path` and `--logname` configuration values apply to training_wrapper
 """
 
-import json
 import logging
 
 from pathlib import Path
@@ -133,14 +132,15 @@ def validate_configuration(configuration):
             config_log.error(f'Configuration contains invalid key \'{key}\'')
             is_valid_config = False
 
-    # The only currently required key is 'trainer-config-path.'
-    try:
-        if not configuration[_TRAINER_CONFIG_PATH_KEY]:
-            raise KeyError
+    # The only required keys are 'trainer-config-path' and '--run-id'
+    for key in {_TRAINER_CONFIG_PATH_KEY, _RUN_ID_KEY}:
+        try:
+            if not configuration[key]:
+                raise KeyError
 
-    except KeyError:
-        config_log.error(f'Configuration is missing required key \'{_TRAINER_CONFIG_PATH_KEY}\'')
-        is_valid_config = False
+        except KeyError:
+            config_log.error(f'Configuration is missing required key \'{key}\'')
+            is_valid_config = False
 
     return is_valid_config
 
