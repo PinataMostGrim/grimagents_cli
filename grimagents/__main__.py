@@ -196,7 +196,11 @@ def parse_args(argv):
         type=str,
         help='Open a grimagents configuration file for editing',
     )
-    options_parser.add_argument('--create-trainer-config', metavar='FILE', type=str, help='Create a default trainer configuration file'
+    options_parser.add_argument(
+        '--create-trainer-config',
+        metavar='FILE',
+        type=str,
+        help='Create a default trainer configuration file',
     )
     options_parser.add_argument(
         '--new-window', action='store_true', help='Run training process in a new console window'

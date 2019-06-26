@@ -8,15 +8,9 @@ import grimagents.config as config
 GRIM_CONFIG_FILE = 'grim_config.json'
 TRAINER_CONFIG_FILE = 'trainer_config.yaml'
 
-VALID_CONFIGURATION = {
-    "trainer-config-path": "config\\3DBall.yaml",
-    "--run-id": "3DBall",
-}
+VALID_CONFIGURATION = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
 
-INVALID_CONFIGURATION = {
-    "--env": "builds\\3DBall\\Unity Environment.exe",
-    "--run-id": "3DBall",
-}
+INVALID_CONFIGURATION = {"--env": "builds\\3DBall\\Unity Environment.exe", "--run-id": "3DBall"}
 
 
 def get_grim_config_file_path():
