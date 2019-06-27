@@ -112,7 +112,7 @@ Values that are not present in a configuration file or left empty will not be pa
 
 All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
 
-The `--timestamp` and `--log-filename` arguments are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
+The `--timestamp` and `--log-filename` values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
 #### Example configuration file
 ```json
@@ -138,4 +138,4 @@ The `--timestamp` and `--log-filename` arguments are consumed by the main module
 ## Notes
 Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the project's root folder set as the current working directory. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
 
-Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of mlagent-learn's output is sent to stdout so only that portion will be captured in the log file.
+Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to stdout so only that portion will be captured in the log file.
