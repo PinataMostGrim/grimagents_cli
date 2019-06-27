@@ -286,8 +286,7 @@ def parse_args(argv):
 
 
 def configure_logging():
-    """Configures logging for the grim-agents CLI.
-    """
+    """Configures logging for the grim-agents CLI."""
 
     log_config = {
         "version": 1,
