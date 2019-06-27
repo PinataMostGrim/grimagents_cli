@@ -106,6 +106,8 @@ class PerformTraining(Command):
     def create_command(self, args):
 
         self.show_command = False
+        self.new_window = args.new_window
+
         trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
@@ -165,6 +167,8 @@ class ResumeTraining(Command):
     def create_command(self, args):
 
         self.show_command = False
+        self.new_window = args.new_window
+
         command = command_util.load_last_history()
 
         if '--timestamp' in command:
