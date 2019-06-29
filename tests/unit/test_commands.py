@@ -1,4 +1,5 @@
 from grimagents.commands import TrainingCommand
+import grimagents.common
 
 
 TEST_CONFIG = {
@@ -15,7 +16,7 @@ TEST_CONFIG = {
     "--base-port": "",
     "--num-envs": "",
     "--no-graphics": False,
-    "--timestamp": True,
+    "--timestamp": False,
     "--log-filename": ""
 }
 
@@ -33,6 +34,8 @@ def test_training_command_handles_no_graphics():
 
     # '--no-graphics' should be present
     test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
         "--no-graphics": True,
     }
     command = TrainingCommand(test_config)
@@ -40,6 +43,8 @@ def test_training_command_handles_no_graphics():
 
     # '--no-graphics' should not be present
     test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
         "--no-graphics": False,
     }
     command = TrainingCommand(test_config)
@@ -50,12 +55,16 @@ def test_training_command_excludes_timestamp():
     """Test for ensuring TrainingWrapperArguments excludes the '--timestamp' argument."""
 
     test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
         "--timestamp": True,
     }
     command = TrainingCommand(test_config)
     assert '--timestamp' not in command.get_command()
 
     test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
         "--timestamp": False,
     }
     command = TrainingCommand(test_config)
@@ -67,12 +76,13 @@ def test_training_command_add_additional_args():
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\Unity Environment.exe"
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--run-id": "3DBall",
     }
     command = TrainingCommand(test_config)
     additional_args = ['--slow', '--load']
     command.set_additional_arguments(additional_args)
-    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--slow', '--load', '--train']
+    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall', '--slow', '--load', '--train']
     assert command.get_command() == command_list
 
 
@@ -93,7 +103,7 @@ def test_training_command_override_args():
         "--base-port": "",
         "--num-envs": "",
         "--no-graphics": False,
-        "--timestamp": True,
+        "--timestamp": False,
         "--log-filename": ""
     }
     command = TrainingCommand(test_config)
@@ -104,6 +114,7 @@ def test_training_command_override_args():
     command.set_num_envs('4')
     command.set_no_graphics_enabled(True)
     command.set_log_filename('3DBall.log')
+    command.set_timestamp_enabled(True)
 
     command_string = command.get_command_as_string()
     assert '--env builds\\3DBall\\3DBall.exe' in command_string
@@ -112,3 +123,33 @@ def test_training_command_override_args():
     assert '--num-envs 4' in command_string
     assert '--no-graphics' in command_string
     assert '--log-filename 3DBall.log' in command_string
+    assert '--run-id ball-' in command_string
+
+
+def test_training_command_timestamp(monkeypatch):
+    """Test for TrainingCommand correctly applying a timestamp and setting
+    the log_filename."""
+
+    def mock_return():
+        return '2019-06-29_17-13-41'
+    monkeypatch.setattr(grimagents.common, "get_timestamp", mock_return)
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--run-id": "3DBall",
+        "--timestamp": True,
+    }
+
+    # Result if a log-name is not already defined
+    command = TrainingCommand(test_config)
+    command_string = command.get_command_as_string()
+
+    assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
+    assert '--log-filename 3DBall' in command_string
+
+    # Result if a log-name is defined
+    command.set_log_filename('ball')
+    command_string = command.get_command_as_string()
+
+    assert '--log-filename ball' in command_string

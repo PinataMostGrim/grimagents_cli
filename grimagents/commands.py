@@ -1,3 +1,4 @@
+from . import common as common
 from . import settings as settings
 
 
@@ -17,7 +18,7 @@ class Command():
         self._arguments = {}
 
     def get_command(self):
-        return ['echo', __class__.__name__]
+        return ['echo', __class__.__name__, self.arguments]
 
 
 class TrainingCommand(Command):
@@ -35,8 +36,19 @@ class TrainingCommand(Command):
         the training process.
         """
 
+        # Note: We copy arguments in order to mutate it in the event a time-stamp is present.
+        command_arguments = self.arguments.copy()
+
+        if TIMESTAMP in command_arguments and command_arguments[TIMESTAMP]:
+            if LOG_FILE_NAME not in command_arguments:
+                # Note: Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
+                command_arguments[LOG_FILE_NAME] = command_arguments[RUN_ID]
+
+            timestamp = common.get_timestamp()
+            command_arguments[RUN_ID] = f'{command_arguments[RUN_ID]}-{timestamp}'
+
         result = list()
-        for key, value in self.arguments.items():
+        for key, value in command_arguments.items():
             # Note: mlagents-learn requires trainer config path be the first argument.
             if key == TRAINER_CONFIG_PATH and value:
                 result.insert(0, value)
