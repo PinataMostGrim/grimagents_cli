@@ -17,7 +17,7 @@ TEST_CONFIG = {
     "--num-envs": "",
     "--no-graphics": False,
     "--timestamp": False,
-    "--log-filename": ""
+    "--log-filename": "",
 }
 
 
@@ -25,7 +25,20 @@ def test_create_training_command():
     """Test for creating TrainingCommand with default configuration."""
 
     command = TrainingCommand(TEST_CONFIG)
-    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--train']
+    command_list = [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--export-path',
+        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        '--run-id',
+        '3DBall',
+        '--train',
+    ]
     assert command.get_command() == command_list
 
 
@@ -82,7 +95,20 @@ def test_training_command_add_additional_args():
     command = TrainingCommand(test_config)
     additional_args = ['--slow', '--load']
     command.set_additional_arguments(additional_args)
-    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall', '--slow', '--load', '--train']
+    command_list = [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--run-id',
+        '3DBall',
+        '--slow',
+        '--load',
+        '--train',
+    ]
     assert command.get_command() == command_list
 
 
@@ -104,7 +130,7 @@ def test_training_command_override_args():
         "--num-envs": "",
         "--no-graphics": False,
         "--timestamp": False,
-        "--log-filename": ""
+        "--log-filename": "",
     }
     command = TrainingCommand(test_config)
 
@@ -132,6 +158,7 @@ def test_training_command_timestamp(monkeypatch):
 
     def mock_return():
         return '2019-06-29_17-13-41'
+
     monkeypatch.setattr(grimagents.common, "get_timestamp", mock_return)
 
     test_config = {
