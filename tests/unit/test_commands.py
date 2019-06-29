@@ -62,3 +62,15 @@ def test_training_command_excludes_timestamp():
     assert '--timestamp' not in command.get_command()
 
 
+def test_training_command_add_additional_args():
+    """Test for TrainingCommand correctly setting additional arguments."""
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--env": "builds\\3DBall\\Unity Environment.exe"
+    }
+    command = TrainingCommand(test_config)
+    additional_args = ['--slow', '--load']
+    command.set_additional_arguments(additional_args)
+    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--slow', '--load', '--train']
+    assert command.get_command() == command_list

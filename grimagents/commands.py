@@ -3,6 +3,7 @@ from . import settings as settings
 TRAINER_CONFIG_PATH = 'trainer-config-path'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
+ADDITIONAL_ARGS = 'additional-args'
 
 
 class Command():
@@ -19,8 +20,14 @@ class TrainingCommand(Command):
     def __init__(self, arguments: dict):
         self.arguments = arguments.copy()
 
+    def set_additional_arguments(self, args):
+        self.arguments[ADDITIONAL_ARGS] = args
+
     def get_command(self):
-        """"""
+        """Converts a configuration dictionary into command line arguments
+        for mlagents-learn and filters out values that should not be sent to
+        the training process.
+        """
 
         result = list()
         for key, value in self.arguments.items():
@@ -37,6 +44,13 @@ class TrainingCommand(Command):
 
             # Note: The --timestamp argument does not get sent to training_wrapper.
             if key == TIMESTAMP:
+                continue
+
+            # Note: Additional arguments are serialized as a list and the key should
+            # not be included.
+            if key == ADDITIONAL_ARGS:
+                for argument in value:
+                    result.append(argument)
                 continue
 
             if value:
