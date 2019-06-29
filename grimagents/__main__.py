@@ -27,8 +27,9 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
-from . import common as common
 from . import settings as settings
+
+from .commands import TrainingCommand
 
 
 class Command:
@@ -108,56 +109,38 @@ class PerformTraining(Command):
         self.show_command = False
         self.new_window = args.new_window
 
-        trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
-        config = self.override_configuration_values(config, args)
+        training_command = TrainingCommand(config)
+        self.override_configuration_values(training_command, args)
+        training_command.set_additional_arguments(args.args)
 
-        if config_util.get_timestamp_enabled(config):
-            run_id = config_util.get_run_id(config)
-            # Note: If a log filename isn't configured, we explicitly set it
-            # to the run_id before appending a timestamp to reduce the
-            # number of log files being generated.
-            if not config_util.get_log_filename(config):
-                config = config_util.set_log_filename(run_id, config)
+        return training_command.get_command()
 
-            timestamp = common.get_timestamp()
-            run_id = f'{run_id}-{timestamp}'
-            config = config_util.set_run_id(run_id, config)
-
-        training_arguments = config_util.get_training_arguments(config)
-        return (
-            ['pipenv', 'run', 'python', str(trainer_path)]
-            + training_arguments
-            + args.args
-            + ['--train']
-        )
-
-    def override_configuration_values(self, configuration: dict, args: Namespace):
+    def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
 
         if args.env is not None:
-            configuration = config_util.set_env(args.env, configuration)
+            training_command.set_env(args.env)
         if args.lesson is not None:
-            configuration = config_util.set_lesson(str(args.lesson), configuration)
+            training_command.set_lesson(str(args.lesson))
         if args.run_id is not None:
-            configuration = config_util.set_run_id(args.run_id, configuration)
+            training_command.set_run_id(args.run_id)
         if args.num_envs is not None:
-            configuration = config_util.set_num_envs(str(args.num_envs), configuration)
+            training_command.set_num_envs(str(args.num_envs))
 
         if args.graphics:
+            training_command
             # Note: As the argument is 'no-graphics', false in this case means
             # graphics are used.
-            configuration = config_util.set_no_graphics_enabled(False, configuration)
+            training_command.set_no_graphics_enabled(False)
         if args.no_graphics:
-            configuration = config_util.set_no_graphics_enabled(True, configuration)
+            training_command.set_no_graphics_enabled(True)
 
         if args.timestamp:
-            configuration = config_util.set_timestamp_enabled(True, configuration)
+            training_command.set_timestamp_enabled(True)
         if args.no_timestamp:
-            configuration = config_util.set_timestamp_enabled(False, configuration)
-
-        return configuration
+            training_command.set_timestamp_enabled(False)
 
 
 class ResumeTraining(Command):
@@ -183,6 +166,9 @@ def main():
 
     args = parse_args(sys.argv[1:])
 
+    if args.tensorboard_start:
+        StartTensorboard().execute(args)
+
     if args.list:
         ListTrainingOptions().execute(args)
     elif args.edit_config:
@@ -191,8 +177,6 @@ def main():
         EditTrainerConfigFile().execute(args)
     elif args.edit_curriculum:
         EditCurriculumFile().execute(args)
-    elif args.tensorboard_start:
-        StartTensorboard().execute(args)
     elif args.resume:
         ResumeTraining().execute(args)
     else:
