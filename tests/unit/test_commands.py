@@ -24,21 +24,21 @@ def test_create_training_command():
     """Test for creating TrainingCommand with default configuration."""
 
     command = TrainingCommand(TEST_CONFIG)
-    command_list = ['config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall']
+    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--train']
     assert command.get_command() == command_list
 
 
 def test_training_command_handles_no_graphics():
     """Test for correct handling of the --no-graphics argument."""
 
-    # --no-graphics should be present
+    # '--no-graphics' should be present
     test_config = {
         "--no-graphics": True,
     }
     command = TrainingCommand(test_config)
     assert '--no-graphics' in command.get_command()
 
-    # --no-graphics should not be present
+    # '--no-graphics' should not be present
     test_config = {
         "--no-graphics": False,
     }
@@ -47,7 +47,7 @@ def test_training_command_handles_no_graphics():
 
 
 def test_training_command_excludes_timestamp():
-    """Test for ensuring TrainingWrapperArguments excludes the --timestamp argument."""
+    """Test for ensuring TrainingWrapperArguments excludes the '--timestamp' argument."""
 
     test_config = {
         "--timestamp": True,

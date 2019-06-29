@@ -1,3 +1,5 @@
+from . import settings as settings
+
 TRAINER_CONFIG_PATH = 'trainer-config-path'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
@@ -40,6 +42,8 @@ class TrainingCommand(Command):
             if value:
                 result = result + [key, value]
 
+        trainer_path = settings.get_training_wrapper_path()
+        result = ['pipenv', 'run', 'python', str(trainer_path)] + result + ['--train']
         return result
 
 
