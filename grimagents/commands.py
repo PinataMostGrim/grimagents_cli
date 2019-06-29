@@ -1,8 +1,14 @@
 from . import settings as settings
 
+
 TRAINER_CONFIG_PATH = 'trainer-config-path'
+ENV = '--env'
+LESSON = '--lesson'
+RUN_ID = '--run-id'
+NUM_ENVS = '--num-envs'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
+LOG_FILE_NAME = '--log-filename'
 ADDITIONAL_ARGS = 'additional-args'
 
 
@@ -59,6 +65,30 @@ class TrainingCommand(Command):
         trainer_path = settings.get_training_wrapper_path()
         result = ['pipenv', 'run', 'python', str(trainer_path)] + result + ['--train']
         return result
+
+    def get_command_as_string(self):
+        return ' '.join(self.get_command())
+
+    def set_env(self, value):
+        self.arguments[ENV] = value
+
+    def set_lesson(self, value):
+        self.arguments[LESSON] = value
+
+    def set_run_id(self, value):
+        self.arguments[RUN_ID] = value
+
+    def set_num_envs(self, value):
+        self.arguments[NUM_ENVS] = value
+
+    def set_no_graphics_enabled(self, value):
+        self.arguments[NO_GRAPHICS] = value
+
+    def set_timestamp_enabled(self, value):
+        self.arguments[TIMESTAMP] = value
+
+    def set_log_filename(self, value):
+        self.arguments[LOG_FILE_NAME] = value
 
 
 class MLAgentsLearnCommand(Command):
