@@ -9,36 +9,29 @@ Notes:
 import logging
 
 from pathlib import Path
-
 from . import command_util as command_util
 
 
 # Default configuration values
-_TRAINER_CONFIG_PATH_KEY = 'trainer-config-path'
-_ENV_KEY = '--env'
-_LESSON_KEY = '--lesson'
-_RUN_ID_KEY = '--run-id'
-_NUM_ENVS_KEY = '--num-envs'
-_NO_GRAPHICS_KEY = '--no-graphics'
-_TIMESTAMP_KEY = '--timestamp'
-_LOG_FILE_NAME = '--log-filename'
+TRAINER_CONFIG_PATH = 'trainer-config-path'
+RUN_ID = '--run-id'
 
 _DEFAULT_GRIM_CONFIG = {
-    _TRAINER_CONFIG_PATH_KEY: '',
-    _ENV_KEY: '',
+    TRAINER_CONFIG_PATH: '',
+    '--env': '',
     '--export-path': '',
     '--curriculum': '',
     '--keep-checkpoints': '',
-    _LESSON_KEY: '',
-    _RUN_ID_KEY: 'ppo',
+    '--lesson': '',
+    RUN_ID: 'ppo',
     '--num-runs': '',
     '--save-freq': '',
     '--seed': '',
     '--base-port': '',
-    _NUM_ENVS_KEY: '',
-    _NO_GRAPHICS_KEY: False,
-    _TIMESTAMP_KEY: False,
-    _LOG_FILE_NAME: None,
+    '--num-envs': '',
+    '--no-graphics': False,
+    '--timestamp': False,
+    '--log-filename': None,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
@@ -150,7 +143,7 @@ def validate_grim_configuration(configuration):
             is_valid_config = False
 
     # The only required keys are 'trainer-config-path' and '--run-id'
-    for key in {_TRAINER_CONFIG_PATH_KEY, _RUN_ID_KEY}:
+    for key in {TRAINER_CONFIG_PATH, RUN_ID}:
         try:
             if not configuration[key]:
                 raise KeyError
@@ -200,92 +193,3 @@ def create_curriculum_file(file_path: Path):
     """Creates a curriculum file with default values at the specified path."""
 
     command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
-
-
-def get_training_arguments(configuration):
-    """Converts a configuration dictionary into command line arguments
-    for mlagents-learn and filters out values that should not be sent to
-    the training process.
-    """
-
-    command_args = list()
-
-    for key, value in configuration.items():
-        # Note: mlagents-learn requires trainer config path be the first argument.
-        if key == _TRAINER_CONFIG_PATH_KEY and value:
-            command_args.insert(0, value)
-            continue
-
-        # Note: The --no-graphics argument does not accept a value.
-        if key == _NO_GRAPHICS_KEY:
-            if value is True:
-                command_args = command_args + [key]
-            continue
-
-        # Note: The --timestamp argument does not get sent to training_wrapper.
-        if key == _TIMESTAMP_KEY:
-            continue
-
-        if value:
-            command_args = command_args + [key, value]
-
-    return command_args
-
-
-def set_env(value: str, configuration):
-    configuration[_ENV_KEY] = value
-    return configuration
-
-
-def set_lesson(value: int, configuration):
-
-    configuration[_LESSON_KEY] = value
-    return configuration
-
-
-def get_run_id(configuration):
-
-    return configuration[_RUN_ID_KEY]
-
-
-def set_run_id(value: str, configuration):
-
-    configuration[_RUN_ID_KEY] = value
-    return configuration
-
-
-def set_num_envs(value: int, configuration):
-    configuration[_NUM_ENVS_KEY] = value
-    return configuration
-
-
-def set_no_graphics_enabled(value: bool, configuration):
-
-    configuration[_NO_GRAPHICS_KEY] = value
-    return configuration
-
-
-def get_timestamp_enabled(configuration):
-
-    try:
-        return configuration['--timestamp']
-    except KeyError:
-        return False
-
-
-def set_timestamp_enabled(value: bool, configuration):
-
-    configuration[_TIMESTAMP_KEY] = value
-    return configuration
-
-
-def get_log_filename(configuration):
-    try:
-        return configuration[_LOG_FILE_NAME]
-    except KeyError:
-        return None
-
-
-def set_log_filename(value: str, configuration):
-    configuration[_LOG_FILE_NAME] = value
-    return configuration
