@@ -141,15 +141,17 @@ def test_training_command_timestamp(monkeypatch):
         "--timestamp": True,
     }
 
-    # Result if a log-name is not already defined
+    # Result if a log-filename key does not already exist
     command = TrainingCommand(test_config)
     command_string = command.get_command_as_string()
 
     assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
     assert '--log-filename 3DBall' in command_string
 
-    # Result if a log-name is defined
-    command.set_log_filename('ball')
-    command_string = command.get_command_as_string()
+    # Result if an empty log-filename key already exists
+    command.set_log_filename("")
+    assert '--log-filename 3DBall' in command.get_command_as_string()
 
-    assert '--log-filename ball' in command_string
+    # Result if a log-filename key exists and has content
+    command.set_log_filename('ball')
+    assert '--log-filename ball' in command.get_command_as_string()

@@ -40,7 +40,7 @@ class TrainingCommand(Command):
         command_arguments = self.arguments.copy()
 
         if TIMESTAMP in command_arguments and command_arguments[TIMESTAMP]:
-            if LOG_FILE_NAME not in command_arguments:
+            if LOG_FILE_NAME not in command_arguments or not command_arguments[LOG_FILE_NAME]:
                 # Note: Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
                 command_arguments[LOG_FILE_NAME] = command_arguments[RUN_ID]
 
