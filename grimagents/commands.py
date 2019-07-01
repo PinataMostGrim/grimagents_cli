@@ -6,6 +6,7 @@ TRAINER_CONFIG_PATH = 'trainer-config-path'
 ENV = '--env'
 LESSON = '--lesson'
 RUN_ID = '--run-id'
+BASE_PORT = '--base-port'
 NUM_ENVS = '--num-envs'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
@@ -93,6 +94,9 @@ class TrainingCommand(Command):
     def set_run_id(self, value):
         self.arguments[RUN_ID] = value
 
+    def get_run_id(self):
+        return self.arguments[RUN_ID]
+
     def set_num_envs(self, value):
         self.arguments[NUM_ENVS] = value
 
@@ -104,6 +108,9 @@ class TrainingCommand(Command):
 
     def set_log_filename(self, value):
         self.arguments[LOG_FILE_NAME] = value
+
+    def set_base_port(self, value):
+        self.arguments[BASE_PORT] = value
 
 
 class MLAgentsLearnCommand(Command):
