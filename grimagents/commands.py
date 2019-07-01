@@ -81,6 +81,9 @@ class TrainingCommand(Command):
     def get_command_as_string(self):
         return ' '.join(self.get_command())
 
+    def set_trainer_config(self, value):
+        self.arguments[TRAINER_CONFIG_PATH] = value
+
     def set_env(self, value):
         self.arguments[ENV] = value
 

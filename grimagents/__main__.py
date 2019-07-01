@@ -97,12 +97,13 @@ class PerformTraining(Command):
     """Launches the training wrapper script with arguments loaded from a configuration file."""
 
     def execute(self, args: Namespace):
-        self.command = self.create_command(args)
 
-        command_util.save_to_history(self.command)
-        command_util.execute_command(
-            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
-        )
+        for next_command in self.create_command(args):
+            self.command = next_command
+            command_util.save_to_history(next_command)
+            command_util.execute_command(
+                next_command, self.cwd, new_window=self.new_window, show_command=self.show_command
+            )
 
     def create_command(self, args):
 
@@ -111,11 +112,22 @@ class PerformTraining(Command):
 
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
-        training_command = TrainingCommand(config)
-        self.override_configuration_values(training_command, args)
-        training_command.set_additional_arguments(args.args)
 
-        return training_command.get_command()
+        # We convert entries that are a single string into a list with one element
+        # in order to support defining a list of trainer config files in a grimagents
+        # configuration file.
+        if type(config['trainer-config-path']) is str:
+            config['trainer-config-path'] = [config['trainer-config-path']]
+
+        for trainer_config in config['trainer-config-path']:
+
+            training_command = TrainingCommand(config)
+            self.override_configuration_values(training_command, args)
+            training_command.set_trainer_config(trainer_config)
+
+            training_command.set_additional_arguments(args.args)
+
+            yield training_command.get_command()
 
     def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
