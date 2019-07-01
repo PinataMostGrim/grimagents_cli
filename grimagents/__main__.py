@@ -21,7 +21,6 @@ import argparse
 import logging
 import logging.config
 import sys
-import time
 
 from argparse import Namespace
 from pathlib import Path
@@ -105,8 +104,6 @@ class PerformTraining(Command):
             command_util.execute_command(
                 next_command, self.cwd, new_window=self.new_window, show_command=self.show_command
             )
-
-            time.sleep(1)
 
     def create_command(self, args):
 
