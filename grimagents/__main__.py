@@ -125,7 +125,7 @@ class PerformTraining(Command):
         # instance in a new window and disable brain exporting on completion.
         if len(config['trainer-config-path']) > 1:
             self.new_window = True
-            args.env = ''
+            config['--export-path'] = ''
 
         if '--base-port' in config and config['--base-port']:
             base_port = int(config['--base-port'])
