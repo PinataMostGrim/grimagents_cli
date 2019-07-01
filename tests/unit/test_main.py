@@ -90,6 +90,43 @@ def test_perform_training_multiple_trainer_configs(monkeypatch):
         next(generator)
 
 
+def test_override_configuration_values(monkeypatch):
+    """Test for correct creation of a training command with command line argument overrides.
+    """
+    args = Namespace(configuration_file='config\\3DBall_grimagents.json',
+                     new_window=False,
+                     env='',
+                     lesson=2,
+                     run_id='ball',
+                     num_envs=2,
+                     graphics=None,
+                     no_graphics=True,
+                     timestamp=None,
+                     no_timestamp=True,
+                     args=['--load', '--slow'])
+
+    test_config = {
+        "trainer-config-path": [
+            "config\\3DBall.yaml",
+            "config\\2DBall.yaml"
+            ],
+        "--run-id": "3DBall",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--base-port": "5006",
+        "--timestamp": True
+    }
+
+    def mock_load_config(config_path):
+        return test_config
+
+    monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
+
+    perform_training = PerformTraining()
+
+    generator = perform_training.create_command(args)
+    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', 'ball_00', '--base-port', '5006', '--lesson', '2', '--num-envs', '2', '--no-graphics', '--load', '--slow', '--train']
+
+    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\2DBall.yaml', '--run-id', 'ball_01', '--base-port', '5007', '--lesson', '2', '--num-envs', '2', '--no-graphics', '--load', '--slow', '--train']
 
     with pytest.raises(StopIteration):
         next(generator)
