@@ -14,9 +14,7 @@ def test_perform_training_single_trainer_config(monkeypatch):
     - Ensures only one training command is generated
     """
 
-    args = Namespace(configuration_file='config\\3DBall_grimagents.json',
-                     new_window=False,
-                     args=[])
+    args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, args=[])
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
@@ -37,7 +35,22 @@ def test_perform_training_single_trainer_config(monkeypatch):
     perform_training = PerformTraining()
 
     generator = perform_training.create_command(args)
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', '3DBall', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--base-port', '5010', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--run-id',
+        '3DBall',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--export-path',
+        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        '--base-port',
+        '5010',
+        '--train',
+    ]
 
     with pytest.raises(StopIteration):
         next(generator)
@@ -53,16 +66,14 @@ def test_perform_training_multiple_trainer_configs(monkeypatch):
     - Ensures the correct number of commands are generated
     """
 
-    args = Namespace(configuration_file='config\\3DBall_grimagents.json',
-                     new_window=False,
-                     args=[])
+    args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, args=[])
 
     test_config = {
         "trainer-config-path": [
             "config\\3DBall.yaml",
             "config\\2DBall.yaml",
-            "config\\NoBall.yaml"
-            ],
+            "config\\NoBall.yaml",
+        ],
         "--run-id": "3DBall",
         "--env": "builds\\3DBall\\Unity Environment.exe",
         "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
@@ -81,11 +92,50 @@ def test_perform_training_multiple_trainer_configs(monkeypatch):
     perform_training = PerformTraining()
 
     generator = perform_training.create_command(args)
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', '3DBall_00', '--env', 'builds\\3DBall\\Unity Environment.exe', '--base-port', '5006', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--run-id',
+        '3DBall_00',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--base-port',
+        '5006',
+        '--train',
+    ]
 
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\2DBall.yaml', '--run-id', '3DBall_01', '--env', 'builds\\3DBall\\Unity Environment.exe', '--base-port', '5007', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\2DBall.yaml',
+        '--run-id',
+        '3DBall_01',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--base-port',
+        '5007',
+        '--train',
+    ]
 
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\NoBall.yaml', '--run-id', '3DBall_02', '--env', 'builds\\3DBall\\Unity Environment.exe', '--base-port', '5008', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\NoBall.yaml',
+        '--run-id',
+        '3DBall_02',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--base-port',
+        '5008',
+        '--train',
+    ]
 
     with pytest.raises(StopIteration):
         next(generator)
@@ -94,27 +144,26 @@ def test_perform_training_multiple_trainer_configs(monkeypatch):
 def test_override_configuration_values(monkeypatch):
     """Test for correct creation of a training command with command line argument overrides.
     """
-    args = Namespace(configuration_file='config\\3DBall_grimagents.json',
-                     new_window=False,
-                     env='',
-                     lesson=2,
-                     run_id='ball',
-                     num_envs=2,
-                     graphics=None,
-                     no_graphics=True,
-                     timestamp=None,
-                     no_timestamp=True,
-                     args=['--load', '--slow'])
+    args = Namespace(
+        configuration_file='config\\3DBall_grimagents.json',
+        new_window=False,
+        env='',
+        lesson=2,
+        run_id='ball',
+        num_envs=2,
+        graphics=None,
+        no_graphics=True,
+        timestamp=None,
+        no_timestamp=True,
+        args=['--load', '--slow'],
+    )
 
     test_config = {
-        "trainer-config-path": [
-            "config\\3DBall.yaml",
-            "config\\2DBall.yaml"
-            ],
+        "trainer-config-path": ["config\\3DBall.yaml", "config\\2DBall.yaml"],
         "--run-id": "3DBall",
         "--env": "builds\\3DBall\\Unity Environment.exe",
         "--base-port": "5006",
-        "--timestamp": True
+        "--timestamp": True,
     }
 
     def mock_load_config(config_path):
@@ -125,9 +174,45 @@ def test_override_configuration_values(monkeypatch):
     perform_training = PerformTraining()
 
     generator = perform_training.create_command(args)
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', 'ball_00', '--base-port', '5006', '--lesson', '2', '--num-envs', '2', '--no-graphics', '--load', '--slow', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--run-id',
+        'ball_00',
+        '--base-port',
+        '5006',
+        '--lesson',
+        '2',
+        '--num-envs',
+        '2',
+        '--no-graphics',
+        '--load',
+        '--slow',
+        '--train',
+    ]
 
-    assert next(generator) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\2DBall.yaml', '--run-id', 'ball_01', '--base-port', '5007', '--lesson', '2', '--num-envs', '2', '--no-graphics', '--load', '--slow', '--train']
+    assert next(generator) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\2DBall.yaml',
+        '--run-id',
+        'ball_01',
+        '--base-port',
+        '5007',
+        '--lesson',
+        '2',
+        '--num-envs',
+        '2',
+        '--no-graphics',
+        '--load',
+        '--slow',
+        '--train',
+    ]
 
     with pytest.raises(StopIteration):
         next(generator)
