@@ -196,9 +196,6 @@ def main():
 
     args = parse_args(sys.argv[1:])
 
-    if args.tensorboard_start:
-        StartTensorboard().execute(args)
-
     if args.list:
         ListTrainingOptions().execute(args)
     elif args.edit_config:
@@ -207,6 +204,8 @@ def main():
         EditTrainerConfigFile().execute(args)
     elif args.edit_curriculum:
         EditCurriculumFile().execute(args)
+    elif args.tensorboard_start:
+        StartTensorboard().execute(args)
     elif args.resume:
         ResumeTraining().execute(args)
     else:
