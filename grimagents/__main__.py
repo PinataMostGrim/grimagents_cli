@@ -127,7 +127,7 @@ class PerformTraining(Command):
         if '--base-port' in config and config['--base-port']:
             base_port = int(config['--base-port'])
         else:
-            base_port = 5010
+            base_port = 5005
 
         counter = -1
 
