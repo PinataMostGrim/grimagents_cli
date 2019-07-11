@@ -23,7 +23,7 @@
 
 ## Usage
 Training can be initiated several ways:
-- Execute the provided `grimagents.bat` file
+- Execute `grimagents.bat` file
 - Execute the module in python using `python -m grimagents`
 - Execute `training_wrapper.py` in python directly
 
@@ -144,6 +144,6 @@ The `--timestamp` configuration value is consumed by the main module and not pas
 
 
 ## Notes
-Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the project's root folder set as the current working directory. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
+Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the current working directory set to the project's root folder. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
 
-Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to stdout so only that portion will be captured in the log file.
+Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to `stdout` so only that portion will be captured by the log file.
