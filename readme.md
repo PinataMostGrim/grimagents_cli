@@ -4,6 +4,7 @@
 - Optionally override loaded configuration arguments with command line arguments
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Easily resume the last training run
 - Logs `mlagents-learn` output to file
 - Optionally exports trained models to another location after training finishes (for example, into a Unity project)
 
@@ -22,7 +23,7 @@
 
 ## Usage
 Training can be initiated several ways:
-- Execute the provided `grimagents.bat` file
+- Execute `grimagents.bat` file
 - Execute the module in python using `python -m grimagents`
 - Execute `training_wrapper.py` in python directly
 
@@ -78,9 +79,14 @@ Initiate training with the `3DBall.json` configuration file:
 grimagents grim-agents\config\3DBall.json
 ```
 
-Initiate training with the `3DBall.json` configuration file, but override several configuration values (in this case, to resume an earlier training run):
+Initiate training with the `3DBall.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
 ```
 grimagents grim-agents\config\3DBall.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
+```
+
+Resume the previous training run:
+```
+grimagents --resume
 ```
 
 
@@ -112,7 +118,9 @@ Values that are not present in a configuration file or left empty will not be pa
 
 All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
 
-The `--timestamp` and `--log-filename` values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
+If multiple `trainer-config-path` values are present (and defined as a json array), a unique training process will be launched for each trainer config file specified.
+
+The `--timestamp` configuration value is consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
 #### Example configuration file
 ```json
@@ -136,6 +144,6 @@ The `--timestamp` and `--log-filename` values are consumed by the main module an
 
 
 ## Notes
-Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the project's root folder set as the current working directory. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
+Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the current working directory set to the project's root folder. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
 
-Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to stdout so only that portion will be captured in the log file.
+Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to `stdout` so only that portion will be captured by the log file.
