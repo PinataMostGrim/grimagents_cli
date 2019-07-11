@@ -4,6 +4,7 @@
 - Optionally override loaded configuration arguments with command line arguments
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Easily resume the last training run
 - Logs `mlagents-learn` output to file
 - Optionally exports trained models to another location after training finishes (for example, into a Unity project)
 
@@ -78,9 +79,14 @@ Initiate training with the `3DBall.json` configuration file:
 grimagents grim-agents\config\3DBall.json
 ```
 
-Initiate training with the `3DBall.json` configuration file, but override several configuration values (in this case, to resume an earlier training run):
+Initiate training with the `3DBall.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
 ```
 grimagents grim-agents\config\3DBall.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
+```
+
+Resume the previous training run:
+```
+grimagents --resume
 ```
 
 
