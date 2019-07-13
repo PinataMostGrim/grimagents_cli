@@ -22,12 +22,15 @@ class CommandUtilError(Exception):
     pass
 
 
-def execute_command(command: list, cwd=None, new_window=False, show_command=True):
+def execute_command(command: list, cwd=None, new_window=False, show_command=True, dry_run=False):
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
 
-    if show_command:
+    if show_command or dry_run:
         command_log.info(' '.join(command))
+
+    if dry_run:
+        return
 
     if new_window:
         command = ['cmd', '/K'] + command
