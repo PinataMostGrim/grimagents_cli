@@ -42,7 +42,11 @@ class Command:
         self.dry_run = args.dry_run
         self.command = self.create_command(args)
         command_util.execute_command(
-            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command, dry_run=self.dry_run
+            self.command,
+            self.cwd,
+            new_window=self.new_window,
+            show_command=self.show_command,
+            dry_run=self.dry_run,
         )
 
     def create_command(self, args):
@@ -104,7 +108,11 @@ class PerformTraining(Command):
             self.command = next_command
             command_util.save_to_history(next_command)
             command_util.execute_command(
-                next_command, self.cwd, new_window=self.new_window, show_command=self.show_command, dry_run=self.dry_run
+                next_command,
+                self.cwd,
+                new_window=self.new_window,
+                show_command=self.show_command,
+                dry_run=self.dry_run,
             )
 
     def create_command(self, args):
@@ -239,7 +247,10 @@ def parse_args(argv):
         '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window', '-w', action='store_true', help='Run training process in a new console window'
+        '--new-window',
+        '-w',
+        action='store_true',
+        help='Run training process in a new console window',
     )
     options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
@@ -248,7 +259,8 @@ def parse_args(argv):
         '--resume', '-r', action='store_true', help='Resume the last training run'
     )
     options_parser.add_argument(
-        '--dry-run', '-n', action='store_true', help='Print command without executing')
+        '--dry-run', '-n', action='store_true', help='Print command without executing'
+    )
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
