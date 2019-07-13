@@ -149,4 +149,6 @@ The `--timestamp` configuration value is consumed by the main module and not pas
 ## Notes
 Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the current working directory set to the project's root folder. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
 
+The `--resume` argument will not remember how far through a curriculum the previous training run progressed but it will accept a `--lesson` override argument.
+
 Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to `stdout` so only that portion will be captured by the log file.
