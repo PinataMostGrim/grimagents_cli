@@ -196,6 +196,9 @@ class ResumeTraining(Command):
 
         if '--load' not in command:
             command.append('--load')
+        if args.lesson:
+            command.append('--lesson')
+            command.append(str(args.lesson))
 
         return command
 
