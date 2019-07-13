@@ -294,17 +294,17 @@ def test_resume_training(monkeypatch):
     """
 
     last_history = [
-            "pipenv",
-            "run",
-            "python",
-            "grim-agents\\grimagents\\training_wrapper.py",
-            "config\\3DBall.yaml",
-            "--env",
-            "builds\\3DBall\\Unity Environment.exe",
-            "--run-id",
-            "3DBall_01-2019-07-12_23-55-05",
-            "--train"
-        ]
+        "pipenv",
+        "run",
+        "python",
+        "grim-agents\\grimagents\\training_wrapper.py",
+        "config\\3DBall.yaml",
+        "--env",
+        "builds\\3DBall\\Unity Environment.exe",
+        "--run-id",
+        "3DBall_01-2019-07-12_23-55-05",
+        "--train",
+    ]
 
     def mock_load_history():
         return last_history
@@ -314,19 +314,35 @@ def test_resume_training(monkeypatch):
     resume_training = ResumeTraining()
 
     # --load argument is appended and --lesson IS NOT present
-    args = Namespace(
-        new_window=False,
-        dry_run=False,
-        lesson=None,
-        args=[],
-    )
-    assert resume_training.create_command(args) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall_01-2019-07-12_23-55-05', '--train', '--load']
+    args = Namespace(new_window=False, dry_run=False, lesson=None, args=[])
+    assert resume_training.create_command(args) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--run-id',
+        '3DBall_01-2019-07-12_23-55-05',
+        '--train',
+        '--load',
+    ]
 
     # --load argument is appended and --lesson IS present
-    args = Namespace(
-        new_window=False,
-        dry_run=False,
-        lesson=3,
-        args=[],
-    )
-    assert resume_training.create_command(args) == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall_01-2019-07-12_23-55-05', '--train', '--load', '--lesson', '3']
+    args = Namespace(new_window=False, dry_run=False, lesson=3, args=[])
+    assert resume_training.create_command(args) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--run-id',
+        '3DBall_01-2019-07-12_23-55-05',
+        '--train',
+        '--load',
+        '--lesson',
+        '3',
+    ]
