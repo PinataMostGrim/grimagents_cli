@@ -48,7 +48,7 @@ def test_perform_training_single_trainer_config(monkeypatch):
         '--export-path',
         'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
         '--base-port',
-        '5010',
+        '5005',
         '--train',
     ]
 
