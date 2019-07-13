@@ -1,5 +1,5 @@
 from argparse import Namespace
-from grimagents.__main__ import Command, PerformTraining
+from grimagents.__main__ import Command, PerformTraining, ResumeTraining
 
 import grimagents.config
 import pytest
@@ -284,3 +284,65 @@ def test_perform_training_command_dry_run(monkeypatch):
     perform_training = PerformTraining()
     perform_training.execute(dry_run_args)
     assert perform_training.dry_run is True
+
+
+def test_resume_training(monkeypatch):
+    """Tests for correct parsing of ResumeTraining command.
+
+    - Ensures --load argument is appended
+    - Ensures --lesson argument is appended, if present in args
+    """
+
+    last_history = [
+        "pipenv",
+        "run",
+        "python",
+        "grim-agents\\grimagents\\training_wrapper.py",
+        "config\\3DBall.yaml",
+        "--env",
+        "builds\\3DBall\\Unity Environment.exe",
+        "--run-id",
+        "3DBall_01-2019-07-12_23-55-05",
+        "--train",
+    ]
+
+    def mock_load_history():
+        return last_history
+
+    monkeypatch.setattr(grimagents.command_util, "load_last_history", mock_load_history)
+
+    resume_training = ResumeTraining()
+
+    # --load argument is appended and --lesson IS NOT present
+    args = Namespace(new_window=False, dry_run=False, lesson=None, args=[])
+    assert resume_training.create_command(args) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--run-id',
+        '3DBall_01-2019-07-12_23-55-05',
+        '--train',
+        '--load',
+    ]
+
+    # --load argument is appended and --lesson IS present
+    args = Namespace(new_window=False, dry_run=False, lesson=3, args=[])
+    assert resume_training.create_command(args) == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\Unity Environment.exe',
+        '--run-id',
+        '3DBall_01-2019-07-12_23-55-05',
+        '--train',
+        '--load',
+        '--lesson',
+        '3',
+    ]
