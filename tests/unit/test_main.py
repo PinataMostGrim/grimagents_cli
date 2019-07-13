@@ -247,9 +247,16 @@ def test_command_dry_run(monkeypatch):
 def test_perform_training_command_dry_run(monkeypatch):
     """Test for the correct assignment of dry_run argument to PerformTraining."""
 
-    no_dry_run_args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, dry_run=False, args=[])
+    no_dry_run_args = Namespace(
+        configuration_file='config\\3DBall_grimagents.json',
+        new_window=False,
+        dry_run=False,
+        args=[],
+    )
 
-    dry_run_args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, dry_run=True, args=[])
+    dry_run_args = Namespace(
+        configuration_file='config\\3DBall_grimagents.json', new_window=False, dry_run=True, args=[]
+    )
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",

@@ -32,9 +32,10 @@ Training can be initiated several ways:
 ```
 usage: grim-agents [-h] [--list] [--edit-config FILE]
                    [--edit-trainer-config FILE] [--edit-curriculum FILE]
-                   [--new-window] [--tensorboard-start] [--resume] [--env ENV]
-                   [--lesson LESSON] [--run-id RUN_ID] [--num-envs NUM_ENVS]
-                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
+                   [--new-window] [--tensorboard-start] [--resume] [--dry-run]
+                   [--env ENV] [--lesson LESSON] [--run-id RUN_ID]
+                   [--num-envs NUM_ENVS] [--graphics | --no-graphics]
+                   [--timestamp | --no-timestamp]
                    configuration_file ...
 
 CLI application that wraps Unity ML-Agents with some quality of life
@@ -47,15 +48,17 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --list                List mlagents-learn training options
+  --list, -l            List mlagents-learn training options
   --edit-config FILE    Open a grimagents configuration file for editing
   --edit-trainer-config FILE
                         Open a trainer configuration file for editing
   --edit-curriculum FILE
                         Open a curriculum file for editing
-  --new-window          Run training process in a new console window
-  --tensorboard-start   Start tensorboard server
-  --resume              Resume the last training run
+  --new-window, -w      Run training process in a new console window
+  --tensorboard-start, -s
+                        Start tensorboard server
+  --resume, -r          Resume the last training run
+  --dry-run, -n         Print command without executing
   --env ENV
   --lesson LESSON
   --run-id RUN_ID
