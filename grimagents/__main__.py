@@ -220,7 +220,7 @@ def parse_args(argv):
     # Parser for arguments that apply exclusively to the grimagents cli
     options_parser = argparse.ArgumentParser(add_help=False)
     options_parser.add_argument(
-        '--list', action='store_true', help='List mlagents-learn training options'
+        '--list', '-l', action='store_true', help='List mlagents-learn training options'
     )
     options_parser.add_argument(
         '--edit-config',
@@ -239,16 +239,16 @@ def parse_args(argv):
         '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window', action='store_true', help='Run training process in a new console window'
+        '--new-window', '-w', action='store_true', help='Run training process in a new console window'
     )
     options_parser.add_argument(
-        '--tensorboard-start', action='store_true', help='Start tensorboard server'
+        '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
     options_parser.add_argument(
-        '--resume', action='store_true', help='Resume the last training run'
+        '--resume', '-r', action='store_true', help='Resume the last training run'
     )
     options_parser.add_argument(
-        '--dry-run', action='store_true', help='Print commands without executing')
+        '--dry-run', '-n', action='store_true', help='Print commands without executing')
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
