@@ -1,5 +1,5 @@
 from argparse import Namespace
-from grimagents.__main__ import PerformTraining
+from grimagents.__main__ import Command, PerformTraining
 
 import grimagents.config
 import pytest
@@ -216,3 +216,64 @@ def test_override_configuration_values(monkeypatch):
 
     with pytest.raises(StopIteration):
         next(generator)
+
+
+def test_command_dry_run(monkeypatch):
+    """Tests the correct assignment of the 'dry_run' argument for the following commands:
+        - Command
+        - ListTrainingOptions
+        - StartTensorboard
+        - ResumeTraining
+    """
+
+    no_dry_run_args = Namespace(new_window=False, dry_run=False, args=[])
+
+    dry_run_args = Namespace(new_window=False, dry_run=True, args=[])
+
+    def mock_override_execute_command(command, cwd, new_window, show_command, dry_run):
+        pass
+
+    monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
+
+    command = Command()
+    command.execute(no_dry_run_args)
+    assert command.dry_run is False
+
+    command = Command()
+    command.execute(dry_run_args)
+    assert command.dry_run is True
+
+
+def test_perform_training_command_dry_run(monkeypatch):
+    """Test for the correct assignment of dry_run argument to PerformTraining."""
+
+    no_dry_run_args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, dry_run=False, args=[])
+
+    dry_run_args = Namespace(configuration_file='config\\3DBall_grimagents.json', new_window=False, dry_run=True, args=[])
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+    }
+
+    def mock_load_config(config_path):
+        return test_config
+
+    def mock_override_args(self, training_command, args):
+        return training_command
+
+    def mock_override_execute_command(command, cwd, new_window, show_command, dry_run):
+        pass
+
+    monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
+    monkeypatch.setattr(PerformTraining, "override_configuration_values", mock_override_args)
+    monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
+
+    perform_training = PerformTraining()
+    perform_training.execute(no_dry_run_args)
+    assert perform_training.dry_run is False
+
+    perform_training = PerformTraining()
+    perform_training.execute(dry_run_args)
+    assert perform_training.dry_run is True
