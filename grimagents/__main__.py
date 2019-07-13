@@ -194,8 +194,6 @@ class ResumeTraining(Command):
 
         command = command_util.load_last_history()
 
-        if '--timestamp' in command:
-            command.remove('--timestamp')
         if '--load' not in command:
             command.append('--load')
 
