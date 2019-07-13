@@ -248,7 +248,7 @@ def parse_args(argv):
         '--resume', '-r', action='store_true', help='Resume the last training run'
     )
     options_parser.add_argument(
-        '--dry-run', '-n', action='store_true', help='Print commands without executing')
+        '--dry-run', '-n', action='store_true', help='Print command without executing')
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
