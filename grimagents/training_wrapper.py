@@ -57,7 +57,7 @@ def main():
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)
-            training_log.info(f'Initiating training run \'{run_id}\'')
+            training_log.info(f'Initiating \'{run_id}\'')
 
             start_time = time.perf_counter()
 
