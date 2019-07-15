@@ -1,6 +1,5 @@
 {
     "trainer-config-path": [
-        "config\\trainer_config.yaml",
         "config\\3DBall.yaml"
     ],
     "--env": "builds\\3DBall\\Unity Environment.exe",
@@ -14,6 +13,7 @@
     "--seed": "",
     "--base-port": "",
     "--num-envs": "",
+    "--inference": false,
     "--no-graphics": false,
     "--timestamp": true,
     "--log-filename": ""

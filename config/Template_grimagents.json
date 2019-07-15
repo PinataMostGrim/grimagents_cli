@@ -11,6 +11,7 @@
     "--seed": "",
     "--base-port": "",
     "--num-envs": "",
+    "--inference": false,
     "--no-graphics": false,
     "--timestamp": false,
     "--log-filename": null
