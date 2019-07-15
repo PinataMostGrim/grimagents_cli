@@ -253,13 +253,13 @@ def parse_args(argv):
         '--new-window',
         '-w',
         action='store_true',
-        help='Run training process in a new console window',
+        help='Run process in a new console window',
     )
     options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
     options_parser.add_argument(
-        '--resume', '-r', action='store_true', help='Resume the last training run'
+        '--resume', '-r', action='store_true', help='Resume the last run'
     )
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
