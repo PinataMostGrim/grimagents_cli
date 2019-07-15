@@ -29,6 +29,7 @@ _DEFAULT_GRIM_CONFIG = {
     '--seed': '',
     '--base-port': '',
     '--num-envs': '',
+    '--inference': False,
     '--no-graphics': False,
     '--timestamp': False,
     '--log-filename': None,
