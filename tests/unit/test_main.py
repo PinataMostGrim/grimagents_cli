@@ -187,7 +187,25 @@ def test_override_configuration_values(monkeypatch):
     perform_training = PerformTraining()
     perform_training.override_configuration_values(training_command, args)
 
-    assert training_command.get_command() == ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', 'ball', '--base-port', '5006', '--load', '--slow', '--lesson', '2', '--num-envs', '2', '--no-graphics', '--train']
+    assert training_command.get_command() == [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--run-id',
+        'ball',
+        '--base-port',
+        '5006',
+        '--load',
+        '--slow',
+        '--lesson',
+        '2',
+        '--num-envs',
+        '2',
+        '--no-graphics',
+        '--train',
+    ]
 
 
 def test_command_dry_run(monkeypatch):

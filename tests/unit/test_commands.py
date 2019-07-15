@@ -197,12 +197,21 @@ def test_training_command_inference():
         "trainer-config-path": "config\\3DBall.yaml",
         "--run-id": "3DBall",
         "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-        "--inference": True
+        "--inference": True,
     }
 
     # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
     command = TrainingCommand(test_config)
-    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', '3DBall', '--slow']
+    command_list = [
+        'pipenv',
+        'run',
+        'python',
+        'grim-agents\\grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--run-id',
+        '3DBall',
+        '--slow',
+    ]
 
     assert command.get_command() == command_list
 
