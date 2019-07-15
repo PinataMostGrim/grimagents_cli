@@ -182,3 +182,33 @@ def test_training_command_timestamp(monkeypatch):
     # Result if a log-filename key exists and has content
     command.set_log_filename('ball')
     assert '--log-filename ball' in command.get_command_as_string()
+
+
+def test_training_command_inference():
+    """Tests for correct processing of the '--inference' argument.
+
+    - Ensures get_command() can handle no additional args being set
+    - Ensures the '--train' argument is removed
+    - Ensures the '--export-path' argument is removed
+    - Ensures the '--slow' argument is appended and not duplicated
+    """
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
+        "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+        "--inference": True
+    }
+
+    # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
+    command = TrainingCommand(test_config)
+    command_list = ['pipenv', 'run', 'python', 'grim-agents\\grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--run-id', '3DBall', '--slow']
+
+    assert command.get_command() == command_list
+
+    # '--slow' isn't duplicated
+    command = TrainingCommand(test_config)
+    additional_args = ['--slow']
+    command.set_additional_arguments(additional_args)
+
+    assert command.get_command() == command_list

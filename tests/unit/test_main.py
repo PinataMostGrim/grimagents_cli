@@ -160,6 +160,7 @@ def test_override_configuration_values(monkeypatch):
         lesson=2,
         run_id='ball',
         num_envs=2,
+        inference=False,
         graphics=None,
         no_graphics=True,
         timestamp=None,
