@@ -34,8 +34,8 @@ usage: grim-agents [-h] [--list] [--edit-config FILE]
                    [--edit-trainer-config FILE] [--edit-curriculum FILE]
                    [--new-window] [--tensorboard-start] [--resume] [--dry-run]
                    [--env ENV] [--lesson LESSON] [--run-id RUN_ID]
-                   [--num-envs NUM_ENVS] [--graphics | --no-graphics]
-                   [--timestamp | --no-timestamp]
+                   [--num-envs NUM_ENVS] [--inference]
+                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                    configuration_file ...
 
 CLI application that wraps Unity ML-Agents with some quality of life
@@ -63,6 +63,7 @@ optional arguments:
   --lesson LESSON
   --run-id RUN_ID
   --num-envs NUM_ENVS
+  --inference           Load environment in inference instead of training mode
   --graphics
   --no-graphics
   --timestamp           Append timestamp to run-id. Overrides configuration

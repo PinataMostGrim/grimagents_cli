@@ -272,7 +272,7 @@ def parse_args(argv):
     overrides_parser.add_argument('--run-id', type=str)
     overrides_parser.add_argument('--num-envs', type=int)
     overrides_parser.add_argument(
-        '--inference', action='store_true', help='Perform inference instead of training'
+        '--inference', action='store_true', help='Load environment in inference instead of training mode'
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()
