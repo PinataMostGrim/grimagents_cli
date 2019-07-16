@@ -27,8 +27,9 @@ from pathlib import Path
 
 from . import config as config_util
 from . import command_util as command_util
-from . import common as common
 from . import settings as settings
+
+from .commands import TrainingCommand
 
 
 class Command:
@@ -38,9 +39,14 @@ class Command:
         self.show_command = True
 
     def execute(self, args: Namespace):
+        self.dry_run = args.dry_run
         self.command = self.create_command(args)
         command_util.execute_command(
-            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
+            self.command,
+            self.cwd,
+            new_window=self.new_window,
+            show_command=self.show_command,
+            dry_run=self.dry_run,
         )
 
     def create_command(self, args):
@@ -96,68 +102,87 @@ class PerformTraining(Command):
     """Launches the training wrapper script with arguments loaded from a configuration file."""
 
     def execute(self, args: Namespace):
-        self.command = self.create_command(args)
 
-        command_util.save_to_history(self.command)
-        command_util.execute_command(
-            self.command, self.cwd, new_window=self.new_window, show_command=self.show_command
-        )
+        for next_command in self.create_command(args):
+            self.dry_run = args.dry_run
+            self.command = next_command
+            command_util.save_to_history(next_command)
+            command_util.execute_command(
+                next_command,
+                self.cwd,
+                new_window=self.new_window,
+                show_command=self.show_command,
+                dry_run=self.dry_run,
+            )
 
     def create_command(self, args):
 
         self.show_command = False
         self.new_window = args.new_window
 
-        trainer_path = settings.get_training_wrapper_path()
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
-        config = self.override_configuration_values(config, args)
 
-        if config_util.get_timestamp_enabled(config):
-            run_id = config_util.get_run_id(config)
-            # Note: If a log filename isn't configured, we explicitly set it
-            # to the run_id before appending a timestamp to reduce the
-            # number of log files being generated.
-            if not config_util.get_log_filename(config):
-                config = config_util.set_log_filename(run_id, config)
+        # It is necessary to convert non-list 'trainer-config-path' entries
+        # into a list for iteration later.
+        if type(config['trainer-config-path']) is str:
+            config['trainer-config-path'] = [config['trainer-config-path']]
 
-            timestamp = common.get_timestamp()
-            run_id = f'{run_id}-{timestamp}'
-            config = config_util.set_run_id(run_id, config)
+        # If multiple configurations are defined, we need to load each training
+        # instance in a new window and disable brain exporting on completion.
+        if len(config['trainer-config-path']) > 1:
+            self.new_window = True
+            config['--export-path'] = ''
 
-        training_arguments = config_util.get_training_arguments(config)
-        return (
-            ['pipenv', 'run', 'python', str(trainer_path)]
-            + training_arguments
-            + args.args
-            + ['--train']
-        )
+        if '--base-port' in config and config['--base-port']:
+            base_port = int(config['--base-port'])
+        else:
+            base_port = 5005
 
-    def override_configuration_values(self, configuration: dict, args: Namespace):
+        counter = -1
+
+        for trainer_config in config['trainer-config-path']:
+            counter = counter + 1
+
+            training_command = TrainingCommand(config)
+            self.override_configuration_values(training_command, args)
+            training_command.set_trainer_config(trainer_config)
+
+            training_command.set_base_port(str(base_port + counter))
+
+            if len(config['trainer-config-path']) > 1:
+                training_command.set_run_id(training_command.get_run_id() + f'_{counter:02d}')
+
+            training_command.set_additional_arguments(args.args)
+
+            yield training_command.get_command()
+
+    def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
 
         if args.env is not None:
-            configuration = config_util.set_env(args.env, configuration)
+            training_command.set_env(args.env)
         if args.lesson is not None:
-            configuration = config_util.set_lesson(str(args.lesson), configuration)
+            training_command.set_lesson(str(args.lesson))
         if args.run_id is not None:
-            configuration = config_util.set_run_id(args.run_id, configuration)
+            training_command.set_run_id(args.run_id)
         if args.num_envs is not None:
-            configuration = config_util.set_num_envs(str(args.num_envs), configuration)
+            training_command.set_num_envs(str(args.num_envs))
+        if args.inference is not None:
+            training_command.set_inference(args.inference)
 
         if args.graphics:
-            # Note: As the argument is 'no-graphics', false in this case means
+            training_command
+            # As the argument is 'no-graphics', false in this case means
             # graphics are used.
-            configuration = config_util.set_no_graphics_enabled(False, configuration)
+            training_command.set_no_graphics_enabled(False)
         if args.no_graphics:
-            configuration = config_util.set_no_graphics_enabled(True, configuration)
+            training_command.set_no_graphics_enabled(True)
 
         if args.timestamp:
-            configuration = config_util.set_timestamp_enabled(True, configuration)
+            training_command.set_timestamp_enabled(True)
         if args.no_timestamp:
-            configuration = config_util.set_timestamp_enabled(False, configuration)
-
-        return configuration
+            training_command.set_timestamp_enabled(False)
 
 
 class ResumeTraining(Command):
@@ -171,10 +196,11 @@ class ResumeTraining(Command):
 
         command = command_util.load_last_history()
 
-        if '--timestamp' in command:
-            command.remove('--timestamp')
         if '--load' not in command:
             command.append('--load')
+        if args.lesson:
+            command.append('--lesson')
+            command.append(str(args.lesson))
 
         return command
 
@@ -205,7 +231,7 @@ def parse_args(argv):
     # Parser for arguments that apply exclusively to the grimagents cli
     options_parser = argparse.ArgumentParser(add_help=False)
     options_parser.add_argument(
-        '--list', action='store_true', help='List mlagents-learn training options'
+        '--list', '-l', action='store_true', help='List mlagents-learn training options'
     )
     options_parser.add_argument(
         '--edit-config',
@@ -224,13 +250,14 @@ def parse_args(argv):
         '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window', action='store_true', help='Run training process in a new console window'
+        '--new-window', '-w', action='store_true', help='Run process in a new console window'
     )
     options_parser.add_argument(
-        '--tensorboard-start', action='store_true', help='Start tensorboard server'
+        '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
+    options_parser.add_argument('--resume', '-r', action='store_true', help='Resume the last run')
     options_parser.add_argument(
-        '--resume', action='store_true', help='Resume the last training run'
+        '--dry-run', '-n', action='store_true', help='Print command without executing'
     )
 
     # Parser for arguments that may override configuration values
@@ -239,6 +266,11 @@ def parse_args(argv):
     overrides_parser.add_argument('--lesson', type=int)
     overrides_parser.add_argument('--run-id', type=str)
     overrides_parser.add_argument('--num-envs', type=int)
+    overrides_parser.add_argument(
+        '--inference',
+        action='store_true',
+        help='Load environment in inference instead of training mode',
+    )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()
     graphics_group.add_argument('--graphics', action='store_true')

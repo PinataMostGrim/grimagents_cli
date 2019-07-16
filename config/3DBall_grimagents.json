@@ -1,5 +1,7 @@
 {
-    "trainer-config-path": "config\\3DBall.yaml",
+    "trainer-config-path": [
+        "config\\3DBall.yaml"
+    ],
     "--env": "builds\\3DBall\\Unity Environment.exe",
     "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
     "--curriculum": "",
@@ -11,6 +13,7 @@
     "--seed": "",
     "--base-port": "",
     "--num-envs": "",
+    "--inference": false,
     "--no-graphics": false,
     "--timestamp": true,
     "--log-filename": ""
