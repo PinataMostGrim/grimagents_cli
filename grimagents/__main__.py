@@ -250,17 +250,12 @@ def parse_args(argv):
         '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window',
-        '-w',
-        action='store_true',
-        help='Run training process in a new console window',
+        '--new-window', '-w', action='store_true', help='Run process in a new console window'
     )
     options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
-    options_parser.add_argument(
-        '--resume', '-r', action='store_true', help='Resume the last training run'
-    )
+    options_parser.add_argument('--resume', '-r', action='store_true', help='Resume the last run')
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
     )
@@ -272,7 +267,9 @@ def parse_args(argv):
     overrides_parser.add_argument('--run-id', type=str)
     overrides_parser.add_argument('--num-envs', type=int)
     overrides_parser.add_argument(
-        '--inference', action='store_true', help='Load environment in inference instead of training mode'
+        '--inference',
+        action='store_true',
+        help='Load environment in inference instead of training mode',
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()

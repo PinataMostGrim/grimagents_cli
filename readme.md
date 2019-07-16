@@ -54,10 +54,10 @@ optional arguments:
                         Open a trainer configuration file for editing
   --edit-curriculum FILE
                         Open a curriculum file for editing
-  --new-window, -w      Run training process in a new console window
+  --new-window, -w      Run process in a new console window
   --tensorboard-start, -s
                         Start tensorboard server
-  --resume, -r          Resume the last training run
+  --resume, -r          Resume the last run
   --dry-run, -n         Print command without executing
   --env ENV
   --lesson LESSON
@@ -124,7 +124,7 @@ All paths stored in configuration files should be relative paths from the MLAgen
 
 If multiple `trainer-config-path` values are present (and defined as a json array), a unique training process will be launched for each trainer config file specified.
 
-The `--timestamp` configuration value is consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
+`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
 #### Example configuration file
 ```json
