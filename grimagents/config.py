@@ -1,9 +1,8 @@
-"""Loads configuration files, fetches loaded configuration values and parses
-training arguments from configuration values.
+"""Creates new configuration files, loads configuration files for editing, and validates loaded configurations.
 
 Notes:
-- All path configuration values should be a relative path from MLAgents' project root folder to the target asset or folder
-- `--export-path` and `--logname` configuration values apply to training_wrapper
+- All path values should be a relative path from the MLAgents project root folder
+- `--export-path` and `--logname` configuration values are consumed by training_wrapper
 """
 
 import logging
