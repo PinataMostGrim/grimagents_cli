@@ -34,6 +34,7 @@ def delete_file(file: Path):
 
 @pytest.fixture
 def fixture_grim_config_file():
+    delete_file(get_grim_config_file_path())
     yield 'fixture_grim_config_file'
     delete_file(get_grim_config_file_path())
 
@@ -143,7 +144,7 @@ def test_no_add_search_entry(fixture_grim_config_file, monkeypatch):
     assert 'search' in file_data
 
 
-def test_no_overwrite_search_entry(monkeypatch):
+def test_no_overwrite_search_entry(fixture_grim_config_file, monkeypatch):
     """Tests to ensure config.edit_grim_config_file(add_search=True) does not overwrite an existing search entry.
     """
 
