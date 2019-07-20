@@ -70,7 +70,7 @@ _DEFAULT_CURRICULUM = {
 _DEFAULT_SEARCH_CONFIG = {
     "in_parallel": False,
     "brain": {
-        "name": "PushBlockLearning",
+        "name": "DEFAULT_BRAIN_NAME",
         "hyperparameter": {
             "batch_size": {
                 "min": 512,
