@@ -68,79 +68,76 @@ _DEFAULT_CURRICULUM = {
 
 
 _DEFAULT_SEARCH_CONFIG = {
-    "search": {
-        "type": "grid",
-        "in_parallel": False,
-        "brain": {
-            "name": "PushBlockLearning",
-            "hyperparameter": {
-                "batch_size": {
-                    "min": 512,
-                    "max": 5120,
-                    "samples": 3},
-                "beta": {
-                    "min": 1e-4,
-                    "max": 1e-2,
-                    "samples": 3},
-                "buffer_size_multiple": {
-                    "min": 4,
-                    "max": 10,
-                    "samples": 3},
-                "curiosity_strength": {
-                    "min": 0.001,
-                    "max": 0.1,
-                    "samples": 3},
-                "curiosity_enc_size": {
-                    "min": 64,
-                    "max": 256,
-                    "samples": 3},
-                "epsilon": {
-                    "min": 0.1,
-                    "max": 0.3,
-                    "samples": 3},
-                "gamma": {
-                    "min": 0.8,
-                    "max": 0.995,
-                    "samples": 3},
-                "hidden_units": {
-                    "min": 32,
-                    "max": 512,
-                    "samples": 3},
-                "lambd": {
-                    "min": 0.9,
-                    "max": 0.95,
-                    "samples": 3},
-                "learning_rate": {
-                    "min": 1e-5,
-                    "max": 1e-3,
-                    "samples": 3},
-                "max_steps": {
-                    "min": 5e5,
-                    "max": 1e7,
-                    "samples": 3},
-                "memory_size": {
-                    "min": 64,
-                    "max": 512,
-                    "samples": 3},
-                "num_layers": {
-                    "min": 1,
-                    "max": 3,
-                    "samples": 3},
-                "num_epoch": {
-                    "min": 3,
-                    "max": 10,
-                    "samples": 3},
-                "time_horizon": {
-                    "min": 32,
-                    "max": 2048,
-                    "samples": 3},
-                "sequence_length": {
-                    "min": 4,
-                    "max": 128,
-                    "samples": 3},
-            },
+    "in_parallel": False,
+    "brain": {
+        "name": "PushBlockLearning",
+        "hyperparameter": {
+            "batch_size": {
+                "min": 512,
+                "max": 5120,
+                "samples": 3},
+            "beta": {
+                "min": 1e-4,
+                "max": 1e-2,
+                "samples": 3},
+            "buffer_size_multiple": {
+                "min": 4,
+                "max": 10,
+                "samples": 3},
+            "curiosity_strength": {
+                "min": 0.001,
+                "max": 0.1,
+                "samples": 3},
+            "curiosity_enc_size": {
+                "min": 64,
+                "max": 256,
+                "samples": 3},
+            "epsilon": {
+                "min": 0.1,
+                "max": 0.3,
+                "samples": 3},
+            "gamma": {
+                "min": 0.8,
+                "max": 0.995,
+                "samples": 3},
+            "hidden_units": {
+                "min": 32,
+                "max": 512,
+                "samples": 3},
+            "lambd": {
+                "min": 0.9,
+                "max": 0.95,
+                "samples": 3},
+            "learning_rate": {
+                "min": 1e-5,
+                "max": 1e-3,
+                "samples": 3},
+            "max_steps": {
+                "min": 5e5,
+                "max": 1e7,
+                "samples": 3},
+            "memory_size": {
+                "min": 64,
+                "max": 512,
+                "samples": 3},
+            "num_layers": {
+                "min": 1,
+                "max": 3,
+                "samples": 3},
+            "num_epoch": {
+                "min": 3,
+                "max": 10,
+                "samples": 3},
+            "time_horizon": {
+                "min": 32,
+                "max": 2048,
+                "samples": 3},
+            "sequence_length": {
+                "min": 4,
+                "max": 128,
+                "samples": 3},
         },
-    }
+    },
 }
 
 
@@ -155,7 +152,7 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_grim_config_file(file_path: Path):
+def edit_grim_config_file(file_path: Path, add_search=False):
     """Opens a grimagents configuration file with the system's default editor.
     Creates a configuration file with default values if file does not already exist.
     """
@@ -165,6 +162,12 @@ def edit_grim_config_file(file_path: Path):
 
     if not file_path.exists():
         create_grim_config_file(file_path)
+
+    if add_search:
+        config = command_util.load_json_file(file_path)
+        if 'search' not in config:
+            config['search'] = get_default_search_config()
+            command_util.write_json_file(config, file_path)
 
     command_util.open_file(file_path)
 
@@ -179,6 +182,12 @@ def get_default_grim_config():
     """Fetches a copy of the default configuration dictionary."""
 
     return _DEFAULT_GRIM_CONFIG.copy()
+
+
+def get_default_search_config():
+    """Fetches a copy of the default search configuration dictionary."""
+
+    return _DEFAULT_SEARCH_CONFIG.copy()
 
 
 def load_grim_config_file(file_path: Path):
