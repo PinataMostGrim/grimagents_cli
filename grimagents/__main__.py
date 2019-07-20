@@ -61,7 +61,7 @@ class ListTrainingOptions(Command):
 
 
 class EditGrimConfigFile(Command):
-    """Opens a GrimAgents configuration file for editing or creatse one if
+    """Opens a grimagents configuration file for editing or creates one if
     a file does not already exist."""
 
     def execute(self, args):
@@ -236,18 +236,18 @@ def parse_args(argv):
     options_parser.add_argument(
         '--edit-config',
         dest='edit_config',
-        metavar='FILE',
+        metavar='<file>',
         type=str,
         help='Open a grimagents configuration file for editing',
     )
     options_parser.add_argument(
         '--edit-trainer-config',
-        metavar='FILE',
+        metavar='<file>',
         type=str,
         help='Open a trainer configuration file for editing',
     )
     options_parser.add_argument(
-        '--edit-curriculum', metavar='FILE', type=str, help='Open a curriculum file for editing'
+        '--edit-curriculum', metavar='<file>', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
         '--new-window', '-w', action='store_true', help='Run process in a new console window'
