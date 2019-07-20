@@ -96,12 +96,20 @@ def get_grid(hyperparameters, permutations, index):
     return result
 
 
-# Load yaml and prepare trainer_configuration
-# run_id = 'PushBlock'
-# path = Path("../config/PushBlock.yaml")
-# brain_name = SEARCH_CONFIG['brain']['name']
+def get_brain_config_for_grid(brain_config, grid):
 
-# brain_config = get_brain_configuration(path, brain_name)
+    result = brain_config.copy()
+    for hyperparameter in grid:
+        result[hyperparameter[0]] = hyperparameter[1]
+    return result
+
+
+# Load yaml and prepare trainer_configuration
+run_id = 'PushBlock'
+path = Path("../config/PushBlock.yaml")
+brain_name = SEARCH_CONFIG['brain']['name']
+
+brain_config = get_brain_configuration(path, brain_name)
 # pprint(brain_config)
 
 
@@ -116,5 +124,15 @@ sets = get_hyperparameter_sets(SEARCH_CONFIG)
 permutations = get_hyperparameter_permutations(sets)
 # pprint(permutations)
 
-for grid in create_grid_generator(hyperparameters, permutations):
-    print(grid)
+grid = get_grid(hyperparameters, permutations, 10)
+new_brain_config = get_brain_config_for_grid(brain_config, grid)
+
+pprint(brain_config)
+print('-' * 70)
+pprint(new_brain_config)
+
+
+# write brain_config to file
+# override trainer-config argument with configuration file
+#   - add override argument to __main__.py
+# sort out how to execute __main__ from search.py
