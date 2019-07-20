@@ -1,5 +1,6 @@
 from pathlib import Path
 from pprint import pprint
+import itertools
 import numpy
 import sys
 import yaml
@@ -29,7 +30,7 @@ SEARCH_CONFIG = {
 }
 
 
-def load_brain_configuration(path: Path, brain):
+def get_brain_configuration(path: Path, brain):
 
     with path.open(mode='r') as file:
         loaded_data = yaml.load(file, Loader=yaml.BaseLoader)
@@ -53,22 +54,25 @@ def load_brain_configuration(path: Path, brain):
     return result
 
 
+def get_hyperparameter_list(search_config):
+    return [name for name in search_config['brain']['hyperparameters']]
+
+
 def get_hyperparameter_sets(search_config):
 
     sets = []
-    for hyperparameter, values in SEARCH_CONFIG['brain']['hyperparameters'].items():
+    for _, values in search_config['brain']['hyperparameters'].items():
         minimum = values['min']
         maximum = values['max']
         sample_count = values['samples']
 
-        samples = [hyperparameter]
-        samples = samples + get_distributed_samples(minimum, maximum, sample_count).tolist()
+        samples = calculate_sample_set(minimum, maximum, sample_count).tolist()
         sets.append(samples)
 
     return sets
 
 
-def get_distributed_samples(minimum, maximum, sample_count):
+def calculate_sample_set(minimum, maximum, sample_count):
 
     if (type(minimum) is float or type(maximum) is float):
         return numpy.linspace(minimum, maximum, sample_count)
@@ -76,15 +80,41 @@ def get_distributed_samples(minimum, maximum, sample_count):
         return numpy.linspace(minimum, maximum, sample_count).astype(int)
 
 
+def get_hyperparameter_permutations(hyperparameter_sets):
+    return list(itertools.product(*hyperparameter_sets))
+
+
+def create_grid_generator(hyperparameters, permutations):
+
+    for i in range(len(permutations)):
+        yield get_grid(hyperparameters, permutations, i)
+
+
+def get_grid(hyperparameters, permutations, index):
+
+    result = list(zip(hyperparameters, permutations[index]))
+    return result
+
+
 # Load yaml and prepare trainer_configuration
-run_id = 'PushBlock'
-path = Path("../config/PushBlock.yaml")
-brain_name = SEARCH_CONFIG['brain']['name']
+# run_id = 'PushBlock'
+# path = Path("../config/PushBlock.yaml")
+# brain_name = SEARCH_CONFIG['brain']['name']
 
-brain_config = load_brain_configuration(path, brain_name)
-pprint(brain_config)
+# brain_config = get_brain_configuration(path, brain_name)
+# pprint(brain_config)
 
+
+# Load hyperparameter names
+hyperparameters = get_hyperparameter_list(SEARCH_CONFIG)
+# print(hyperparameters)
 
 # Load hyperparameter variations
-sample_sets = get_hyperparameter_sets(SEARCH_CONFIG)
-pprint(sample_sets)
+sets = get_hyperparameter_sets(SEARCH_CONFIG)
+# pprint(sets)
+
+permutations = get_hyperparameter_permutations(sets)
+# pprint(permutations)
+
+for grid in create_grid_generator(hyperparameters, permutations):
+    print(grid)
