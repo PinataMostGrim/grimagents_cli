@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 import grimagents.config as config
+import grimagents.command_util as command_util
 
 
 GRIM_CONFIG_FILE = 'grim_config.json'
@@ -116,3 +117,50 @@ def test_create_curriculum_file(fixture_curriculum_file):
     path = get_curriculum_file_path()
     config.create_curriculum_file(path)
     assert path.exists()
+
+
+def test_no_add_search_entry(fixture_grim_config_file, monkeypatch):
+    """Test for correct handling of the 'add_search' flag in config.edit_grim_config_file()
+    """
+
+    def mock_open_file(file_path):
+        pass
+
+    monkeypatch.setattr(command_util, "open_file", mock_open_file)
+
+    path = get_grim_config_file_path()
+    config.edit_grim_config_file(path, add_search=False)
+
+    with path.open('r') as f:
+        file_data = json.load(f)
+
+    assert 'search' not in file_data
+
+    config.edit_grim_config_file(path, add_search=True)
+    with path.open('r') as f:
+        file_data = json.load(f)
+
+    assert 'search' in file_data
+
+
+def test_no_overwrite_search_entry(monkeypatch):
+    """Tests to ensure config.edit_grim_config_file(add_search=True) does not overwrite an existing search entry.
+    """
+
+    def mock_open_file(file_path):
+        pass
+
+    monkeypatch.setattr(command_util, "open_file", mock_open_file)
+
+    configuration = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall", "search": []}
+
+    path = get_grim_config_file_path()
+    with path.open('w') as f:
+        json.dump(configuration, f)
+
+    config.edit_grim_config_file(path, add_search=True)
+
+    with path.open('r') as f:
+        file_data = json.load(f)
+
+    assert 'brain' not in file_data['search']
