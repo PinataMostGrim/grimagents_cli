@@ -6,6 +6,7 @@ Notes:
 """
 
 import logging
+import yaml
 
 from pathlib import Path
 from . import command_util as command_util
@@ -71,7 +72,7 @@ _DEFAULT_SEARCH_CONFIG = {
     "in_parallel": False,
     "brain": {
         "name": "DEFAULT_BRAIN_NAME",
-        "hyperparameter": {
+        "hyperparameters": {
             "batch_size": {
                 "min": 512,
                 "max": 5120,
@@ -184,6 +185,18 @@ def get_default_grim_config():
     return _DEFAULT_GRIM_CONFIG.copy()
 
 
+def get_default_trainer_config():
+    """Fetches the default trainer configuration."""
+
+    return yaml.load(_DEFAULT_TRAINER_CONFIG, Loader=yaml.BaseLoader)
+
+
+def get_default_curriculum():
+    """Fetches the default curriculum."""
+
+    return _DEFAULT_CURRICULUM.copy()
+
+
 def get_default_search_config():
     """Fetches a copy of the default search configuration dictionary."""
 
@@ -194,7 +207,6 @@ def load_grim_config_file(file_path: Path):
     """Loads a grimagents configuration dictionary from file.
 
     Raises:
-      FileNotFoundError: An error occurred while attempting to load a configuration file.
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
@@ -241,6 +253,14 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
+def load_trainer_configuration(file_path: Path):
+    """Loads a MLAgents trainer configuration from a yaml file.
+    """
+
+    configuration = command_util.load_yaml_file(file_path)
+    return configuration
+
+
 def edit_trainer_configuration_file(file_path: Path):
     """Opens a trainer configuration file for editing. Creates a configuration
     file with default values if file does not already exit.
@@ -258,7 +278,7 @@ def edit_trainer_configuration_file(file_path: Path):
 def create_trainer_configuration_file(file_path: Path):
     """Creates a trainer configuration file with default values at the specified path."""
 
-    command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
+    command_util.write_yaml_file(get_default_trainer_config(), file_path)
 
 
 def edit_curriculum_file(file_path: Path):
@@ -278,4 +298,4 @@ def edit_curriculum_file(file_path: Path):
 def create_curriculum_file(file_path: Path):
     """Creates a curriculum file with default values at the specified path."""
 
-    command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
+    command_util.write_json_file(get_default_curriculum(), file_path)
