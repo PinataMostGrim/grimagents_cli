@@ -12,27 +12,37 @@ from pathlib import Path
 from . import command_util as command_util
 
 
-# Default configuration values
+# Configuration keys
 TRAINER_CONFIG_PATH = 'trainer-config-path'
+ENV = '--env'
+LESSON = '--lesson'
 RUN_ID = '--run-id'
+EXPORT_PATH = '--export-path'
+BASE_PORT = '--base-port'
+NUM_ENVS = '--num-envs'
+INFERENCE = '--inference'
+NO_GRAPHICS = '--no-graphics'
+TIMESTAMP = '--timestamp'
+LOG_FILE_NAME = '--log-filename'
+
 
 _DEFAULT_GRIM_CONFIG = {
     TRAINER_CONFIG_PATH: '',
-    '--env': '',
-    '--export-path': '',
+    ENV: '',
+    EXPORT_PATH: '',
     '--curriculum': '',
     '--keep-checkpoints': '',
-    '--lesson': '',
+    LESSON: '',
     RUN_ID: 'ppo',
     '--num-runs': '',
     '--save-freq': '',
     '--seed': '',
-    '--base-port': '',
-    '--num-envs': '',
-    '--inference': False,
-    '--no-graphics': False,
-    '--timestamp': False,
-    '--log-filename': None,
+    BASE_PORT: '',
+    NUM_ENVS: '',
+    INFERENCE: False,
+    NO_GRAPHICS: False,
+    TIMESTAMP: False,
+    LOG_FILE_NAME: None,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
@@ -166,8 +176,8 @@ def edit_grim_config_file(file_path: Path, add_search=False):
 
     if add_search:
         config = command_util.load_json_file(file_path)
-        if 'search' not in config:
-            config['search'] = get_default_search_config()
+        if SEARCH not in config:
+            config[SEARCH] = get_default_search_config()
             command_util.write_json_file(config, file_path)
 
     command_util.open_file(file_path)
