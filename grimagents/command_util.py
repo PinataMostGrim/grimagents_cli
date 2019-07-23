@@ -125,6 +125,7 @@ def write_yaml_file(yaml_data, file_path: Path):
         yaml.dump(yaml_data, f)
         # json.dump(json_data, f, indent=4)
 
+
 def load_yaml_file(file_path: Path):
     """Load yaml data from a file.
 

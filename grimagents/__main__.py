@@ -103,59 +103,30 @@ class PerformTraining(Command):
 
     def execute(self, args: Namespace):
 
-        for next_command in self.create_command(args):
-            self.dry_run = args.dry_run
-            self.command = next_command
-            command_util.save_to_history(next_command)
-            command_util.execute_command(
-                next_command,
-                self.cwd,
-                new_window=self.new_window,
-                show_command=self.show_command,
-                dry_run=self.dry_run,
-            )
+        self.show_command = False
+        self.dry_run = args.dry_run
+        self.new_window = args.new_window
+        self.command = self.create_command(args)
+
+        command_util.save_to_history(self.command)
+        command_util.execute_command(
+            self.command,
+            self.cwd,
+            new_window=self.new_window,
+            show_command=self.show_command,
+            dry_run=self.dry_run,
+        )
 
     def create_command(self, args):
-
-        self.show_command = False
-        self.new_window = args.new_window
 
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
 
-        # It is necessary to convert non-list 'trainer-config-path' entries
-        # into a list for iteration later.
-        if type(config['trainer-config-path']) is str:
-            config['trainer-config-path'] = [config['trainer-config-path']]
+        training_command = TrainingCommand(config)
+        self.override_configuration_values(training_command, args)
+        training_command.set_additional_arguments(args.args)
 
-        # If multiple configurations are defined, we need to load each training
-        # instance in a new window and disable brain exporting on completion.
-        if len(config['trainer-config-path']) > 1:
-            self.new_window = True
-            config['--export-path'] = ''
-
-        if '--base-port' in config and config['--base-port']:
-            base_port = int(config['--base-port'])
-        else:
-            base_port = 5005
-
-        counter = -1
-
-        for trainer_config in config['trainer-config-path']:
-            counter = counter + 1
-
-            training_command = TrainingCommand(config)
-            self.override_configuration_values(training_command, args)
-            training_command.set_trainer_config(trainer_config)
-
-            training_command.set_base_port(str(base_port + counter))
-
-            if len(config['trainer-config-path']) > 1:
-                training_command.set_run_id(training_command.get_run_id() + f'_{counter:02d}')
-
-            training_command.set_additional_arguments(args.args)
-
-            yield training_command.get_command()
+        return training_command.get_command()
 
     def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
