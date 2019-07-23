@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import subprocess
+import yaml
 
 from io import StringIO
 from pathlib import Path
@@ -97,11 +98,43 @@ def write_json_file(json_data, file_path: Path):
 
 
 def load_json_file(file_path: Path):
-    """Load json data from a file."""
+    """Load json data from a file.
+
+    Raises:
+      FileNotFoundError
+    """
 
     try:
         with file_path.open('r') as f:
             data = json.load(f)
+    except FileNotFoundError as exception:
+        command_log.error(f'File \'{file_path}\' not found')
+        raise exception
+
+    return data
+
+
+def write_yaml_file(yaml_data, file_path: Path):
+    """Write yaml data to a file."""
+
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    command_log.debug(f'Creating file \'{file_path}\'')
+    with file_path.open(mode='w') as f:
+        yaml.dump(yaml_data, f)
+        # json.dump(json_data, f, indent=4)
+
+def load_yaml_file(file_path: Path):
+    """Load yaml data from a file.
+
+    Raises:
+      FileNotFoundError
+    """
+
+    try:
+        with file_path.open('r') as f:
+            data = yaml.load(f, Loader=yaml.BaseLoader)
     except FileNotFoundError as exception:
         command_log.error(f'File \'{file_path}\' not found')
         raise exception
