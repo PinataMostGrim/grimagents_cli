@@ -131,6 +131,8 @@ class PerformTraining(Command):
     def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
 
+        if args.trainer_config is not None:
+            training_command.set_trainer_config(args.trainer_config)
         if args.env is not None:
             training_command.set_env(args.env)
         if args.lesson is not None:
@@ -233,6 +235,7 @@ def parse_args(argv):
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
+    overrides_parser.add_argument('--trainer-config', type=str)
     overrides_parser.add_argument('--env', type=str)
     overrides_parser.add_argument('--lesson', type=int)
     overrides_parser.add_argument('--run-id', type=str)

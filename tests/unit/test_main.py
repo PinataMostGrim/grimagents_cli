@@ -51,6 +51,7 @@ def test_override_configuration_values(monkeypatch):
     """Test for correct creation of a training command with command line argument overrides.
 
     Ensures the following arguments are overridden:
+        --trainer-config
         --env
         --lesson
         --run-id
@@ -61,9 +62,10 @@ def test_override_configuration_values(monkeypatch):
     args = Namespace(
         configuration_file='config\\3DBall_grimagents.json',
         new_window=False,
-        env='',
+        trainer_config='config\\PushBlock_grimagents.json',
+        env='builds\\PushBlock\\PushBlock.exe',
         lesson=2,
-        run_id='ball',
+        run_id='PushBlock',
         num_envs=2,
         inference=False,
         graphics=None,
@@ -77,7 +79,6 @@ def test_override_configuration_values(monkeypatch):
         "trainer-config-path": "config\\3DBall.yaml",
         "--run-id": "3DBall",
         "--env": "builds\\3DBall\\Unity Environment.exe",
-        "--base-port": "5006",
         "--timestamp": True,
     }
 
@@ -97,11 +98,11 @@ def test_override_configuration_values(monkeypatch):
         'run',
         'python',
         'grim-agents\\grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'config\\PushBlock_grimagents.json',
         '--run-id',
-        'ball',
-        '--base-port',
-        '5006',
+        'PushBlock',
+        '--env',
+        'builds\\PushBlock\\PushBlock.exe',
         '--load',
         '--slow',
         '--lesson',
