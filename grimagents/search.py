@@ -82,15 +82,17 @@ class GridSearch(Command):
         """
 
         if ('default' in trainer_config):
-            result = {brain_name: trainer_config['default']}
+            result = {'default': trainer_config['default']}
         else:
-            result = {brain_name: config_util.get_default_trainer_config()['default']}
+            result = {'default': config_util.get_default_trainer_config()['default']}
 
         if brain_name not in trainer_config:
             print(f'Unable to find configuration settings for brain \'{brain_name}\' in trainer_config')
             sys.exit()
 
         brain_data = trainer_config[brain_name]
+        result[brain_name] = {}
+
         for key, value in brain_data.items():
             result[brain_name][key] = value
 
