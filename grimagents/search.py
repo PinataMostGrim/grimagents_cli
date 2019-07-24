@@ -1,8 +1,10 @@
-#TODO: logging config, convert print statements to logging
-
+"""
+"""
 
 import argparse
 import itertools
+import logging
+import logging.config
 import subprocess
 import sys
 
@@ -12,7 +14,9 @@ import grimagents.settings as settings
 
 from argparse import Namespace
 from pathlib import Path
-from pprint import pprint
+
+
+search_log = logging.getLogger('grimagents.search')
 
 
 class Command:
@@ -55,6 +59,12 @@ class GridSearch(Command):
         permutations = self.get_search_permutations(sets)
 
         # Perform search on permutations
+        search_log.info('-' * 63)
+        search_log.info('Performing grid search for hyperparameters:')
+        for i in range(len(hyperparameters)):
+            search_log.info(f'    {hyperparameters[i]}: {sets[i]}')
+        search_log.info('-' * 63)
+
         grid_config_path = trainer_config_path.with_name('search_config.yaml')
         for i in range(len(permutations)):
 
@@ -62,19 +72,26 @@ class GridSearch(Command):
             grid_brain_config = self.get_brain_config_for_grid(brain_config, grid)
 
             # Write trainer configuration file for grid
-            command_util.write_yaml_file(grid_brain_config, grid_config_path)
             # TODO: Handle writing config files while parallel training
+            command_util.write_yaml_file(grid_brain_config, grid_config_path)
 
             # Execute training with the new trainer-config and run_id
             run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
             command = ['pipenv', 'run', 'python', '-m', 'grimagents', str(grim_config_path), '--trainer-config', str(grid_config_path), '--run-id', run_id]
 
-            print(f'Running grid {i:02d}')
+            search_log.info('-' * 63)
+            search_log.info(f'Training {run_id}:')
+            for i in range(len(grid)):
+                search_log.info(f'    {grid[i][0]}: {grid[i][1]}')
+            search_log.info('-' * 63)
+
+
             cwd = settings.get_project_folder_absolute()
+            #TODO: Try / except keyboard interrupt and auto kill process
+            # to prevent needing to answer Terminate Process prompt
             subprocess.run(command, cwd=cwd)
-            print('')
-        print('Search complete')
-        # TODO: remove grid configuration file
+
+        search_log.info('Grid search complete\n')
 
     def get_brain_configuration(self, trainer_config, brain_name):
         """Returns a complete trainer configuration for a brain. If hyperparameter values
@@ -171,5 +188,31 @@ def parse_args(argv):
     return args
 
 
+def configure_logging():
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "display": {"style": "{", "format": "{message}"},
+            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "display",
+            }
+        },
+        "loggers": {
+            "grimagents.search": {"handlers": ["console"]},
+        },
+        "root": {"level": "INFO"},
+    }
+
+    logging.config.dictConfig(log_config)
+
+
 if __name__ == '__main__':
+    configure_logging()
     main()
+    logging.shutdown()
