@@ -91,6 +91,7 @@ class GridSearch(Command):
             # to prevent needing to answer Terminate Process prompt
             subprocess.run(command, cwd=cwd)
 
+        grid_config_path.unlink()
         search_log.info('Grid search complete\n')
 
     def get_brain_configuration(self, trainer_config, brain_name):
