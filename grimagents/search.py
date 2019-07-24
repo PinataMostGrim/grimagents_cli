@@ -1,46 +1,18 @@
-# write brain_config to file
-# override trainer-config argument with configuration file
-#   - add override argument to __main__.py
-# sort out how to execute __main__ from search.py
-# logging config
+#TODO: logging config, convert print statements to logging
 
 
 import argparse
 import itertools
-import numpy
+import subprocess
 import sys
-import yaml
 
 import grimagents.command_util as command_util
 import grimagents.config as config_util
+import grimagents.settings as settings
 
 from argparse import Namespace
 from pathlib import Path
 from pprint import pprint
-
-
-SEARCH_CONFIG = {
-    "type": "grid",
-    "sample_size": 3,
-    "in_parallel": False,
-    "brain": {
-        "name": "PushBlockLearning",
-        "hyperparameters": {
-            "batch_size": {
-                "min": 512,
-                "max": 5120,
-                "samples": 3},
-            "beta": {
-                "min": 1e-4,
-                "max": 1e-2,
-                "samples": 3},
-            "num_epoch": {
-                "min": 3,
-                "max": 10,
-                "samples": 3},
-        }
-    }
-}
 
 
 class Command:
@@ -58,112 +30,101 @@ class EditGrimConfigFile(Command):
 
 
 class GridSearch(Command):
-    """Performs a hyperparameter grid search using values from a grimagents configuration file.
+    """Perform a hyperparameter grid search using values from a grimagents configuration file.
     """
 
     def execute(self, args):
 
-        # Load yaml and prepare trainer_configuration
-        # run_id = 'PushBlock'
-        path = Path(args.configuration_file)
-
-        grim_config = command_util.load_json_file(path)
+        # Load trainer configuration from file
+        grim_config_path = Path(args.configuration_file)
+        grim_config = config_util.load_grim_config_file(grim_config_path)
         trainer_config_path = Path(grim_config['trainer-config-path'])
 
-        brain_name = SEARCH_CONFIG['brain']['name']
-        brain_config = self.get_brain_configuration(trainer_config_path, brain_name)
-        # pprint(brain_config)
+        trainer_config = config_util.load_trainer_configuration(trainer_config_path)
 
-        # Load hyperparameter names
-        hyperparameters = self.get_hyperparameter_list(SEARCH_CONFIG)
-        # print(hyperparameters)
+        # Load search configuration
+        search_config = grim_config[config_util.SEARCH]
 
-        # Load hyperparameter variations
-        sets = self.get_hyperparameter_sets(SEARCH_CONFIG)
-        # pprint(sets)
+        # Fetch brain configuration
+        brain_name = search_config['brain']['name']
+        brain_config = self.get_brain_configuration(trainer_config, brain_name)
 
-        permutations = self.get_hyperparameter_permutations(sets)
-        # pprint(permutations)
+        # Determine search permutations
+        hyperparameters = self.get_search_hyperparameters(search_config)
+        sets = self.get_search_sets(search_config)
+        permutations = self.get_search_permutations(sets)
 
-        grid = self.get_grid(hyperparameters, permutations, 10)
-        new_brain_config = self.get_brain_config_for_grid(brain_config, grid)
+        # Perform search on permutations
+        grid_config_path = trainer_config_path.with_name('search_config.yaml')
+        for i in range(len(permutations)):
 
-        pprint(brain_config)
-        print('-' * 70)
-        pprint(new_brain_config)
+            grid = self.get_grid(hyperparameters, permutations, i)
+            grid_brain_config = self.get_brain_config_for_grid(brain_config, grid)
 
+            # Write trainer configuration file for grid
+            command_util.write_yaml_file(grid_brain_config, grid_config_path)
+            # TODO: Handle writing config files while parallel training
 
-    def get_brain_configuration(self, path: Path, brain):
+            # Execute training with the new trainer-config and run_id
+            run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
+            command = ['pipenv', 'run', 'python', '-m', 'grimagents', str(grim_config_path), '--trainer-config', str(grid_config_path), '--run-id', run_id]
 
-        with path.open(mode='r') as file:
-            loaded_data = yaml.load(file, Loader=yaml.BaseLoader)
+            print(f'Running grid {i:02d}')
+            cwd = settings.get_project_folder_absolute()
+            subprocess.run(command, cwd=cwd)
+            print('')
+        print('Search complete')
+        # TODO: remove grid configuration file
 
-        result = ""
+    def get_brain_configuration(self, trainer_config, brain_name):
+        """Returns a complete trainer configuration for a brain. If hyperparameter values
+        are missing, they are isnerted with default values.
+        """
 
-        if ('default' in loaded_data):
-            result = loaded_data['default']
-        # else:
-            # TODO: Get default configuration from config.py
+        if ('default' in trainer_config):
+            result = {brain_name: trainer_config['default']}
+        else:
+            result = {brain_name: config_util.get_default_trainer_config()['default']}
 
-        if brain not in loaded_data:
-            print(f'Unable to find configuration settings for brain \'{brain}\' in loaded_data')
+        if brain_name not in trainer_config:
+            print(f'Unable to find configuration settings for brain \'{brain_name}\' in trainer_config')
             sys.exit()
 
-        brain_data = loaded_data[brain]
-
+        brain_data = trainer_config[brain_name]
         for key, value in brain_data.items():
-            result[key] = value
+            result[brain_name][key] = value
 
         return result
 
-
-    def get_hyperparameter_list(self, search_config):
+    def get_search_hyperparameters(self, search_config):
         return [name for name in search_config['brain']['hyperparameters']]
 
-
-    def get_hyperparameter_sets(self, search_config):
+    def get_search_sets(self, search_config):
 
         sets = []
         for _, values in search_config['brain']['hyperparameters'].items():
-            minimum = values['min']
-            maximum = values['max']
-            sample_count = values['samples']
-
-            samples = self.calculate_sample_set(minimum, maximum, sample_count).tolist()
-            sets.append(samples)
+            sets.append(values)
 
         return sets
 
-
-    def calculate_sample_set(self, minimum, maximum, sample_count):
-
-        if (type(minimum) is float or type(maximum) is float):
-            return numpy.linspace(minimum, maximum, sample_count)
-        else:
-            return numpy.linspace(minimum, maximum, sample_count).astype(int)
-
-
-    def get_hyperparameter_permutations(self, hyperparameter_sets):
+    def get_search_permutations(self, hyperparameter_sets):
         return list(itertools.product(*hyperparameter_sets))
-
-
-    def create_grid_generator(self, hyperparameters, permutations):
-
-        for i in range(len(permutations)):
-            yield self.get_grid(hyperparameters, permutations, i)
-
 
     def get_grid(self, hyperparameters, permutations, index):
 
         result = list(zip(hyperparameters, permutations[index]))
         return result
 
-
     def get_brain_config_for_grid(self, brain_config, grid):
+        """Returns a brain configuration dictionary with values overriden by the grid settings.
+        """
 
         result = brain_config.copy()
+        brain_name = [*result.keys()][0]
+
         for hyperparameter in grid:
-            result[hyperparameter[0]] = hyperparameter[1]
+            result[brain_name][hyperparameter[0]] = hyperparameter[1]
+
         return result
 
 
@@ -189,6 +150,7 @@ def parse_args(argv):
     options_parser = argparse.ArgumentParser(add_help=False)
     options_parser.add_argument('--edit-config', metavar='<file>', type=str, help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.')
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
 
     parser = argparse.ArgumentParser(prog='search',
                                      description='CLI application that performs a hyperparameter grid search',

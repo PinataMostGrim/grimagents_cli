@@ -75,6 +75,10 @@ class TrainingCommand(Command):
             if key == config_util.INFERENCE:
                 continue
 
+            # The 'search' dictionary is not sent to training_wrapper.
+            if key == config_util.SEARCH:
+                continue
+
             # Additional arguments are serialized as a list and the key should
             # not be included.
             if key == ADDITIONAL_ARGS:

@@ -24,6 +24,7 @@ INFERENCE = '--inference'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
 LOG_FILE_NAME = '--log-filename'
+SEARCH = 'search'
 
 
 _DEFAULT_GRIM_CONFIG = {
@@ -79,74 +80,25 @@ _DEFAULT_CURRICULUM = {
 
 
 _DEFAULT_SEARCH_CONFIG = {
-    "in_parallel": False,
     "brain": {
-        "name": "DEFAULT_BRAIN_NAME",
+        "name": "BRAIN_NAME",
         "hyperparameters": {
-            "batch_size": {
-                "min": 512,
-                "max": 5120,
-                "samples": 3},
-            "beta": {
-                "min": 1e-4,
-                "max": 1e-2,
-                "samples": 3},
-            "buffer_size_multiple": {
-                "min": 4,
-                "max": 10,
-                "samples": 3},
-            "curiosity_strength": {
-                "min": 0.001,
-                "max": 0.1,
-                "samples": 3},
-            "curiosity_enc_size": {
-                "min": 64,
-                "max": 256,
-                "samples": 3},
-            "epsilon": {
-                "min": 0.1,
-                "max": 0.3,
-                "samples": 3},
-            "gamma": {
-                "min": 0.8,
-                "max": 0.995,
-                "samples": 3},
-            "hidden_units": {
-                "min": 32,
-                "max": 512,
-                "samples": 3},
-            "lambd": {
-                "min": 0.9,
-                "max": 0.95,
-                "samples": 3},
-            "learning_rate": {
-                "min": 1e-5,
-                "max": 1e-3,
-                "samples": 3},
-            "max_steps": {
-                "min": 5e5,
-                "max": 1e7,
-                "samples": 3},
-            "memory_size": {
-                "min": 64,
-                "max": 512,
-                "samples": 3},
-            "num_layers": {
-                "min": 1,
-                "max": 3,
-                "samples": 3},
-            "num_epoch": {
-                "min": 3,
-                "max": 10,
-                "samples": 3},
-            "time_horizon": {
-                "min": 32,
-                "max": 2048,
-                "samples": 3},
-            "sequence_length": {
-                "min": 4,
-                "max": 128,
-                "samples": 3},
+            "batch_size": [512, 5120],
+            "beta": [1e-4, 1e-2],
+            "buffer_size_multiple": [4, 10],
+            "curiosity_strength": [0.001, 0.1],
+            "curiosity_enc_size": [64, 256],
+            "epsilon": [0.1, 0.3],
+            "gamma": [0.8, 0.995],
+            "hidden_units": [32, 512],
+            "lambd": [0.9, 0.95],
+            "learning_rate": [1e-5, 1e-3],
+            "max_steps": [5e5, 1e7],
+            "memory_size": [64, 512],
+            "num_layers": [1, 3],
+            "num_epoch": [3, 10],
+            "time_horizon": [32, 2048],
+            "sequence_length": [4, 128],
         },
     },
 }
@@ -244,6 +196,10 @@ def validate_grim_configuration(configuration):
     # configuration, but it should not contain any keys that do not exist
     # in the full configuration.
     for key, value in configuration.items():
+        # 'search' is not defined in the default configuration but is still a valid key.
+        if key == SEARCH:
+            continue
+
         try:
             default_config[key]
         except KeyError:
