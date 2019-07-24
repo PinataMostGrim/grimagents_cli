@@ -1,6 +1,9 @@
 """
-"""
+CLI application that performs hyperparameter searches using grimagents and a grimagents configuration file.
 
+Features:
+- Grid Search
+"""
 import argparse
 import itertools
 import logging
@@ -95,8 +98,7 @@ class GridSearch(Command):
         search_log.info('Grid search complete\n')
 
     def get_brain_configuration(self, trainer_config, brain_name):
-        """Returns a complete trainer configuration for a brain. If hyperparameter values
-        are missing, they are isnerted with default values.
+        """Returns a complete trainer configuration for a brain. A dictionary of default parameters are also included.
         """
 
         if ('default' in trainer_config):
@@ -117,9 +119,12 @@ class GridSearch(Command):
         return result
 
     def get_search_hyperparameters(self, search_config):
+        """Returns the list of hyperparameter names defined in the search configuration."""
+
         return [name for name in search_config['brain']['hyperparameters']]
 
     def get_search_sets(self, search_config):
+        """Returns a two dimensional array containing all hyperparameter values to use in the grid search."""
 
         sets = []
         for _, values in search_config['brain']['hyperparameters'].items():
@@ -128,9 +133,13 @@ class GridSearch(Command):
         return sets
 
     def get_search_permutations(self, hyperparameter_sets):
+        """Returns a two dimensional list of grid search permutations."""
+
         return list(itertools.product(*hyperparameter_sets))
 
     def get_grid(self, hyperparameters, permutations, index):
+        """Returns a two dimensional list containing the search parameters to use for a given grid in the search (index).
+        """
 
         result = list(zip(hyperparameters, permutations[index]))
         return result
