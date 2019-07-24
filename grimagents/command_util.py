@@ -122,8 +122,7 @@ def write_yaml_file(yaml_data, file_path: Path):
 
     command_log.debug(f'Creating file \'{file_path}\'')
     with file_path.open(mode='w') as f:
-        yaml.dump(yaml_data, f)
-        # json.dump(json_data, f, indent=4)
+        yaml.dump(yaml_data, f, indent=4)
 
 
 def load_yaml_file(file_path: Path):
@@ -135,7 +134,7 @@ def load_yaml_file(file_path: Path):
 
     try:
         with file_path.open('r') as f:
-            data = yaml.load(f, Loader=yaml.BaseLoader)
+            data = yaml.safe_load(f)
     except FileNotFoundError as exception:
         command_log.error(f'File \'{file_path}\' not found')
         raise exception

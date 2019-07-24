@@ -150,7 +150,7 @@ def get_default_grim_config():
 def get_default_trainer_config():
     """Fetches the default trainer configuration."""
 
-    return yaml.load(_DEFAULT_TRAINER_CONFIG, Loader=yaml.BaseLoader)
+    return yaml.safe_load(_DEFAULT_TRAINER_CONFIG)
 
 
 def get_default_curriculum():
