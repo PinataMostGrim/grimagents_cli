@@ -170,7 +170,22 @@ def main():
     # elif args.random:
     #     random_search(args)
     else:
+        if not pipenv_exists():
+            search_log.error('A Pipenv virtual environment is not accessible from this directory')
+            return
         GridSearch().execute(args)
+
+
+def pipenv_exists():
+    """Returns True if a virtual environment can be accessed through Pipenv and False otherwise.
+    """
+
+    process = subprocess.run(['pipenv', '--venv'], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    if 'No virtualenv has been created for this project yet!' in process.stderr:
+        return False
+
+    return True
 
 
 def parse_args(argv):
