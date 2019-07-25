@@ -121,6 +121,18 @@ class PerformGridSearch(GridSearchCommand):
         search_log.info('Grid search complete\n')
 
 
+class ExportGridSearchConfiguration(GridSearchCommand):
+    """Exports a trainer config file for a given GridSearch intersect."""
+
+    def execute(self):
+
+        search_log.info(f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_intersect}\' into \'{self.search_config_path}\'')
+
+        intersect = self.grid_search.get_intersect(self.args.export_intersect)
+        intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
+        command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
+
+
 def main():
 
     args = parse_args(sys.argv[1:])
@@ -135,6 +147,8 @@ def main():
         EditGrimConfigFile(args).execute()
     elif args.search_count:
         OutputGridSearchCount(args).execute()
+    elif args.export_intersect:
+        ExportGridSearchConfiguration(args).execute()
     else:
         PerformGridSearch(args).execute()
 
@@ -151,6 +165,8 @@ def parse_args(argv):
     )
     options_parser.add_argument('--search-count', action='store_true', help='Output the total number of searches a grimagents configuration file will attempt')
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    options_parser.add_argument('--export-intersect', metavar='<search index>', type=int, help='Export trainer configuration for a GridSearch intersect')
+
     # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
 
     parser = argparse.ArgumentParser(
