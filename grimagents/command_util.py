@@ -40,27 +40,6 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
         subprocess.run(command, cwd=cwd)
 
 
-def execute_command_and_capture(command: list, cwd=None, show_command=True):
-    """Executes a command in terminal, captures output,
-    prints it, and returns it.
-    """
-
-    if show_command:
-        command_log.info(' '.join(command))
-
-    with subprocess.Popen(
-        command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True
-    ) as p, StringIO() as buf:
-
-        for line in p.stdout:
-            command_log.info(line, end='')
-            buf.write(line)
-
-        output = buf.getvalue()
-
-    return output
-
-
 def open_file(file_path: Path):
     """Opens a file using the default system application."""
 
