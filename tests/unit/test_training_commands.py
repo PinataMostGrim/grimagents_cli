@@ -1,4 +1,6 @@
-from grimagents.commands import TrainingCommand
+from argparse import Namespace
+
+from grimagents.training_commands import TrainingWrapperCommand
 import grimagents.common
 
 
@@ -22,9 +24,9 @@ TEST_CONFIG = {
 
 
 def test_create_training_command():
-    """Test for creating TrainingCommand with default configuration."""
+    """Test for creating TrainingWrapperCommand with default configuration."""
 
-    command = TrainingCommand(TEST_CONFIG)
+    command = TrainingWrapperCommand(TEST_CONFIG)
     command_list = [
         'pipenv',
         'run',
@@ -56,7 +58,7 @@ def test_training_command_handles_no_graphics():
         "--run-id": "3DBall",
         "--no-graphics": True,
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     assert '--no-graphics' in command.get_command()
 
     # '--no-graphics' should not be present
@@ -65,7 +67,7 @@ def test_training_command_handles_no_graphics():
         "--run-id": "3DBall",
         "--no-graphics": False,
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     assert '--no-graphics' not in command.get_command()
 
 
@@ -77,7 +79,7 @@ def test_training_command_excludes_timestamp():
         "--run-id": "3DBall",
         "--timestamp": True,
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     assert '--timestamp' not in command.get_command()
 
     test_config = {
@@ -85,19 +87,19 @@ def test_training_command_excludes_timestamp():
         "--run-id": "3DBall",
         "--timestamp": False,
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     assert '--timestamp' not in command.get_command()
 
 
 def test_training_command_add_additional_args():
-    """Test for TrainingCommand correctly setting additional arguments."""
+    """Test for TrainingWrapperCommand correctly setting additional arguments."""
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
         "--env": "builds\\3DBall\\Unity Environment.exe",
         "--run-id": "3DBall",
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     additional_args = ['--slow', '--load']
     command.set_additional_arguments(additional_args)
     command_list = [
@@ -122,8 +124,73 @@ def test_training_command_add_additional_args():
     assert result == command_list
 
 
-def test_training_command_override_args():
-    """Test for TrainingCommand correctly overriding argument values."""
+def test_override_configuration_values():
+    """Test for correct handling of TrainingWrapperCommand argument overrides.
+
+    Ensures the following arguments are overridden:
+        --trainer-config
+        --env
+        --lesson
+        --run-id
+        --num-envs
+        --no-graphics
+        --timestamp
+    """
+
+    args = Namespace(
+        configuration_file='config\\3DBall_grimagents.json',
+        new_window=False,
+        trainer_config='config\\PushBlock_grimagents.json',
+        env='builds\\PushBlock\\PushBlock.exe',
+        lesson=2,
+        run_id='PushBlock',
+        num_envs=2,
+        inference=False,
+        graphics=None,
+        no_graphics=True,
+        timestamp=None,
+        no_timestamp=True,
+        args=['--load', '--slow'],
+    )
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--timestamp": True,
+    }
+
+    training_command = TrainingWrapperCommand(test_config)
+    training_command.set_additional_arguments(args.args)
+    training_command.apply_argument_overrides(args)
+
+    result = training_command.get_command()
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == [
+        'pipenv',
+        'run',
+        'python',
+        'grimagents\\training_wrapper.py',
+        'config\\PushBlock_grimagents.json',
+        '--run-id',
+        'PushBlock',
+        '--env',
+        'builds\\PushBlock\\PushBlock.exe',
+        '--load',
+        '--slow',
+        '--lesson',
+        '2',
+        '--num-envs',
+        '2',
+        '--no-graphics',
+        '--train',
+    ]
+
+
+def test_training_command_set_methods():
+    """Tests that TrainingWrapperCommand correctly sets argument values."""
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
@@ -142,7 +209,7 @@ def test_training_command_override_args():
         "--timestamp": False,
         "--log-filename": "",
     }
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
 
     command.set_env('builds\\3DBall\\3DBall.exe')
     command.set_lesson('3')
@@ -163,7 +230,7 @@ def test_training_command_override_args():
 
 
 def test_training_command_timestamp(monkeypatch):
-    """Test for TrainingCommand correctly applying a timestamp and setting
+    """Test for TrainingWrapperCommand correctly applying a timestamp and setting
     the log_filename."""
 
     def mock_return():
@@ -179,7 +246,7 @@ def test_training_command_timestamp(monkeypatch):
     }
 
     # Result if a log-filename key does not already exist
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     command_string = command.get_command_as_string()
 
     assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
@@ -211,7 +278,7 @@ def test_training_command_inference():
     }
 
     # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     command_list = [
         'pipenv',
         'run',
@@ -230,7 +297,7 @@ def test_training_command_inference():
     assert result == command_list
 
     # '--slow' isn't duplicated
-    command = TrainingCommand(test_config)
+    command = TrainingWrapperCommand(test_config)
     additional_args = ['--slow']
     command.set_additional_arguments(additional_args)
 

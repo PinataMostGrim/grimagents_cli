@@ -7,7 +7,7 @@ ADDITIONAL_ARGS = 'additional-args'
 SLOW = '--slow'
 
 
-class Command():
+class Command:
     def __init__(self):
         self._arguments = {}
 
@@ -15,11 +15,39 @@ class Command():
         return ['echo', __class__.__name__, self.arguments]
 
 
-class TrainingCommand(Command):
+class TrainingWrapperCommand(Command):
     """Training Wrapper command"""
 
     def __init__(self, arguments: dict):
         self.arguments = arguments.copy()
+
+    def apply_argument_overrides(self, args):
+        """Replaces values in the arguments dictionary with the overrides stored in args."""
+
+        if args.trainer_config is not None:
+            self.set_trainer_config(args.trainer_config)
+        if args.env is not None:
+            self.set_env(args.env)
+        if args.lesson is not None:
+            self.set_lesson(str(args.lesson))
+        if args.run_id is not None:
+            self.set_run_id(args.run_id)
+        if args.num_envs is not None:
+            self.set_num_envs(str(args.num_envs))
+        if args.inference is not None:
+            self.set_inference(args.inference)
+
+        if args.graphics:
+            # As the argument is 'no-graphics', false in this case means
+            # graphics are used.
+            self.set_no_graphics_enabled(False)
+        if args.no_graphics:
+            self.set_no_graphics_enabled(True)
+
+        if args.timestamp:
+            self.set_timestamp_enabled(True)
+        if args.no_timestamp:
+            self.set_timestamp_enabled(False)
 
     def set_additional_arguments(self, args):
         self.arguments[ADDITIONAL_ARGS] = args
@@ -35,15 +63,22 @@ class TrainingCommand(Command):
 
         # Process --timestamp argument
         if config_util.TIMESTAMP in command_arguments and command_arguments[config_util.TIMESTAMP]:
-            if config_util.LOG_FILE_NAME not in command_arguments or not command_arguments[config_util.LOG_FILE_NAME]:
+            if (
+                config_util.LOG_FILE_NAME not in command_arguments
+                or not command_arguments[config_util.LOG_FILE_NAME]
+            ):
                 # Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
                 command_arguments[config_util.LOG_FILE_NAME] = command_arguments[config_util.RUN_ID]
 
             timestamp = common.get_timestamp()
-            command_arguments[config_util.RUN_ID] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
+            command_arguments[
+                config_util.RUN_ID
+            ] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
 
         # Process --inference argument
-        use_inference = config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
+        use_inference = (
+            config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
+        )
         if use_inference:
             if ADDITIONAL_ARGS not in command_arguments:
                 command_arguments[ADDITIONAL_ARGS] = []
@@ -52,7 +87,7 @@ class TrainingCommand(Command):
             if SLOW not in command_arguments[ADDITIONAL_ARGS]:
                 command_arguments[ADDITIONAL_ARGS].append(SLOW)
             if config_util.EXPORT_PATH in command_arguments:
-                del(command_arguments[config_util.EXPORT_PATH])
+                del command_arguments[config_util.EXPORT_PATH]
 
         result = list()
         for key, value in command_arguments.items():

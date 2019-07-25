@@ -9,6 +9,9 @@ Features:
 - Quickly resume the last training run
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Convenience command for listing mlagents-learn command line arguments
+- Convenience command for starting the tensorboard server
+- Convenience command for creating grimagents config, trainer config, and curriculum files
 
 See training_wrapper.py for its feature list and readme.md for more documentation.
 """
@@ -26,7 +29,7 @@ import grimagents.command_util as command_util
 import grimagents.settings as settings
 import grimagents.common as common
 
-from grimagents.commands import TrainingCommand
+from grimagents.training_commands import TrainingWrapperCommand
 
 
 main_log = logging.getLogger('grimagents.main')
@@ -119,40 +122,11 @@ class PerformTraining(Command):
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
 
-        training_command = TrainingCommand(config)
-        self.override_configuration_values(training_command, args)
+        training_command = TrainingWrapperCommand(config)
+        training_command.apply_argument_overrides(args)
         training_command.set_additional_arguments(args.args)
 
         return training_command.get_command()
-
-    def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
-        """Replaces values in the configuration dictionary with those stored in args."""
-
-        if args.trainer_config is not None:
-            training_command.set_trainer_config(args.trainer_config)
-        if args.env is not None:
-            training_command.set_env(args.env)
-        if args.lesson is not None:
-            training_command.set_lesson(str(args.lesson))
-        if args.run_id is not None:
-            training_command.set_run_id(args.run_id)
-        if args.num_envs is not None:
-            training_command.set_num_envs(str(args.num_envs))
-        if args.inference is not None:
-            training_command.set_inference(args.inference)
-
-        if args.graphics:
-            training_command
-            # As the argument is 'no-graphics', false in this case means
-            # graphics are used.
-            training_command.set_no_graphics_enabled(False)
-        if args.no_graphics:
-            training_command.set_no_graphics_enabled(True)
-
-        if args.timestamp:
-            training_command.set_timestamp_enabled(True)
-        if args.no_timestamp:
-            training_command.set_timestamp_enabled(False)
 
 
 class ResumeTraining(Command):
