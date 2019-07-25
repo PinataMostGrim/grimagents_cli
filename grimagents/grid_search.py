@@ -7,15 +7,17 @@ class GridSearchError(Exception):
 
 class InvalidTrainerConfig(GridSearchError):
     """The trainer config yaml file is invalid."""
+
     pass
 
 
 class InvalidIntersectionIndex(GridSearchError):
     """An attempt to access an invalid intersection index was made."""
+
     pass
 
 
-class GridSearch():
+class GridSearch:
     """Object that faciliates performing hyperparameter grid searchs."""
 
     def __init__(self, search_config, trainer_config):
@@ -78,12 +80,16 @@ class GridSearch():
         try:
             result = {'default': trainer_config['default']}
         except KeyError:
-            raise InvalidTrainerConfig(f'Unable to find \'default\' configuration values in trainer configuration:\n{trainer_config}')
+            raise InvalidTrainerConfig(
+                f'Unable to find \'default\' configuration values in trainer configuration:\n{trainer_config}'
+            )
 
         try:
             brain_data = trainer_config[brain_name]
         except KeyError:
-            raise InvalidTrainerConfig(f'Unable to find configuration settings for brain \'{brain_name}\' in trainer configuration:{trainer_config}')
+            raise InvalidTrainerConfig(
+                f'Unable to find configuration settings for brain \'{brain_name}\' in trainer configuration:{trainer_config}'
+            )
 
         result[brain_name] = {}
         for key, value in brain_data.items():
@@ -101,7 +107,9 @@ class GridSearch():
         try:
             result = list(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
-            raise InvalidIntersectionIndex(f'Unable to access intersection {index}, GridSearch only contains {self.get_intersection_count()} intersections.')
+            raise InvalidIntersectionIndex(
+                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
+            )
 
         return result
 

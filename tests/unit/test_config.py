@@ -153,7 +153,11 @@ def test_no_overwrite_search_entry(fixture_grim_config_file, monkeypatch):
 
     monkeypatch.setattr(command_util, "open_file", mock_open_file)
 
-    configuration = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall", "search": []}
+    configuration = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
+        "search": [],
+    }
 
     path = get_grim_config_file_path()
     with path.open('w') as f:

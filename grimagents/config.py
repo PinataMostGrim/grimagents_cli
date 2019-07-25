@@ -101,7 +101,7 @@ _DEFAULT_SEARCH_CONFIG = {
             "time_horizon": [32, 2048],
             "sequence_length": [4, 128],
         },
-    },
+    }
 }
 
 

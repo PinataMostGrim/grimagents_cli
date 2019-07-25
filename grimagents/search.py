@@ -58,7 +58,9 @@ class PerformGridSearch(Command):
         search_log.info('-' * 63)
         search_log.info('Performing grid search for hyperparameters:')
         for i in range(len(grid_search.hyperparameters)):
-            search_log.info(f'    {grid_search.hyperparameters[i]}: {grid_search.hyperparameter_sets[i]}')
+            search_log.info(
+                f'    {grid_search.hyperparameters[i]}: {grid_search.hyperparameter_sets[i]}'
+            )
         search_log.info('-' * 63)
 
         grid_config_path = trainer_config_path.with_name('search_config.yaml')
@@ -73,7 +75,18 @@ class PerformGridSearch(Command):
 
             # Execute training with the new trainer-config and run_id
             run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
-            command = ['pipenv', 'run', 'python', '-m', 'grimagents', str(grim_config_path), '--trainer-config', str(grid_config_path), '--run-id', run_id]
+            command = [
+                'pipenv',
+                'run',
+                'python',
+                '-m',
+                'grimagents',
+                str(grim_config_path),
+                '--trainer-config',
+                str(grid_config_path),
+                '--run-id',
+                run_id,
+            ]
 
             search_log.info('-' * 63)
             search_log.info(f'Training {run_id}:')
@@ -104,7 +117,12 @@ def pipenv_exists():
     """Returns True if a virtual environment can be accessed through Pipenv and False otherwise.
     """
 
-    process = subprocess.run(['pipenv', '--venv'], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.run(
+        ['pipenv', '--venv'],
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
 
     if 'No virtualenv has been created for this project yet!' in process.stderr:
         return False
@@ -116,14 +134,23 @@ def parse_args(argv):
     """Builds a Namespace object out of parsed arguments."""
 
     options_parser = argparse.ArgumentParser(add_help=False)
-    options_parser.add_argument('--edit-config', metavar='<file>', type=str, help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.')
+    options_parser.add_argument(
+        '--edit-config',
+        metavar='<file>',
+        type=str,
+        help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.',
+    )
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
     # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
 
-    parser = argparse.ArgumentParser(prog='search',
-                                     description='CLI application that performs a hyperparameter grid search',
-                                     parents=[options_parser])
-    parser.add_argument('configuration_file', type=str, help='grimagents configuration file with search parameters')
+    parser = argparse.ArgumentParser(
+        prog='search',
+        description='CLI application that performs a hyperparameter grid search',
+        parents=[options_parser],
+    )
+    parser.add_argument(
+        'configuration_file', type=str, help='grimagents configuration file with search parameters'
+    )
 
     args, unparsed_args = options_parser.parse_known_args()
 
@@ -152,9 +179,7 @@ def configure_logging():
                 "formatter": "display",
             }
         },
-        "loggers": {
-            "grimagents.search": {"handlers": ["console"]},
-        },
+        "loggers": {"grimagents.search": {"handlers": ["console"]}},
         "root": {"level": "INFO"},
     }
 
