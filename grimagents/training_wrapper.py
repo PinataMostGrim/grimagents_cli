@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """CLI application that wraps 'mlagents-learn' with several quality of life improvements.
 
-- Initiates training with mlagents-learn
+Features:
 - Logs mlagents-learn output to file
 - Optionally exports trained models to another location after training finishes (for example, into a Unity project)
 
 Notes:
 - training_wrapper can be executed as a stand-alone script for logging and export features
-- The training process is executed with the project's root folder set as the current working directory
 - Potentially works with Linux (untested)
+- See readme.md for more documentation
 """
 
 import argparse
@@ -51,9 +51,8 @@ def main():
         run_id,
     ] + args.args
 
-    cwd = settings.get_project_folder_absolute()
     try:
-        with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
+        with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)
@@ -178,7 +177,7 @@ def configure_logging(log_filename: str):
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder_absolute()
+    log_folder = settings.get_log_folder()
     if not log_folder.exists():
         log_folder.mkdir(parents=True, exist_ok=True)
 
