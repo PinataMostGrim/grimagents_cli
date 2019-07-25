@@ -30,6 +30,12 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 
 def main():
 
+    if not common.is_pipenv_present():
+        training_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
+        return
+
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
@@ -91,25 +97,6 @@ def main():
         training_log.info('-' * 63)
         training_log.info('')
         logging.shutdown()
-
-
-def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained policies into a folder."""
-
-    training_log.info('Exporting brains')
-
-    if not export_path.exists():
-        export_path.mkdir(parents=True, exist_ok=True)
-
-    for brain in brains:
-        source = Path(brain)
-        if not source.exists():
-            continue
-
-        destination = export_path / source.name
-        destination.write_bytes(source.read_bytes())
-
-        training_log.info(f'Exported {destination}')
 
 
 def parse_args(argv):
@@ -177,18 +164,32 @@ def configure_logging(log_filename: str):
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
+    log_file = settings.get_log_file_path()
 
-    log_filename = Path(log_filename)
-    if not log_filename.suffix == '.log':
-        log_filename = log_filename.with_suffix('.log')
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    log_path = log_folder / log_filename.name
-
-    log_config['handlers']['file']['filename'] = log_path
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
+
+
+def export_brains(brains: list, export_path: Path):
+    """Exports a list of trained policies into a folder."""
+
+    training_log.info('Exporting brains')
+
+    if not export_path.exists():
+        export_path.mkdir(parents=True, exist_ok=True)
+
+    for brain in brains:
+        source = Path(brain)
+        if not source.exists():
+            continue
+
+        destination = export_path / source.name
+        destination.write_bytes(source.read_bytes())
+
+        training_log.info(f'Exported {destination}')
 
 
 if __name__ == '__main__':

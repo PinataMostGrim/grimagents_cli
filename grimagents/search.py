@@ -18,6 +18,8 @@ from pathlib import Path
 
 import grimagents.command_util as command_util
 import grimagents.config as config_util
+import grimagents.common as common
+import grimagents.settings as settings
 
 from grimagents.grid_search import GridSearch
 
@@ -106,30 +108,16 @@ def main():
 
     args = parse_args(sys.argv[1:])
 
+    if not common.is_pipenv_present():
+        search_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
+        return
+
     if args.edit_config:
         EditGrimConfigFile().execute(args)
     else:
-        if not pipenv_exists():
-            search_log.error('A Pipenv virtual environment is not accessible from this directory')
-            return
         PerformGridSearch().execute(args)
-
-
-def pipenv_exists():
-    """Returns True if a virtual environment can be accessed through Pipenv and False otherwise.
-    """
-
-    process = subprocess.run(
-        ['pipenv', '--venv'],
-        universal_newlines=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    if 'No virtualenv has been created for this project yet!' in process.stderr:
-        return False
-
-    return True
 
 
 def parse_args(argv):
@@ -179,12 +167,19 @@ def configure_logging():
                 "class": "logging.StreamHandler",
                 "stream": "ext://sys.stdout",
                 "formatter": "display",
-            }
+            },
+            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
         },
-        "loggers": {"grimagents.search": {"handlers": ["console"]}},
+        "loggers": {"grimagents.search": {"handlers": ["console", "file"]}},
         "root": {"level": "INFO"},
     }
 
+    log_file = settings.get_log_file_path()
+
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
 
 

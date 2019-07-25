@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """CLI application that loads training arguments from a configuration file and sends
 them to the grimagents.training_wrapper. This script aims to automate several
 repetitive training tasks.
@@ -23,8 +24,12 @@ from pathlib import Path
 import grimagents.config as config_util
 import grimagents.command_util as command_util
 import grimagents.settings as settings
+import grimagents.common as common
 
 from grimagents.commands import TrainingCommand
+
+
+main_log = logging.getLogger('grimagents.main')
 
 
 class Command:
@@ -174,6 +179,12 @@ def main():
 
     args = parse_args(sys.argv[1:])
 
+    if not common.is_pipenv_present():
+        main_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
+        return
+
     if args.list:
         ListTrainingOptions().execute(args)
     elif args.edit_config:
@@ -302,19 +313,19 @@ def configure_logging():
             "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
         },
         "loggers": {
+            "grimagents.main": {"handlers": ["console", "file"]},
             "grimagents.config": {"handlers": ["console", "file"]},
             "grimagents.command_util": {"handlers": ["console", "file"]},
         },
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
+    log_file = settings.get_log_file_path()
 
-    log_path = log_folder / 'grim-agents.log'
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    log_config['handlers']['file']['filename'] = log_path
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
 
 
