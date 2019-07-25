@@ -9,6 +9,9 @@ Features:
 - Quickly resume the last training run
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
+- Convenience command for listing mlagents-learn command line arguments
+- Convenience command for starting the tensorboard server
+- Convenience command for creating grimagents config, trainer config, and curriculum files
 
 See training_wrapper.py for its feature list and readme.md for more documentation.
 """
