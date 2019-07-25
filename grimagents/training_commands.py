@@ -21,6 +21,34 @@ class TrainingWrapperCommand(Command):
     def __init__(self, arguments: dict):
         self.arguments = arguments.copy()
 
+    def apply_argument_overrides(self, args):
+        """Replaces values in the arguments dictionary with the overrides stored in args."""
+
+        if args.trainer_config is not None:
+            self.set_trainer_config(args.trainer_config)
+        if args.env is not None:
+            self.set_env(args.env)
+        if args.lesson is not None:
+            self.set_lesson(str(args.lesson))
+        if args.run_id is not None:
+            self.set_run_id(args.run_id)
+        if args.num_envs is not None:
+            self.set_num_envs(str(args.num_envs))
+        if args.inference is not None:
+            self.set_inference(args.inference)
+
+        if args.graphics:
+            # As the argument is 'no-graphics', false in this case means
+            # graphics are used.
+            self.set_no_graphics_enabled(False)
+        if args.no_graphics:
+            self.set_no_graphics_enabled(True)
+
+        if args.timestamp:
+            self.set_timestamp_enabled(True)
+        if args.no_timestamp:
+            self.set_timestamp_enabled(False)
+
     def set_additional_arguments(self, args):
         self.arguments[ADDITIONAL_ARGS] = args
 

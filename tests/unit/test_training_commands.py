@@ -1,3 +1,5 @@
+from argparse import Namespace
+
 from grimagents.training_commands import TrainingWrapperCommand
 import grimagents.common
 
@@ -122,8 +124,73 @@ def test_training_command_add_additional_args():
     assert result == command_list
 
 
-def test_training_command_override_args():
-    """Test for TrainingWrapperCommand correctly overriding argument values."""
+def test_override_configuration_values():
+    """Test for correct handling of TrainingWrapperCommand argument overrides.
+
+    Ensures the following arguments are overridden:
+        --trainer-config
+        --env
+        --lesson
+        --run-id
+        --num-envs
+        --no-graphics
+        --timestamp
+    """
+
+    args = Namespace(
+        configuration_file='config\\3DBall_grimagents.json',
+        new_window=False,
+        trainer_config='config\\PushBlock_grimagents.json',
+        env='builds\\PushBlock\\PushBlock.exe',
+        lesson=2,
+        run_id='PushBlock',
+        num_envs=2,
+        inference=False,
+        graphics=None,
+        no_graphics=True,
+        timestamp=None,
+        no_timestamp=True,
+        args=['--load', '--slow'],
+    )
+
+    test_config = {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--run-id": "3DBall",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--timestamp": True,
+    }
+
+    training_command = TrainingWrapperCommand(test_config)
+    training_command.set_additional_arguments(args.args)
+    training_command.apply_argument_overrides(args)
+
+    result = training_command.get_command()
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == [
+        'pipenv',
+        'run',
+        'python',
+        'grimagents\\training_wrapper.py',
+        'config\\PushBlock_grimagents.json',
+        '--run-id',
+        'PushBlock',
+        '--env',
+        'builds\\PushBlock\\PushBlock.exe',
+        '--load',
+        '--slow',
+        '--lesson',
+        '2',
+        '--num-envs',
+        '2',
+        '--no-graphics',
+        '--train',
+    ]
+
+
+def test_training_command_set_methods():
+    """Tests that TrainingWrapperCommand correctly sets argument values."""
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",

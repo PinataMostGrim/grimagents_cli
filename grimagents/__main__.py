@@ -120,39 +120,10 @@ class PerformTraining(Command):
         config = config_util.load_grim_config_file(config_path)
 
         training_command = TrainingWrapperCommand(config)
-        self.override_configuration_values(training_command, args)
+        training_command.apply_argument_overrides(args)
         training_command.set_additional_arguments(args.args)
 
         return training_command.get_command()
-
-    def override_configuration_values(self, training_command: TrainingWrapperCommand, args: Namespace):
-        """Replaces values in the configuration dictionary with those stored in args."""
-
-        if args.trainer_config is not None:
-            training_command.set_trainer_config(args.trainer_config)
-        if args.env is not None:
-            training_command.set_env(args.env)
-        if args.lesson is not None:
-            training_command.set_lesson(str(args.lesson))
-        if args.run_id is not None:
-            training_command.set_run_id(args.run_id)
-        if args.num_envs is not None:
-            training_command.set_num_envs(str(args.num_envs))
-        if args.inference is not None:
-            training_command.set_inference(args.inference)
-
-        if args.graphics:
-            training_command
-            # As the argument is 'no-graphics', false in this case means
-            # graphics are used.
-            training_command.set_no_graphics_enabled(False)
-        if args.no_graphics:
-            training_command.set_no_graphics_enabled(True)
-
-        if args.timestamp:
-            training_command.set_timestamp_enabled(True)
-        if args.no_timestamp:
-            training_command.set_timestamp_enabled(False)
 
 
 class ResumeTraining(Command):
