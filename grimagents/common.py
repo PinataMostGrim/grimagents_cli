@@ -1,6 +1,23 @@
 """Methods useful across package modules."""
 
 from datetime import datetime
+import subprocess
+
+
+def is_pipenv_present():
+    """Returns True if a virtual environment can be accessed through Pipenv and False if it can't.
+    """
+
+    process = subprocess.run(
+        ['pipenv', '--venv'],
+        universal_newlines=True,
+        stderr=subprocess.PIPE,
+    )
+
+    if 'No virtualenv has been created for this project yet!' in process.stderr:
+        return False
+
+    return True
 
 
 def get_timestamp():
