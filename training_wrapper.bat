@@ -7,5 +7,5 @@
 :: NOTE: By default, this file must be copied or moved up one folder for the grimagents folder to be added to PYTHONPATH.
 setlocal
 set PYTHONPATH=%~dp0grim-agents
-"%~dp0.venv\Scripts\python.exe" -m grimagents %*
+"%~dp0.venv\Scripts\python.exe" "%~dp0grim-agents\grimagents\training_wrapper.py" %*
 endlocal
