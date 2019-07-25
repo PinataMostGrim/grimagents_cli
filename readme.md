@@ -24,7 +24,7 @@
 
 ## Usage
 Training can be initiated several ways from the MLAgents project root folder:
-- Execute `grimagents.bat` file
+- Execute `grimagents.bat` or `training_wrapper.bat` files
 - Execute the module in python using `python -m grimagents`
 - Execute `training_wrapper.py` in python directly
 
@@ -124,7 +124,9 @@ optional arguments:
 
 ### search
 ```
-usage: search [-h] [--edit-config <file>] configuration_file
+usage: search [-h] [--edit-config <file>] [--search-count] [--parallel]
+              [--resume <search index>] [--export-intersect <search index>]
+              configuration_file
 
 CLI application that performs a hyperparameter grid search
 
@@ -134,7 +136,17 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --edit-config <file>  Open a grimagents configuration file for editing. Adds
-                        a search entry if one is not present.
+                        a default search entry if one is not present.
+  --search-count        Output the total number of searches a grimagents
+                        configuration file will attempt
+  --parallel            Perform all searchs in parallel (be careful with this
+                        one!)
+  --resume <search index>
+                        Resume grid search from <search index> (counting from
+                        zero)
+  --export-intersect <search index>
+                        Export trainer configuration for a GridSearch
+                        intersect
 ```
 
 #### Example usages

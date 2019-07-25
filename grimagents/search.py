@@ -179,10 +179,10 @@ def parse_args(argv):
         '--edit-config',
         metavar='<file>',
         type=str,
-        help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.',
+        help='Open a grimagents configuration file for editing. Adds a default search entry if one is not present.',
     )
     options_parser.add_argument('--search-count', action='store_true', help='Output the total number of searches a grimagents configuration file will attempt')
-    options_parser.add_argument('--parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this one!)')
+    options_parser.add_argument('--parallel', action='store_true', help='Perform all searchs in parallel (be careful with this one!)')
     options_parser.add_argument('--resume', metavar='<search index>', type=int, help='Resume grid search from <search index> (counting from zero)')
     options_parser.add_argument('--export-intersect', metavar='<search index>', type=int, help='Export trainer configuration for a GridSearch intersect')
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
