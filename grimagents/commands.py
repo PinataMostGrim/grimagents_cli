@@ -120,7 +120,7 @@ class TrainingCommand(Command):
         self.arguments[config_util.NUM_ENVS] = value
 
     def set_inference(self, value):
-        self.arguments[config_util.INFERENCE] = value;
+        self.arguments[config_util.INFERENCE] = value
 
     def set_no_graphics_enabled(self, value):
         self.arguments[config_util.NO_GRAPHICS] = value
