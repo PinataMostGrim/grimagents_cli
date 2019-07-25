@@ -12,9 +12,6 @@ _SUMMARIES_RELATIVE_PATH = 'summaries'
 # Relative path from project root to the log folder.
 _LOG_FOLDER_PATH = 'grim-agents\\logs'
 
-# Relative path from project root to trainer_wrapper.py.
-_TRAINING_WRAPPER_PATH = 'grim-agents\\grimagents\\training_wrapper.py'
-
 # Relative path from project root to the file that stores the last run command.
 _RUN_HISTORY_FILE = 'grim-agents\\grimagents\\history'
 
@@ -45,9 +42,9 @@ def get_log_folder_absolute():
 
 
 def get_training_wrapper_path():
-    """Returns project relative path to the training wrapper."""
+    """Returns absolute path to the training wrapper."""
 
-    return Path(_TRAINING_WRAPPER_PATH)
+    return Path(__file__).parent / 'training_wrapper.py'
 
 
 def get_history_file_path():

@@ -1,18 +1,8 @@
-from . import common as common
-from . import settings as settings
+import grimagents.common as common
+import grimagents.config as config_util
+import grimagents.settings as settings
 
 
-TRAINER_CONFIG_PATH = 'trainer-config-path'
-ENV = '--env'
-LESSON = '--lesson'
-RUN_ID = '--run-id'
-EXPORT_PATH = '--export-path'
-BASE_PORT = '--base-port'
-NUM_ENVS = '--num-envs'
-INFERENCE = '--inference'
-NO_GRAPHICS = '--no-graphics'
-TIMESTAMP = '--timestamp'
-LOG_FILE_NAME = '--log-filename'
 ADDITIONAL_ARGS = 'additional-args'
 SLOW = '--slow'
 
@@ -44,16 +34,16 @@ class TrainingCommand(Command):
         command_arguments = self.arguments.copy()
 
         # Process --timestamp argument
-        if TIMESTAMP in command_arguments and command_arguments[TIMESTAMP]:
-            if LOG_FILE_NAME not in command_arguments or not command_arguments[LOG_FILE_NAME]:
+        if config_util.TIMESTAMP in command_arguments and command_arguments[config_util.TIMESTAMP]:
+            if config_util.LOG_FILE_NAME not in command_arguments or not command_arguments[config_util.LOG_FILE_NAME]:
                 # Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
-                command_arguments[LOG_FILE_NAME] = command_arguments[RUN_ID]
+                command_arguments[config_util.LOG_FILE_NAME] = command_arguments[config_util.RUN_ID]
 
             timestamp = common.get_timestamp()
-            command_arguments[RUN_ID] = f'{command_arguments[RUN_ID]}-{timestamp}'
+            command_arguments[config_util.RUN_ID] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
 
         # Process --inference argument
-        use_inference = INFERENCE in command_arguments and command_arguments[INFERENCE]
+        use_inference = config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
         if use_inference:
             if ADDITIONAL_ARGS not in command_arguments:
                 command_arguments[ADDITIONAL_ARGS] = []
@@ -61,28 +51,32 @@ class TrainingCommand(Command):
             # Add the --slow flag if inference was requested, but it isn't present.
             if SLOW not in command_arguments[ADDITIONAL_ARGS]:
                 command_arguments[ADDITIONAL_ARGS].append(SLOW)
-            if EXPORT_PATH in command_arguments:
-                del(command_arguments[EXPORT_PATH])
+            if config_util.EXPORT_PATH in command_arguments:
+                del(command_arguments[config_util.EXPORT_PATH])
 
         result = list()
         for key, value in command_arguments.items():
             # mlagents-learn requires trainer config path be the first argument.
-            if key == TRAINER_CONFIG_PATH and value:
+            if key == config_util.TRAINER_CONFIG_PATH and value:
                 result.insert(0, value)
                 continue
 
             # The --no-graphics argument does not accept a value.
-            if key == NO_GRAPHICS:
+            if key == config_util.NO_GRAPHICS:
                 if value is True:
                     result = result + [key]
                 continue
 
             # The --timestamp argument is not sent to training_wrapper.
-            if key == TIMESTAMP:
+            if key == config_util.TIMESTAMP:
                 continue
 
             # The --inference argument is not sent to training_wrapper.
-            if key == INFERENCE:
+            if key == config_util.INFERENCE:
+                continue
+
+            # The 'search' dictionary is not sent to training_wrapper.
+            if key == config_util.SEARCH:
                 continue
 
             # Additional arguments are serialized as a list and the key should
@@ -108,37 +102,37 @@ class TrainingCommand(Command):
         return ' '.join(self.get_command())
 
     def set_trainer_config(self, value):
-        self.arguments[TRAINER_CONFIG_PATH] = value
+        self.arguments[config_util.TRAINER_CONFIG_PATH] = value
 
     def set_env(self, value):
-        self.arguments[ENV] = value
+        self.arguments[config_util.ENV] = value
 
     def set_lesson(self, value):
-        self.arguments[LESSON] = value
+        self.arguments[config_util.LESSON] = value
 
     def set_run_id(self, value):
-        self.arguments[RUN_ID] = value
+        self.arguments[config_util.RUN_ID] = value
 
     def get_run_id(self):
-        return self.arguments[RUN_ID]
+        return self.arguments[config_util.RUN_ID]
 
     def set_num_envs(self, value):
-        self.arguments[NUM_ENVS] = value
+        self.arguments[config_util.NUM_ENVS] = value
 
     def set_inference(self, value):
-        self.arguments[INFERENCE] = value;
+        self.arguments[config_util.INFERENCE] = value
 
     def set_no_graphics_enabled(self, value):
-        self.arguments[NO_GRAPHICS] = value
+        self.arguments[config_util.NO_GRAPHICS] = value
 
     def set_timestamp_enabled(self, value):
-        self.arguments[TIMESTAMP] = value
+        self.arguments[config_util.TIMESTAMP] = value
 
     def set_log_filename(self, value):
-        self.arguments[LOG_FILE_NAME] = value
+        self.arguments[config_util.LOG_FILE_NAME] = value
 
     def set_base_port(self, value):
-        self.arguments[BASE_PORT] = value
+        self.arguments[config_util.BASE_PORT] = value
 
 
 class MLAgentsLearnCommand(Command):

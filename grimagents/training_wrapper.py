@@ -21,8 +21,8 @@ import time
 from pathlib import Path
 from subprocess import Popen, PIPE
 
-import settings as settings
-import common as common
+import grimagents.settings as settings
+import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -120,11 +120,6 @@ def parse_args(argv):
     # As intermixed parsing was not introduced into ArgParser until Python 3.7,
     # we need to separate parsing into two parsers to accomplish this.
 
-    # The issue with ArgParse in Python 3.6 is that optional arguments will get
-    # collected by argparse.REMAINDER if they are not placed before positional
-    # arguments. As this places an idiosyncratic restriction on the wrapper's
-    # command line argument positioning, another solution needs to be found.
-
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
         '--run-id',
@@ -142,7 +137,7 @@ def parse_args(argv):
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
-        description='CLI application that wraps mlagents-learn with quality of life improvements.',
+        description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
         parents=[wrapper_parser],
     )
 
