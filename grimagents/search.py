@@ -2,10 +2,10 @@
 CLI application that performs hyperparameter searches using grimagents and a grimagents configuration file.
 
 Features:
-- Grid Search
+- Grid Search for hyperparameters
 """
+
 import argparse
-import itertools
 import logging
 import logging.config
 import subprocess
@@ -16,7 +16,8 @@ from pathlib import Path
 
 import grimagents.command_util as command_util
 import grimagents.config as config_util
-import grimagents.settings as settings
+
+from grimagents.grid_search import GridSearch
 
 
 search_log = logging.getLogger('grimagents.search')
@@ -36,48 +37,39 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(file_path, add_search=True)
 
 
-class GridSearch(Command):
+class PerformGridSearch(Command):
     """Perform a hyperparameter grid search using values from a grimagents configuration file.
     """
 
     def execute(self, args):
 
-        # Load trainer configuration from file
+        # Gather configurations
         grim_config_path = Path(args.configuration_file)
         grim_config = config_util.load_grim_config_file(grim_config_path)
-        trainer_config_path = Path(grim_config['trainer-config-path'])
 
-        trainer_config = config_util.load_trainer_configuration(trainer_config_path)
-
-        # Load search configuration
         search_config = grim_config[config_util.SEARCH]
 
-        # Fetch brain configuration
-        brain_name = search_config['brain']['name']
-        brain_config = self.get_brain_configuration(trainer_config, brain_name)
+        trainer_config_path = Path(grim_config['trainer-config-path'])
+        trainer_config = config_util.load_trainer_configuration(trainer_config_path)
 
-        # Determine search permutations
-        hyperparameters = self.get_search_hyperparameters(search_config)
-        sets = self.get_search_sets(search_config)
-        permutations = self.get_search_permutations(sets)
+        grid_search = GridSearch(search_config, trainer_config)
 
         # Perform search on permutations
         search_log.info('-' * 63)
         search_log.info('Performing grid search for hyperparameters:')
-        for i in range(len(hyperparameters)):
-            search_log.info(f'    {hyperparameters[i]}: {sets[i]}')
+        for i in range(len(grid_search.hyperparameters)):
+            search_log.info(f'    {grid_search.hyperparameters[i]}: {grid_search.hyperparameter_sets[i]}')
         search_log.info('-' * 63)
 
         grid_config_path = trainer_config_path.with_name('search_config.yaml')
 
-        for i in range(len(permutations)):
+        for i in range(grid_search.get_intersect_count()):
 
-            grid = self.get_grid(hyperparameters, permutations, i)
-            grid_brain_config = self.get_brain_config_for_grid(brain_config, grid)
+            intersect = grid_search.get_intersect(i)
+            intersect_brain_config = grid_search.get_brain_config_for_intersect(intersect)
 
             # Write trainer configuration file for grid
-            # TODO: Handle writing config files while parallel training
-            command_util.write_yaml_file(grid_brain_config, grid_config_path)
+            command_util.write_yaml_file(intersect_brain_config, grid_config_path)
 
             # Execute training with the new trainer-config and run_id
             run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
@@ -85,77 +77,14 @@ class GridSearch(Command):
 
             search_log.info('-' * 63)
             search_log.info(f'Training {run_id}:')
-            for i in range(len(grid)):
-                search_log.info(f'    {grid[i][0]}: {grid[i][1]}')
+            for i in range(len(intersect)):
+                search_log.info(f'    {intersect[i][0]}: {intersect[i][1]}')
             search_log.info('-' * 63)
 
             subprocess.run(command)
 
         grid_config_path.unlink()
         search_log.info('Grid search complete\n')
-
-    def get_brain_configuration(self, trainer_config, brain_name):
-        """Returns a complete trainer configuration for a brain. A dictionary of default parameters are also included.
-        """
-
-        if ('default' in trainer_config):
-            result = {'default': trainer_config['default']}
-        else:
-            result = {'default': config_util.get_default_trainer_config()['default']}
-
-        if brain_name not in trainer_config:
-            print(f'Unable to find configuration settings for brain \'{brain_name}\' in trainer_config')
-            sys.exit()
-
-        brain_data = trainer_config[brain_name]
-        result[brain_name] = {}
-
-        for key, value in brain_data.items():
-            result[brain_name][key] = value
-
-        return result
-
-    def get_search_hyperparameters(self, search_config):
-        """Returns the list of hyperparameter names defined in the search configuration."""
-
-        return [name for name in search_config['brain']['hyperparameters']]
-
-    def get_search_sets(self, search_config):
-        """Returns a two dimensional array containing all hyperparameter values to use in the grid search."""
-
-        sets = []
-        for _, values in search_config['brain']['hyperparameters'].items():
-            sets.append(values)
-
-        return sets
-
-    def get_search_permutations(self, hyperparameter_sets):
-        """Returns a two dimensional list of grid search permutations."""
-
-        return list(itertools.product(*hyperparameter_sets))
-
-    def get_grid(self, hyperparameters, permutations, index):
-        """Returns a two dimensional list containing the search parameters to use for a given grid in the search (index).
-        """
-
-        result = list(zip(hyperparameters, permutations[index]))
-        return result
-
-    def get_brain_config_for_grid(self, brain_config, grid):
-        """Returns a brain configuration dictionary with values overriden by the grid settings.
-        """
-
-        result = brain_config.copy()
-        brain_name = [*result.keys()][0]
-
-        for hyperparameter in grid:
-            result[brain_name][hyperparameter[0]] = hyperparameter[1]
-
-        return result
-
-
-# def random_search(args):
-#     pass
 
 
 def main():
@@ -164,13 +93,11 @@ def main():
 
     if args.edit_config:
         EditGrimConfigFile().execute(args)
-    # elif args.random:
-    #     random_search(args)
     else:
         if not pipenv_exists():
             search_log.error('A Pipenv virtual environment is not accessible from this directory')
             return
-        GridSearch().execute(args)
+        PerformGridSearch().execute(args)
 
 
 def pipenv_exists():
