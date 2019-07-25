@@ -9,10 +9,10 @@ def get_summaries_folder():
     return (Path(__file__).parent / '../../summaries').resolve()
 
 
-def get_log_folder():
+def get_log_file_path():
     """Returns absolute path to the log folder."""
 
-    return (Path(__file__).parent / '../logs').resolve()
+    return (Path(__file__).parent / '../logs/grimagents.log').resolve()
 
 
 def get_training_wrapper_path():

@@ -308,13 +308,12 @@ def configure_logging():
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
+    log_file = settings.get_log_file_path()
 
-    log_path = log_folder / 'grim-agents.log'
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    log_config['handlers']['file']['filename'] = log_path
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
 
 

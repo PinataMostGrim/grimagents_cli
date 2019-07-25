@@ -177,17 +177,12 @@ def configure_logging(log_filename: str):
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
+    log_file = settings.get_log_file_path()
 
-    log_filename = Path(log_filename)
-    if not log_filename.suffix == '.log':
-        log_filename = log_filename.with_suffix('.log')
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    log_path = log_folder / log_filename.name
-
-    log_config['handlers']['file']['filename'] = log_path
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
 
 
