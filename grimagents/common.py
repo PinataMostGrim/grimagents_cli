@@ -15,6 +15,8 @@ def is_pipenv_present():
         stderr=subprocess.PIPE,
     )
 
+    # TODO: Handle case where pipenv is not present on PATH
+
     if 'No virtualenv has been created for this project yet!' in process.stderr:
         return False
 
