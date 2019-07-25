@@ -8,7 +8,7 @@ def is_pipenv_present():
     """Returns True if a virtual environment can be accessed through Pipenv and False if it can't.
     """
 
-    process = subprocess.run(['pipenv', '--venv'], universal_newlines=True, stderr=subprocess.PIPE)
+    process = subprocess.run(['pipenv', '--venv'], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if 'No virtualenv has been created for this project yet!' in process.stderr:
         return False
