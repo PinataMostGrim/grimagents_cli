@@ -63,6 +63,15 @@ class GridSearchCommand(Command):
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
 
 
+class OutputGridSearchCount(GridSearchCommand):
+    """Prints out the total number of training runs a grimagents configuration file will attempt.
+    """
+
+    def execute(self):
+
+        search_log.info(f' \'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs')
+
+
 class PerformGridSearch(GridSearchCommand):
     """Perform a hyperparameter grid search using values from a grimagents configuration file.
     """
@@ -140,6 +149,7 @@ def parse_args(argv):
         type=str,
         help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.',
     )
+    options_parser.add_argument('--search-count', action='store_true', help='Output the total number of searches a grimagents configuration file will attempt')
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
     # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
 
