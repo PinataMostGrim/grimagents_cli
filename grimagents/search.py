@@ -63,7 +63,7 @@ class PerformGridSearch(Command):
             )
         search_log.info('-' * 63)
 
-        grid_config_path = trainer_config_path.with_name('search_config.yaml')
+        search_config_path = trainer_config_path.with_name('search_config.yaml')
 
         for i in range(grid_search.get_intersect_count()):
 
@@ -71,7 +71,7 @@ class PerformGridSearch(Command):
             intersect_brain_config = grid_search.get_brain_config_for_intersect(intersect)
 
             # Write trainer configuration file for grid
-            command_util.write_yaml_file(intersect_brain_config, grid_config_path)
+            command_util.write_yaml_file(intersect_brain_config, search_config_path)
 
             # Execute training with the new trainer-config and run_id
             run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
@@ -83,7 +83,7 @@ class PerformGridSearch(Command):
                 'grimagents',
                 str(grim_config_path),
                 '--trainer-config',
-                str(grid_config_path),
+                str(search_config_path),
                 '--run-id',
                 run_id,
             ]
@@ -96,7 +96,7 @@ class PerformGridSearch(Command):
 
             subprocess.run(command)
 
-        grid_config_path.unlink()
+        search_config_path.unlink()
         search_log.info('Grid search complete\n')
 
 
