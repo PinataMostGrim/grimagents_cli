@@ -6,10 +6,11 @@ Notes:
 """
 
 import logging
+from pathlib import Path
+
 import yaml
 
-from pathlib import Path
-from . import command_util as command_util
+import grimagents.command_util as command_util
 
 
 # Configuration keys

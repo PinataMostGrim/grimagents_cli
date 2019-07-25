@@ -21,8 +21,8 @@ import time
 from pathlib import Path
 from subprocess import Popen, PIPE
 
-import settings as settings
-import common as common
+import grimagents.settings as settings
+import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')

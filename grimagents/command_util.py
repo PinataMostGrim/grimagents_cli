@@ -10,7 +10,7 @@ from io import StringIO
 from pathlib import Path
 from subprocess import PIPE, CREATE_NEW_CONSOLE
 
-from . import settings as settings
+import grimagents.settings as settings
 
 
 TRAINING_HISTORY_COUNT = 10

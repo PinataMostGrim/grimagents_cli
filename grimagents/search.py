@@ -11,12 +11,12 @@ import logging.config
 import subprocess
 import sys
 
+from argparse import Namespace
+from pathlib import Path
+
 import grimagents.command_util as command_util
 import grimagents.config as config_util
 import grimagents.settings as settings
-
-from argparse import Namespace
-from pathlib import Path
 
 
 search_log = logging.getLogger('grimagents.search')

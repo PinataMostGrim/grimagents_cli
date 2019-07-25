@@ -1,6 +1,6 @@
-from . import common as common
-from . import config as config_util
-from . import settings as settings
+import grimagents.common as common
+import grimagents.config as config_util
+import grimagents.settings as settings
 
 
 ADDITIONAL_ARGS = 'additional-args'
