@@ -29,7 +29,7 @@ def test_create_training_command():
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
         'builds\\3DBall\\Unity Environment.exe',
@@ -39,7 +39,12 @@ def test_create_training_command():
         '3DBall',
         '--train',
     ]
-    assert command.get_command() == command_list
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result = command.get_command()
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == command_list
 
 
 def test_training_command_handles_no_graphics():
@@ -99,7 +104,7 @@ def test_training_command_add_additional_args():
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
         'builds\\3DBall\\Unity Environment.exe',
@@ -109,7 +114,12 @@ def test_training_command_add_additional_args():
         '--load',
         '--train',
     ]
-    assert command.get_command() == command_list
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result = command.get_command()
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == command_list
 
 
 def test_training_command_override_args():
@@ -206,18 +216,25 @@ def test_training_command_inference():
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--run-id',
         '3DBall',
         '--slow',
     ]
 
-    assert command.get_command() == command_list
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result = command.get_command()
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == command_list
 
     # '--slow' isn't duplicated
     command = TrainingCommand(test_config)
     additional_args = ['--slow']
     command.set_additional_arguments(additional_args)
 
-    assert command.get_command() == command_list
+    result = command.get_command()
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == command_list

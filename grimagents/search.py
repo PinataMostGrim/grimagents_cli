@@ -69,6 +69,7 @@ class GridSearch(Command):
         search_log.info('-' * 63)
 
         grid_config_path = trainer_config_path.with_name('search_config.yaml')
+
         for i in range(len(permutations)):
 
             grid = self.get_grid(hyperparameters, permutations, i)
@@ -88,11 +89,7 @@ class GridSearch(Command):
                 search_log.info(f'    {grid[i][0]}: {grid[i][1]}')
             search_log.info('-' * 63)
 
-
-            cwd = settings.get_project_folder_absolute()
-            #TODO: Try / except keyboard interrupt and auto kill process
-            # to prevent needing to answer Terminate Process prompt
-            subprocess.run(command, cwd=cwd)
+            subprocess.run(command)
 
         grid_config_path.unlink()
         search_log.info('Grid search complete\n')

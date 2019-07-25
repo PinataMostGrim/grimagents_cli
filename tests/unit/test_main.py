@@ -3,7 +3,6 @@ from grimagents.__main__ import Command, PerformTraining, ResumeTraining
 from grimagents.commands import TrainingCommand
 
 import grimagents.config
-import pytest
 
 
 def test_perform_training_single_trainer_config(monkeypatch):
@@ -31,11 +30,15 @@ def test_perform_training_single_trainer_config(monkeypatch):
     perform_training = PerformTraining()
 
     command = perform_training.create_command(args)
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    command[3] = 'grimagents\\training_wrapper.py'
+
     assert command == [
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--run-id',
         '3DBall',
@@ -93,11 +96,15 @@ def test_override_configuration_values(monkeypatch):
     perform_training = PerformTraining()
     perform_training.override_configuration_values(training_command, args)
 
-    assert training_command.get_command() == [
+    result = training_command.get_command()
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == [
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\PushBlock_grimagents.json',
         '--run-id',
         'PushBlock',
@@ -193,7 +200,7 @@ def test_resume_training(monkeypatch):
         "pipenv",
         "run",
         "python",
-        "grim-agents\\grimagents\\training_wrapper.py",
+        "grimagents\\training_wrapper.py",
         "config\\3DBall.yaml",
         "--env",
         "builds\\3DBall\\Unity Environment.exe",
@@ -215,7 +222,7 @@ def test_resume_training(monkeypatch):
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
         'builds\\3DBall\\Unity Environment.exe',
@@ -231,7 +238,7 @@ def test_resume_training(monkeypatch):
         'pipenv',
         'run',
         'python',
-        'grim-agents\\grimagents\\training_wrapper.py',
+        'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
         'builds\\3DBall\\Unity Environment.exe',
