@@ -177,7 +177,7 @@ def configure_logging(log_filename: str):
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder_absolute()
+    log_folder = settings.get_log_folder()
     if not log_folder.exists():
         log_folder.mkdir(parents=True, exist_ok=True)
 
