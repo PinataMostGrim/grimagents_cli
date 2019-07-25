@@ -180,7 +180,9 @@ def main():
     args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
-        main_log.error('No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn')
+        main_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
         return
 
     if args.list:

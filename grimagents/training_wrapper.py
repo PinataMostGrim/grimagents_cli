@@ -31,7 +31,9 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 def main():
 
     if not common.is_pipenv_present():
-        training_log.error('No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn')
+        training_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
         return
 
     args = parse_args(sys.argv[1:])
