@@ -7,7 +7,7 @@ ADDITIONAL_ARGS = 'additional-args'
 SLOW = '--slow'
 
 
-class Command():
+class Command:
     def __init__(self):
         self._arguments = {}
 
@@ -63,15 +63,22 @@ class TrainingWrapperCommand(Command):
 
         # Process --timestamp argument
         if config_util.TIMESTAMP in command_arguments and command_arguments[config_util.TIMESTAMP]:
-            if config_util.LOG_FILE_NAME not in command_arguments or not command_arguments[config_util.LOG_FILE_NAME]:
+            if (
+                config_util.LOG_FILE_NAME not in command_arguments
+                or not command_arguments[config_util.LOG_FILE_NAME]
+            ):
                 # Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
                 command_arguments[config_util.LOG_FILE_NAME] = command_arguments[config_util.RUN_ID]
 
             timestamp = common.get_timestamp()
-            command_arguments[config_util.RUN_ID] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
+            command_arguments[
+                config_util.RUN_ID
+            ] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
 
         # Process --inference argument
-        use_inference = config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
+        use_inference = (
+            config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
+        )
         if use_inference:
             if ADDITIONAL_ARGS not in command_arguments:
                 command_arguments[ADDITIONAL_ARGS] = []
@@ -80,7 +87,7 @@ class TrainingWrapperCommand(Command):
             if SLOW not in command_arguments[ADDITIONAL_ARGS]:
                 command_arguments[ADDITIONAL_ARGS].append(SLOW)
             if config_util.EXPORT_PATH in command_arguments:
-                del(command_arguments[config_util.EXPORT_PATH])
+                del command_arguments[config_util.EXPORT_PATH]
 
         result = list()
         for key, value in command_arguments.items():
