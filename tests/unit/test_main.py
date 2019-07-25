@@ -133,7 +133,7 @@ def test_command_dry_run(monkeypatch):
 
     dry_run_args = Namespace(new_window=False, dry_run=True, args=[])
 
-    def mock_override_execute_command(command, cwd, new_window, show_command, dry_run):
+    def mock_override_execute_command(command, new_window, show_command, dry_run):
         pass
 
     monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
@@ -173,7 +173,7 @@ def test_perform_training_command_dry_run(monkeypatch):
     def mock_override_args(self, training_command, args):
         return training_command
 
-    def mock_override_execute_command(command, cwd, new_window, show_command, dry_run):
+    def mock_override_execute_command(command, new_window, show_command, dry_run):
         pass
 
     monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
