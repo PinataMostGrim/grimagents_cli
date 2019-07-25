@@ -1,20 +1,15 @@
 """CLI application that loads training arguments from a configuration file and sends
-them to the mlagents-learn training wrapper. This script aims to automate several
+them to the grimagents.training_wrapper. This script aims to automate several
 repetitive training tasks.
 
 Features:
 - Load training arguments from a configuration file
 - Override loaded configuration arguments with command line arguments
-- Easily resume the last training run
+- Quickly resume the last training run
 - Optionally time-stamp the training run-id
 - Optionally launch training in a new console window
 
-See training_wrapper.py for its feature list.
-
-Requirements:
-- Windows
-- Pipenv accessible through the PATH environment variable
-- Virtual environment setup for the MLAgents project
+See training_wrapper.py for its feature list and readme.md for more documentation.
 """
 
 import argparse

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """CLI application that wraps 'mlagents-learn' with several quality of life improvements.
 
-- Initiates training with mlagents-learn
+Features:
 - Logs mlagents-learn output to file
 - Optionally exports trained models to another location after training finishes (for example, into a Unity project)
 
 Notes:
 - training_wrapper can be executed as a stand-alone script for logging and export features
-- The training process is executed with the project's root folder set as the current working directory
 - Potentially works with Linux (untested)
+- See readme.md for more documentation
 """
 
 import argparse

@@ -3,6 +3,8 @@ CLI application that performs hyperparameter searches using grimagents and a gri
 
 Features:
 - Grid Search for hyperparameters
+
+See readme.md for more documentation.
 """
 
 import argparse
