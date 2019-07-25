@@ -51,9 +51,8 @@ def main():
         run_id,
     ] + args.args
 
-    cwd = settings.get_project_folder_absolute()
     try:
-        with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
+        with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)

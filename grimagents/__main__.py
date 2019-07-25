@@ -34,7 +34,6 @@ from grimagents.commands import TrainingCommand
 
 class Command:
     def __init__(self):
-        self.cwd = settings.get_project_folder_absolute()
         self.new_window = False
         self.show_command = True
 
@@ -43,7 +42,6 @@ class Command:
         self.command = self.create_command(args)
         command_util.execute_command(
             self.command,
-            self.cwd,
             new_window=self.new_window,
             show_command=self.show_command,
             dry_run=self.dry_run,
@@ -111,7 +109,6 @@ class PerformTraining(Command):
         command_util.save_to_history(self.command)
         command_util.execute_command(
             self.command,
-            self.cwd,
             new_window=self.new_window,
             show_command=self.show_command,
             dry_run=self.dry_run,
