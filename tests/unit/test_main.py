@@ -1,6 +1,6 @@
 from argparse import Namespace
 from grimagents.__main__ import Command, PerformTraining, ResumeTraining
-from grimagents.commands import TrainingCommand
+from grimagents.training_commands import TrainingWrapperCommand
 
 import grimagents.config
 
@@ -90,7 +90,7 @@ def test_override_configuration_values(monkeypatch):
 
     monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
 
-    training_command = TrainingCommand(test_config)
+    training_command = TrainingWrapperCommand(test_config)
     training_command.set_additional_arguments(args.args)
 
     perform_training = PerformTraining()

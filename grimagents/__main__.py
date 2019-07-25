@@ -26,7 +26,7 @@ import grimagents.command_util as command_util
 import grimagents.settings as settings
 import grimagents.common as common
 
-from grimagents.commands import TrainingCommand
+from grimagents.training_commands import TrainingWrapperCommand
 
 
 main_log = logging.getLogger('grimagents.main')
@@ -119,13 +119,13 @@ class PerformTraining(Command):
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
 
-        training_command = TrainingCommand(config)
+        training_command = TrainingWrapperCommand(config)
         self.override_configuration_values(training_command, args)
         training_command.set_additional_arguments(args.args)
 
         return training_command.get_command()
 
-    def override_configuration_values(self, training_command: TrainingCommand, args: Namespace):
+    def override_configuration_values(self, training_command: TrainingWrapperCommand, args: Namespace):
         """Replaces values in the configuration dictionary with those stored in args."""
 
         if args.trainer_config is not None:

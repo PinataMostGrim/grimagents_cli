@@ -15,7 +15,7 @@ class Command():
         return ['echo', __class__.__name__, self.arguments]
 
 
-class TrainingCommand(Command):
+class TrainingWrapperCommand(Command):
     """Training Wrapper command"""
 
     def __init__(self, arguments: dict):
