@@ -78,6 +78,15 @@ class PerformGridSearch(GridSearchCommand):
 
     def execute(self):
 
+        if self.args.resume:
+            count = self.grid_search.get_intersect_count()
+            if self.args.resume > count:
+                search_log.warning(f'\'{self.trainer_config_path}\' will only perform {count} training runs, unable to resume at index {self.args.resume}')
+                sys.exit()
+            start_index = self.args.resume
+        else:
+            start_index = 0
+
         search_log.info('-' * 63)
         search_log.info('Performing grid search for hyperparameters:')
         for i in range(len(self.grid_search.hyperparameters)):
@@ -86,7 +95,7 @@ class PerformGridSearch(GridSearchCommand):
             )
         search_log.info('-' * 63)
 
-        for i in range(self.grid_search.get_intersect_count()):
+        for i in range(start_index, self.grid_search.get_intersect_count()):
 
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
@@ -117,7 +126,9 @@ class PerformGridSearch(GridSearchCommand):
 
             subprocess.run(command)
 
-        self.search_config_path.unlink()
+        if self.search_config_path.exists():
+            self.search_config_path.unlink()
+
         search_log.info('Grid search complete\n')
 
 
@@ -166,6 +177,7 @@ def parse_args(argv):
     options_parser.add_argument('--search-count', action='store_true', help='Output the total number of searches a grimagents configuration file will attempt')
     # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
     options_parser.add_argument('--export-intersect', metavar='<search index>', type=int, help='Export trainer configuration for a GridSearch intersect')
+    options_parser.add_argument('--resume', metavar='<search index>', type=int, help='Resume grid search from <search index> (Counting from zero!)')
 
     # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
 
