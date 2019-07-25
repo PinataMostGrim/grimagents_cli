@@ -18,17 +18,17 @@
 
 ## Installation
 - Copy or clone this repository into the MLAgents project in a folder named `grim-agents`
-- Copy or move `grimagents.bat` and `search.bat` into the MLAgents project root folder. These batch files automatically add the `grimagents` package folder to `PYTHONPATH` and execute their module using Pipenv.
-- *(Optional)* Give the folder another name but update `grimagents.bat`, `search.bat`, and `settings.py` accordingly
+- Copy or move `grimagents.bat`, `training_wrapper.bat`, and `search.bat` into the MLAgents project root folder. These batch files automatically add the `grimagents` package folder to `PYTHONPATH` and execute their module using Pipenv.
+- *(Optional)* Give the grim-agents folder another name and update `grimagents.bat`, `training_wrapper.bat`, `search.bat`, and `settings.py` accordingly
 
 
 ## Usage
-Training can be initiated several ways:
+Training can be initiated several ways from the MLAgents project root folder:
 - Execute `grimagents.bat` file
 - Execute the module in python using `python -m grimagents`
 - Execute `training_wrapper.py` in python directly
 
-Grid search can be initiated by executing `search.bat`.
+Grid search can be initiated by executing `search.bat` from the MLAgents project root folder.
 
 ### grimagents
 ```
