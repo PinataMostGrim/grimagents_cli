@@ -153,7 +153,7 @@ search grim-agents\config\3DBall.json
 #### grimagents Configuration
 Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
-All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder.
+All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run grimagents modules from the MLAgents project root folder and configure paths accordingly.
 
 `--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
 
