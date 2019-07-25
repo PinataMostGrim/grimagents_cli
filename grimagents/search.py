@@ -28,7 +28,10 @@ search_log = logging.getLogger('grimagents.search')
 
 
 class Command:
-    def execute(self, args: Namespace):
+    def __init__(self, args):
+        self.args = args
+
+    def execute(self):
         pass
 
 
@@ -36,58 +39,63 @@ class EditGrimConfigFile(Command):
     """Opens a grimagents configuration file for editing or creates on if a file does not already exist. Appends a search entry to the configuration file if it does not already have one.
     """
 
-    def execute(self, args):
-        file_path = Path(args.edit_config)
+    def execute(self):
+        file_path = Path(self.args.edit_config)
         config_util.edit_grim_config_file(file_path, add_search=True)
 
 
-class PerformGridSearch(Command):
+class GridSearchCommand(Command):
+    def __init__(self, args):
+
+        self.args = args
+
+        # Gather configurations
+        self.grim_config_path = Path(args.configuration_file)
+        self.grim_config = config_util.load_grim_config_file(self.grim_config_path)
+
+        self.search_config = self.grim_config[config_util.SEARCH]
+
+        self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
+        self.trainer_config = config_util.load_trainer_configuration(self.trainer_config_path)
+
+        self.grid_search = GridSearch(self.search_config, self.trainer_config)
+
+        self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
+
+
+class PerformGridSearch(GridSearchCommand):
     """Perform a hyperparameter grid search using values from a grimagents configuration file.
     """
 
-    def execute(self, args):
+    def execute(self):
 
-        # Gather configurations
-        grim_config_path = Path(args.configuration_file)
-        grim_config = config_util.load_grim_config_file(grim_config_path)
-
-        search_config = grim_config[config_util.SEARCH]
-
-        trainer_config_path = Path(grim_config['trainer-config-path'])
-        trainer_config = config_util.load_trainer_configuration(trainer_config_path)
-
-        grid_search = GridSearch(search_config, trainer_config)
-
-        # Perform search on permutations
         search_log.info('-' * 63)
         search_log.info('Performing grid search for hyperparameters:')
-        for i in range(len(grid_search.hyperparameters)):
+        for i in range(len(self.grid_search.hyperparameters)):
             search_log.info(
-                f'    {grid_search.hyperparameters[i]}: {grid_search.hyperparameter_sets[i]}'
+                f'    {self.grid_search.hyperparameters[i]}: {self.grid_search.hyperparameter_sets[i]}'
             )
         search_log.info('-' * 63)
 
-        search_config_path = trainer_config_path.with_name('search_config.yaml')
+        for i in range(self.grid_search.get_intersect_count()):
 
-        for i in range(grid_search.get_intersect_count()):
+            intersect = self.grid_search.get_intersect(i)
+            intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
 
-            intersect = grid_search.get_intersect(i)
-            intersect_brain_config = grid_search.get_brain_config_for_intersect(intersect)
+            # Write trainer configuration file for current intersect
+            command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 
-            # Write trainer configuration file for grid
-            command_util.write_yaml_file(intersect_brain_config, search_config_path)
-
-            # Execute training with the new trainer-config and run_id
-            run_id = grim_config[config_util.RUN_ID] + f'_{i:02d}'
+            # Execute training with the intersect config and run_id
+            run_id = self.grim_config[config_util.RUN_ID] + f'_{i:02d}'
             command = [
                 'pipenv',
                 'run',
                 'python',
                 '-m',
                 'grimagents',
-                str(grim_config_path),
+                str(self.grim_config_path),
                 '--trainer-config',
-                str(search_config_path),
+                str(self.search_config_path),
                 '--run-id',
                 run_id,
             ]
@@ -100,7 +108,7 @@ class PerformGridSearch(Command):
 
             subprocess.run(command)
 
-        search_config_path.unlink()
+        self.search_config_path.unlink()
         search_log.info('Grid search complete\n')
 
 
@@ -115,9 +123,11 @@ def main():
         return
 
     if args.edit_config:
-        EditGrimConfigFile().execute(args)
+        EditGrimConfigFile(args).execute()
+    elif args.search_count:
+        OutputGridSearchCount(args).execute()
     else:
-        PerformGridSearch().execute(args)
+        PerformGridSearch(args).execute()
 
 
 def parse_args(argv):
