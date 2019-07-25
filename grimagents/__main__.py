@@ -243,7 +243,7 @@ def parse_args(argv):
     overrides_parser.add_argument(
         '--inference',
         action='store_true',
-        help='Load environment in inference instead of training mode',
+        help='Load environment in inference mode instead of training',
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()
@@ -264,8 +264,8 @@ def parse_args(argv):
 
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
-        prog='grim-agents',
-        description='CLI application that wraps Unity ML-Agents with some quality of life improvements.',
+        prog='grimagents',
+        description='CLI application that wraps Unity ML-Agents with quality of life improvements.',
         parents=[options_parser, overrides_parser],
     )
 

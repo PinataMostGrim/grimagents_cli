@@ -137,7 +137,7 @@ def parse_args(argv):
 
     parser = argparse.ArgumentParser(
         prog='training_wrapper',
-        description='CLI application that wraps mlagents-learn with quality of life improvements.',
+        description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
         parents=[wrapper_parser],
     )
 
