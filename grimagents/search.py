@@ -13,7 +13,6 @@ import logging.config
 import subprocess
 import sys
 
-from argparse import Namespace
 from pathlib import Path
 
 import grimagents.command_util as command_util
@@ -101,6 +100,9 @@ class PerformGridSearch(GridSearchCommand):
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
 
             # Write trainer configuration file for current intersect
+            if (self.args.parallel):
+                self.search_config_path = self.search_config_path.with_name(f'search_config{i:02d}.yaml')
+
             command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 
             # Execute training with the intersect config and run_id
@@ -120,13 +122,18 @@ class PerformGridSearch(GridSearchCommand):
 
             search_log.info('-' * 63)
             search_log.info(f'Training {run_id}:')
-            for i in range(len(intersect)):
-                search_log.info(f'    {intersect[i][0]}: {intersect[i][1]}')
+            for j in range(len(intersect)):
+                search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
             search_log.info('-' * 63)
 
-            subprocess.run(command)
+            if self.args.parallel:
+                command = ['cmd', '/K'] + command
+                command = command + ['--base-port', str(5005 + i)]
+                subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            else:
+                subprocess.run(command)
 
-        if self.search_config_path.exists():
+        if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
 
         search_log.info('Grid search complete\n')
@@ -175,11 +182,10 @@ def parse_args(argv):
         help='Open a grimagents configuration file for editing. Adds a search entry if one is not present.',
     )
     options_parser.add_argument('--search-count', action='store_true', help='Output the total number of searches a grimagents configuration file will attempt')
-    # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    options_parser.add_argument('--parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this one!)')
+    options_parser.add_argument('--resume', metavar='<search index>', type=int, help='Resume grid search from <search index> (counting from zero)')
     options_parser.add_argument('--export-intersect', metavar='<search index>', type=int, help='Export trainer configuration for a GridSearch intersect')
-    options_parser.add_argument('--resume', metavar='<search index>', type=int, help='Resume grid search from <search index> (Counting from zero!)')
-
-    # options_parser.add_argument('--in-parallel', action='store_true', help='Perform all searchs in parallel (Be careful with this!)')
+    # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
 
     parser = argparse.ArgumentParser(
         prog='search',
