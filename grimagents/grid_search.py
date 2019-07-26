@@ -126,4 +126,20 @@ class GridSearch:
         for hyperparameter in intersect:
             result[self.brain_name][hyperparameter[0]] = hyperparameter[1]
 
+        # Set 'buffer_size' based on 'buffer_size_multiple', if present
+        if 'buffer_size_multiple' in result[self.brain_name]:
+            batch_size = self.get_batch_size_value(result, self.brain_name)
+            result[self.brain_name]['buffer_size'] = batch_size * result[self.brain_name]['buffer_size_multiple']
+            del result[self.brain_name]['buffer_size_multiple']
+
         return result
+
+    @staticmethod
+    def get_batch_size_value(brain_config, brain_name):
+        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead.
+        """
+
+        if 'batch_size' in brain_config[brain_name]:
+            return brain_config[brain_name]['batch_size']
+
+        return brain_config['default']['batch_size']
