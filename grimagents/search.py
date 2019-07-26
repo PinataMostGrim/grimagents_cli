@@ -47,7 +47,6 @@ class EditGrimConfigFile(Command):
 
 
 class SearchCommand(Command):
-
     def __init__(self, args):
 
         self.args = args
@@ -108,7 +107,6 @@ class SearchCommand(Command):
 
 
 class GridSearchCommand(SearchCommand):
-
     def __init__(self, args):
 
         super().__init__(args)
@@ -180,7 +178,6 @@ class ExportGridSearchConfiguration(GridSearchCommand):
 
 
 class PerformRandomSearch(SearchCommand):
-
     def __init__(self, args):
 
         super().__init__(args)
@@ -250,7 +247,7 @@ def parse_args(argv):
     options_parser.add_argument(
         '--parallel',
         action='store_true',
-        help='Perform all searchs in parallel (be careful with this one!)',
+        help='Perform all searches in parallel (be careful with this one!)',
     )
     options_parser.add_argument(
         '--resume',
@@ -264,7 +261,13 @@ def parse_args(argv):
         type=int,
         help='Export trainer configuration for a GridSearch intersect',
     )
-    options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    options_parser.add_argument(
+        '--random',
+        '-r',
+        metavar='<n>',
+        type=int,
+        help='Execute <n> random searches instead of performing a grid search',
+    )
 
     parser = argparse.ArgumentParser(
         prog='search',

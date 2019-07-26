@@ -1,6 +1,11 @@
 import pytest
 
-from grimagents.grid_search import GridSearch, RandomSearch, InvalidTrainerConfig, InvalidIntersectIndex
+from grimagents.grid_search import (
+    GridSearch,
+    RandomSearch,
+    InvalidTrainerConfig,
+    InvalidIntersectIndex,
+)
 
 
 @pytest.fixture
@@ -226,8 +231,10 @@ def test_get_random_intersect(search_config, trainer_config):
     search = RandomSearch(search_config, trainer_config)
     random_intersect = search.get_randomized_intersect(seed=9871237)
 
-    assert random_intersect == [('beta', 0.008715030393329336),
-                                ('hidden_units', 477),
-                                ('learning_rate', 0.0008715030393329336),
-                                ('num_layers', 1),
-                                ('num_epoch', 4)]
+    assert random_intersect == [
+        ('beta', 0.008715030393329336),
+        ('hidden_units', 477),
+        ('learning_rate', 0.0008715030393329336),
+        ('num_layers', 1),
+        ('num_epoch', 4),
+    ]
