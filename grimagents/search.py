@@ -3,6 +3,9 @@ CLI application that performs hyperparameter searches using grimagents and a gri
 
 Features:
 - Grid Search for hyperparameters
+- Random Search for hyperparameters
+- Resume Grid Search
+- Export trainer configuration file for a given Grid Search index
 
 See readme.md for more documentation.
 """
@@ -20,7 +23,7 @@ import grimagents.config as config_util
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.grid_search import GridSearch
+from grimagents.grid_search import GridSearch, RandomSearch
 
 
 search_log = logging.getLogger('grimagents.search')
@@ -43,7 +46,7 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(file_path, add_search=True)
 
 
-class GridSearchCommand(Command):
+class SearchCommand(Command):
     def __init__(self, args):
 
         self.args = args
@@ -57,9 +60,57 @@ class GridSearchCommand(Command):
         self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
         self.trainer_config = config_util.load_trainer_configuration(self.trainer_config_path)
 
-        self.grid_search = GridSearch(self.search_config, self.trainer_config)
-
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
+
+    def perform_search_with_configuration(self, intersect, search_brain_config, index=0):
+        """Executes a search using the provided intersect and matching brain_config."""
+
+        # Write trainer configuration file for current intersect
+        if self.args.parallel:
+            self.search_config_path = self.search_config_path.with_name(
+                f'search_config{index:02d}.yaml'
+            )
+
+        command_util.write_yaml_file(search_brain_config, self.search_config_path)
+
+        # Execute training with the intersect config and run_id
+        run_id = self.grim_config[config_util.RUN_ID] + f'_{index:02d}'
+        command = [
+            'pipenv',
+            'run',
+            'python',
+            '-m',
+            'grimagents',
+            self.grim_config_path,
+            '--trainer-config',
+            self.search_config_path,
+            '--run-id',
+            run_id,
+        ]
+
+        search_log.info('-' * 63)
+        search_log.info(f'Search {run_id}:')
+        for j in range(len(intersect)):
+            search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
+        search_log.info('-' * 63)
+
+        if self.args.parallel:
+            command = ['cmd', '/K'] + command
+            base_port = self.grim_config.get('--base-port', 5005)
+            command = command + ['--base-port', base_port + index]
+            command = [str(element) for element in command]
+            subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
+
+        else:
+            command = [str(element) for element in command]
+            subprocess.run(command)
+
+
+class GridSearchCommand(SearchCommand):
+    def __init__(self, args):
+
+        super().__init__(args)
+        self.grid_search = GridSearch(self.search_config, self.trainer_config)
 
 
 class OutputGridSearchCount(GridSearchCommand):
@@ -69,7 +120,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f' \'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
+            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
         )
 
 
@@ -103,46 +154,13 @@ class PerformGridSearch(GridSearchCommand):
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
 
-            # Write trainer configuration file for current intersect
-            if self.args.parallel:
-                self.search_config_path = self.search_config_path.with_name(
-                    f'search_config{i:02d}.yaml'
-                )
-
-            command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
-
-            # Execute training with the intersect config and run_id
-            run_id = self.grim_config[config_util.RUN_ID] + f'_{i:02d}'
-            command = [
-                'pipenv',
-                'run',
-                'python',
-                '-m',
-                'grimagents',
-                str(self.grim_config_path),
-                '--trainer-config',
-                str(self.search_config_path),
-                '--run-id',
-                run_id,
-            ]
-
-            search_log.info('-' * 63)
-            search_log.info(f'Training {run_id}:')
-            for j in range(len(intersect)):
-                search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
-            search_log.info('-' * 63)
-
-            if self.args.parallel:
-                command = ['cmd', '/K'] + command
-                command = command + ['--base-port', str(5005 + i)]
-                subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
-            else:
-                subprocess.run(command)
+            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
 
-        search_log.info('Grid search complete\n')
+        if not self.args.parallel:
+            search_log.info('Grid search complete\n')
 
 
 class ExportGridSearchConfiguration(GridSearchCommand):
@@ -157,6 +175,36 @@ class ExportGridSearchConfiguration(GridSearchCommand):
         intersect = self.grid_search.get_intersect(self.args.export_intersect)
         intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
         command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
+
+
+class PerformRandomSearch(SearchCommand):
+    def __init__(self, args):
+
+        super().__init__(args)
+        self.random_search = RandomSearch(self.search_config, self.trainer_config)
+
+    def execute(self):
+
+        search_log.info('-' * 63)
+        search_log.info('Performing random search for hyperparameters:')
+        for i in range(len(self.random_search.hyperparameters)):
+            search_log.info(
+                f'    {self.random_search.hyperparameters[i]}: {self.random_search.hyperparameter_sets[i]}'
+            )
+        search_log.info('-' * 63)
+
+        for i in range(self.args.random):
+
+            intersect = self.random_search.get_randomized_intersect()
+            intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
+
+            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
+
+        if not self.args.parallel and self.search_config_path.exists():
+            self.search_config_path.unlink()
+
+        if not self.args.parallel:
+            search_log.info('Random search complete\n')
 
 
 def main():
@@ -175,6 +223,8 @@ def main():
         OutputGridSearchCount(args).execute()
     elif args.export_intersect:
         ExportGridSearchConfiguration(args).execute()
+    elif args.random:
+        PerformRandomSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
 
@@ -197,7 +247,7 @@ def parse_args(argv):
     options_parser.add_argument(
         '--parallel',
         action='store_true',
-        help='Perform all searchs in parallel (be careful with this one!)',
+        help='Perform all searches in parallel (be careful with this one!)',
     )
     options_parser.add_argument(
         '--resume',
@@ -206,12 +256,18 @@ def parse_args(argv):
         help='Resume grid search from <search index> (counting from zero)',
     )
     options_parser.add_argument(
-        '--export-intersect',
+        '--export-index',
         metavar='<search index>',
         type=int,
-        help='Export trainer configuration for a GridSearch intersect',
+        help='Export trainer configuration for grid search <index>',
     )
-    # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    options_parser.add_argument(
+        '--random',
+        '-r',
+        metavar='<n>',
+        type=int,
+        help='Execute <n> random searches instead of performing a grid search',
+    )
 
     parser = argparse.ArgumentParser(
         prog='search',

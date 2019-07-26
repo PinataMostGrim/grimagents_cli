@@ -26,6 +26,9 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
 
+    # Subprocess requires all elements of command be strings
+    command = [str(element) for element in command]
+
     if show_command or dry_run:
         command_log.info(' '.join(command))
 
@@ -146,16 +149,20 @@ def load_history():
 def save_to_history(command: list):
     """Saves a training command to the history file."""
 
-    history_file = settings.get_history_file_path()
-    dict = load_history()
+    try:
+        history_file = settings.get_history_file_path()
+        dict = load_history()
 
-    while len(dict['history']) >= TRAINING_HISTORY_COUNT:
-        dict['history'].pop()
+        while len(dict['history']) >= TRAINING_HISTORY_COUNT:
+            dict['history'].pop()
 
-    dict['history'].insert(0, command)
+        dict['history'].insert(0, command)
 
-    with history_file.open(mode='w') as file:
-        json.dump(dict, file, indent=4)
+        with history_file.open(mode='w') as file:
+            json.dump(dict, file, indent=4)
+
+    except json.decoder.JSONDecodeError as error:
+        command_log.warning(f'Unable to save training command to history, {error}')
 
 
 def load_last_history():

@@ -32,6 +32,8 @@ class TrainingWrapperCommand(Command):
             self.set_lesson(str(args.lesson))
         if args.run_id is not None:
             self.set_run_id(args.run_id)
+        if args.base_port is not None:
+            self.set_base_port(args.base_port)
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
         if args.inference is not None:
@@ -86,6 +88,8 @@ class TrainingWrapperCommand(Command):
             # Add the --slow flag if inference was requested, but it isn't present.
             if SLOW not in command_arguments[ADDITIONAL_ARGS]:
                 command_arguments[ADDITIONAL_ARGS].append(SLOW)
+
+            # Remove the export path, if it is present.
             if config_util.EXPORT_PATH in command_arguments:
                 del command_arguments[config_util.EXPORT_PATH]
 
@@ -134,7 +138,7 @@ class TrainingWrapperCommand(Command):
         return result
 
     def get_command_as_string(self):
-        return ' '.join(self.get_command())
+        return ' '.join([str(element) for element in self.get_command()])
 
     def set_trainer_config(self, value):
         self.arguments[config_util.TRAINER_CONFIG_PATH] = value

@@ -1,4 +1,5 @@
 import itertools
+import random
 
 
 class GridSearchError(Exception):
@@ -143,3 +144,29 @@ class GridSearch:
             return brain_config[brain_name]['batch_size']
 
         return brain_config['default']['batch_size']
+
+
+class RandomSearch(GridSearch):
+
+    @staticmethod
+    def get_random_value(values, seed=None):
+        """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise.
+        """
+        if seed is not None:
+            random.seed(seed)
+
+        for element in values:
+            if isinstance(element, float):
+                return random.uniform(min(values), max(values))
+
+        return random.randint(min(values), max(values))
+
+    def get_randomized_intersect(self, seed=None):
+        """Returns an intersect with randomized values. Values are chosen between the minimum and maximum values that exist for each hyperparameter."""
+
+        randomized_hyperparameters = []
+        for i in range(len(self.hyperparameters)):
+            randomized_hyperparameters.append(self.get_random_value(self.hyperparameter_sets[i], seed=seed))
+
+        result = list(zip(self.hyperparameters, randomized_hyperparameters))
+        return result

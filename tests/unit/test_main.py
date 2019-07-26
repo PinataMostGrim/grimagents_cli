@@ -16,6 +16,7 @@ def namespace_args():
         env=None,
         lesson=None,
         run_id='3DBall',
+        base_port=None,
         num_envs=None,
         inference=None,
         graphics=None,
