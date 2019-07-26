@@ -1,6 +1,6 @@
 import pytest
 
-from grimagents.grid_search import GridSearch, InvalidTrainerConfig, InvalidIntersectionIndex
+from grimagents.grid_search import GridSearch, InvalidTrainerConfig, InvalidIntersectIndex
 
 
 @pytest.fixture
@@ -137,7 +137,7 @@ def test_invalid_intersect_index(search_config, trainer_config):
 
     search = GridSearch(search_config, trainer_config)
 
-    with pytest.raises(InvalidIntersectionIndex):
+    with pytest.raises(InvalidIntersectIndex):
         search.get_intersect(32)
 
 

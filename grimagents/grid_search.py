@@ -11,7 +11,7 @@ class InvalidTrainerConfig(GridSearchError):
     pass
 
 
-class InvalidIntersectionIndex(GridSearchError):
+class InvalidIntersectIndex(GridSearchError):
     """An attempt to access an invalid intersection index was made."""
 
     pass
@@ -101,13 +101,13 @@ class GridSearch:
         """Returns a two dimensional list containing the search parameters to use for a given intersect (index) in the grid search.
 
         Raises:
-          InvalidIntersectionIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
         """
 
         try:
             result = list(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
-            raise InvalidIntersectionIndex(
+            raise InvalidIntersectIndex(
                 f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
             )
 
