@@ -43,7 +43,8 @@ class EditGrimConfigFile(Command):
         config_util.edit_grim_config_file(file_path, add_search=True)
 
 
-class GridSearchCommand(Command):
+class SearchCommand(Command):
+
     def __init__(self, args):
 
         self.args = args
@@ -57,9 +58,54 @@ class GridSearchCommand(Command):
         self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
         self.trainer_config = config_util.load_trainer_configuration(self.trainer_config_path)
 
-        self.grid_search = GridSearch(self.search_config, self.trainer_config)
-
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
+
+    def perform_search_with_configuration(self, intersect, search_brain_config, index=0):
+        """Executes a search using the provided intersect and matching brain_config."""
+
+        # Write trainer configuration file for current intersect
+        if self.args.parallel:
+            self.search_config_path = self.search_config_path.with_name(
+                f'search_config{index:02d}.yaml'
+            )
+
+        command_util.write_yaml_file(search_brain_config, self.search_config_path)
+
+        # Execute training with the intersect config and run_id
+        run_id = self.grim_config[config_util.RUN_ID] + f'_{index:02d}'
+        command = [
+            'pipenv',
+            'run',
+            'python',
+            '-m',
+            'grimagents',
+            str(self.grim_config_path),
+            '--trainer-config',
+            str(self.search_config_path),
+            '--run-id',
+            run_id,
+        ]
+
+        search_log.info('-' * 63)
+        search_log.info(f'Search {run_id}:')
+        for j in range(len(intersect)):
+            search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
+        search_log.info('-' * 63)
+
+        if self.args.parallel:
+            command = ['cmd', '/K'] + command
+            command = command + ['--base-port', str(5005 + index)]
+            subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        else:
+            subprocess.run(command)
+
+
+class GridSearchCommand(SearchCommand):
+
+    def __init__(self, args):
+
+        super().__init__(args)
+        self.grid_search = GridSearch(self.search_config, self.trainer_config)
 
 
 class OutputGridSearchCount(GridSearchCommand):
@@ -103,41 +149,7 @@ class PerformGridSearch(GridSearchCommand):
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
 
-            # Write trainer configuration file for current intersect
-            if self.args.parallel:
-                self.search_config_path = self.search_config_path.with_name(
-                    f'search_config{i:02d}.yaml'
-                )
-
-            command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
-
-            # Execute training with the intersect config and run_id
-            run_id = self.grim_config[config_util.RUN_ID] + f'_{i:02d}'
-            command = [
-                'pipenv',
-                'run',
-                'python',
-                '-m',
-                'grimagents',
-                str(self.grim_config_path),
-                '--trainer-config',
-                str(self.search_config_path),
-                '--run-id',
-                run_id,
-            ]
-
-            search_log.info('-' * 63)
-            search_log.info(f'Training {run_id}:')
-            for j in range(len(intersect)):
-                search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
-            search_log.info('-' * 63)
-
-            if self.args.parallel:
-                command = ['cmd', '/K'] + command
-                command = command + ['--base-port', str(5005 + i)]
-                subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
-            else:
-                subprocess.run(command)
+            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
