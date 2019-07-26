@@ -88,6 +88,8 @@ class TrainingWrapperCommand(Command):
             # Add the --slow flag if inference was requested, but it isn't present.
             if SLOW not in command_arguments[ADDITIONAL_ARGS]:
                 command_arguments[ADDITIONAL_ARGS].append(SLOW)
+
+            # Remove the export path, if it is present.
             if config_util.EXPORT_PATH in command_arguments:
                 del command_arguments[config_util.EXPORT_PATH]
 

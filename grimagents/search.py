@@ -3,6 +3,9 @@ CLI application that performs hyperparameter searches using grimagents and a gri
 
 Features:
 - Grid Search for hyperparameters
+- Random Search for hyperparameters
+- Resume Grid Search
+- Export trainer configuration file for a given Grid Search index
 
 See readme.md for more documentation.
 """
@@ -119,7 +122,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f' \'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
+            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
         )
 
 
