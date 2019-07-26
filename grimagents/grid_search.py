@@ -11,14 +11,14 @@ class InvalidTrainerConfig(GridSearchError):
     pass
 
 
-class InvalidIntersectionIndex(GridSearchError):
+class InvalidIntersectIndex(GridSearchError):
     """An attempt to access an invalid intersection index was made."""
 
     pass
 
 
 class GridSearch:
-    """Object that faciliates performing hyperparameter grid searchs."""
+    """Object that facilitates performing hyperparameter grid searches."""
 
     def __init__(self, search_config, trainer_config):
         self.search_config = None
@@ -101,29 +101,45 @@ class GridSearch:
         """Returns a two dimensional list containing the search parameters to use for a given intersect (index) in the grid search.
 
         Raises:
-          InvalidIntersectionIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
         """
 
         try:
             result = list(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
-            raise InvalidIntersectionIndex(
+            raise InvalidIntersectIndex(
                 f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
             )
 
         return result
 
     def get_intersect_count(self):
-        """Retuns the total count of search permutations for this GridSearch."""
+        """Returns the total count of search permutations for this GridSearch."""
 
         return len(self.search_permutations)
 
     def get_brain_config_for_intersect(self, intersect):
-        """Returns a brain configuration dictionary with values overriden by the grid search intersect.
+        """Returns a brain configuration dictionary with values overridden by the grid search intersect.
         """
 
         result = self.brain_config.copy()
         for hyperparameter in intersect:
             result[self.brain_name][hyperparameter[0]] = hyperparameter[1]
 
+        # Set 'buffer_size' based on 'buffer_size_multiple', if present
+        if 'buffer_size_multiple' in result[self.brain_name]:
+            batch_size = self.get_batch_size_value(result, self.brain_name)
+            result[self.brain_name]['buffer_size'] = batch_size * result[self.brain_name]['buffer_size_multiple']
+            del result[self.brain_name]['buffer_size_multiple']
+
         return result
+
+    @staticmethod
+    def get_batch_size_value(brain_config, brain_name):
+        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead.
+        """
+
+        if 'batch_size' in brain_config[brain_name]:
+            return brain_config[brain_name]['batch_size']
+
+        return brain_config['default']['batch_size']

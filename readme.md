@@ -186,7 +186,9 @@ Example grimagents configuration:
 #### search Configuration
 Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-`search` only supports grid searching one brain at a time. `search` will respect `--num-envs` and `--num-runs` while running a grid search, and will export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`search` only supports grid searching for one brain at a time. `search` will respect `--num-envs` and `--num-runs` while running a grid search and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows GridSearch to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
@@ -200,7 +202,8 @@ Each hyperparameter value added to the search configuration will dramatically in
             "name": "3DBallLearning",
             "hyperparameters":
             {
-                "beta": [1e-4, 1e-2]
+                "beta": [1e-4, 1e-2],
+                "buffer_size_multiple": [4, 10]
             }
         }
     }
@@ -209,7 +212,7 @@ Each hyperparameter value added to the search configuration will dramatically in
 
 
 ## Notes
-Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the current working directory set to the project's root folder. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
+`grimagents`, `training_wrapper`, and `search` initiate training using a Pipenv subprocess call. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
