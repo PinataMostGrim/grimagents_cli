@@ -161,7 +161,8 @@ class PerformGridSearch(GridSearchCommand):
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
 
-        search_log.info('Grid search complete\n')
+        if not self.args.parallel:
+            search_log.info('Grid search complete\n')
 
 
 class ExportGridSearchConfiguration(GridSearchCommand):
@@ -205,7 +206,8 @@ class PerformRandomSearch(SearchCommand):
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
 
-        search_log.info('Random search complete\n')
+        if not self.args.parallel:
+            search_log.info('Random search complete\n')
 
 
 def main():
