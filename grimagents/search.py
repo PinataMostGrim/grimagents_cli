@@ -256,10 +256,10 @@ def parse_args(argv):
         help='Resume grid search from <search index> (counting from zero)',
     )
     options_parser.add_argument(
-        '--export-intersect',
+        '--export-index',
         metavar='<search index>',
         type=int,
-        help='Export trainer configuration for a GridSearch intersect',
+        help='Export trainer configuration for grid search <index>',
     )
     options_parser.add_argument(
         '--random',

@@ -23,12 +23,12 @@
 
 
 ## Usage
-Training can be initiated several ways from the MLAgents project root folder:
+Training can be initiated from the MLAgents project root folder several ways:
 - Execute `grimagents.bat` or `training_wrapper.bat` files
 - Execute the module in python using `python -m grimagents`
 - Execute `training_wrapper.py` in python directly
 
-Grid search can be initiated by executing `search.bat` from the MLAgents project root folder.
+Grid search can be initiated from the MLAgents project root folder by executing `search.bat`.
 
 ### grimagents
 ```
@@ -36,13 +36,12 @@ usage: grimagents [-h] [--list] [--edit-config <file>]
                   [--edit-trainer-config <file>] [--edit-curriculum <file>]
                   [--new-window] [--tensorboard-start] [--resume] [--dry-run]
                   [--trainer-config TRAINER_CONFIG] [--env ENV]
-                  [--lesson LESSON] [--run-id RUN_ID] [--num-envs NUM_ENVS]
-                  [--inference] [--graphics | --no-graphics]
-                  [--timestamp | --no-timestamp]
+                  [--lesson LESSON] [--run-id RUN_ID] [--base-port BASE_PORT]
+                  [--num-envs NUM_ENVS] [--inference]
+                  [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                   configuration_file ...
 
-CLI application that wraps Unity ML-Agents with quality of life
-improvements.
+CLI application that wraps Unity ML-Agents with quality of life improvements.
 
 positional arguments:
   configuration_file    Configuration file to extract training arguments from
@@ -66,6 +65,7 @@ optional arguments:
   --env ENV
   --lesson LESSON
   --run-id RUN_ID
+  --base-port BASE_PORT
   --num-envs NUM_ENVS
   --inference           Load environment in inference mode instead of training
   --graphics
@@ -125,7 +125,8 @@ optional arguments:
 ### search
 ```
 usage: search [-h] [--edit-config <file>] [--search-count] [--parallel]
-              [--resume <search index>] [--export-intersect <search index>]
+              [--resume <search index>] [--export-index <search index>]
+              [--random <n>]
               configuration_file
 
 CLI application that performs a hyperparameter grid search
@@ -139,14 +140,15 @@ optional arguments:
                         a default search entry if one is not present.
   --search-count        Output the total number of searches a grimagents
                         configuration file will attempt
-  --parallel            Perform all searchs in parallel (be careful with this
+  --parallel            Perform all searches in parallel (be careful with this
                         one!)
   --resume <search index>
                         Resume grid search from <search index> (counting from
                         zero)
-  --export-intersect <search index>
-                        Export trainer configuration for a GridSearch
-                        intersect
+  --export-index <search index>
+                        Export trainer configuration for grid search <index>
+  --random <n>, -r <n>  Execute <n> random searches instead of performing a
+                        grid search
 ```
 
 #### Example usages
@@ -190,6 +192,8 @@ Each hyperparameter value added to the search configuration will dramatically in
 
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows GridSearch to dynamically set the `buffer_size` based directly on the `batch_size`.
 
+When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter's value will not be randomized.
+
 ```json
 {
     "trainer-config-path": "config\\3DBall_config.yaml",
@@ -217,3 +221,5 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
 Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A very limited amount of `mlagent-learn`'s output is sent to `stdout` and only that portion will be captured by the log file.
+
+Training multiple instances at the same time can consume a fair amount of RAM due to the nested Pipenv calls.
