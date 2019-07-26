@@ -176,3 +176,18 @@ def test_invalid_trainer_config(trainer_config):
             },
             'BRAIN_NAME': {'beta': 0.005, 'epsilon': 0.2},
         }
+
+
+def test_buffer_size_multiple(search_config, trainer_config):
+    """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config.
+    """
+
+    search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
+
+    search = GridSearch(search_config, trainer_config)
+    intersect = search.get_intersect(0)
+    intersect_config = search.get_brain_config_for_intersect(intersect)
+
+    assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
+
+    assert intersect_config == {'default': {'trainer': 'ppo', 'batch_size': 1024, 'beta': 0.005, 'buffer_size': 10240, 'epsilon': 0.2, 'gamma': 0.99, 'hidden_units': 128, 'lambd': 0.95}, 'BRAIN_NAME': {'beta': 0.0001, 'epsilon': 0.2, 'hidden_units': 32, 'learning_rate': 1e-05, 'num_layers': 1, 'num_epoch': 3, 'buffer_size': 4096}}
