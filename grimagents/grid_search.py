@@ -18,7 +18,7 @@ class InvalidIntersectIndex(GridSearchError):
 
 
 class GridSearch:
-    """Object that faciliates performing hyperparameter grid searchs."""
+    """Object that facilitates performing hyperparameter grid searches."""
 
     def __init__(self, search_config, trainer_config):
         self.search_config = None
@@ -114,12 +114,12 @@ class GridSearch:
         return result
 
     def get_intersect_count(self):
-        """Retuns the total count of search permutations for this GridSearch."""
+        """Returns the total count of search permutations for this GridSearch."""
 
         return len(self.search_permutations)
 
     def get_brain_config_for_intersect(self, intersect):
-        """Returns a brain configuration dictionary with values overriden by the grid search intersect.
+        """Returns a brain configuration dictionary with values overridden by the grid search intersect.
         """
 
         result = self.brain_config.copy()
