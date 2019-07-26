@@ -79,9 +79,9 @@ class SearchCommand(Command):
             'python',
             '-m',
             'grimagents',
-            str(self.grim_config_path),
+            self.grim_config_path,
             '--trainer-config',
-            str(self.search_config_path),
+            self.search_config_path,
             '--run-id',
             run_id,
         ]
@@ -96,9 +96,11 @@ class SearchCommand(Command):
             command = ['cmd', '/K'] + command
             base_port = self.grim_config.get('--base-port', 5005)
             command = command + ['--base-port', base_port + index]
+            command = [str(element) for element in command]
             subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
         else:
+            command = [str(element) for element in command]
             subprocess.run(command)
 
 
