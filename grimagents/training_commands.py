@@ -134,7 +134,7 @@ class TrainingWrapperCommand(Command):
         return result
 
     def get_command_as_string(self):
-        return ' '.join(self.get_command())
+        return ' '.join([str(element) for element in self.get_command()])
 
     def set_trainer_config(self, value):
         self.arguments[config_util.TRAINER_CONFIG_PATH] = value

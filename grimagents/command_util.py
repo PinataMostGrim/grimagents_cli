@@ -26,6 +26,9 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
 
+    # Subprocess requires all elements of command be strings
+    command = [str(element) for element in command]
+
     if show_command or dry_run:
         command_log.info(' '.join(command))
 
