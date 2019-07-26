@@ -20,7 +20,7 @@ import grimagents.config as config_util
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.grid_search import GridSearch
+from grimagents.grid_search import GridSearch, RandomSearch
 
 
 search_log = logging.getLogger('grimagents.search')
@@ -171,6 +171,36 @@ class ExportGridSearchConfiguration(GridSearchCommand):
         command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 
 
+class PerformRandomSearch(SearchCommand):
+
+    def __init__(self, args):
+
+        super().__init__(args)
+        self.random_search = RandomSearch(self.search_config, self.trainer_config)
+
+    def execute(self):
+
+        search_log.info('-' * 63)
+        search_log.info('Performing random search for hyperparameters:')
+        for i in range(len(self.random_search.hyperparameters)):
+            search_log.info(
+                f'    {self.random_search.hyperparameters[i]}: {self.random_search.hyperparameter_sets[i]}'
+            )
+        search_log.info('-' * 63)
+
+        for i in range(self.args.random):
+
+            intersect = self.random_search.get_randomized_intersect()
+            intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
+
+            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
+
+        if not self.args.parallel and self.search_config_path.exists():
+            self.search_config_path.unlink()
+
+        search_log.info('Random search complete\n')
+
+
 def main():
 
     args = parse_args(sys.argv[1:])
@@ -187,6 +217,8 @@ def main():
         OutputGridSearchCount(args).execute()
     elif args.export_intersect:
         ExportGridSearchConfiguration(args).execute()
+    elif args.random:
+        PerformRandomSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
 
@@ -223,7 +255,7 @@ def parse_args(argv):
         type=int,
         help='Export trainer configuration for a GridSearch intersect',
     )
-    # options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
+    options_parser.add_argument('--random', '-r', metavar='<n>', type=int, help='Execute <n> random searches instead of performing a grid search')
 
     parser = argparse.ArgumentParser(
         prog='search',
