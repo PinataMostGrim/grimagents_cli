@@ -1,6 +1,6 @@
 import pytest
 
-from grimagents.grid_search import GridSearch, InvalidTrainerConfig, InvalidIntersectIndex
+from grimagents.grid_search import GridSearch, RandomSearch, InvalidTrainerConfig, InvalidIntersectIndex
 
 
 @pytest.fixture
@@ -211,3 +211,23 @@ def test_buffer_size_multiple(search_config, trainer_config):
             'buffer_size': 4096,
         },
     }
+
+
+def test_get_random_value():
+    """Test for the correct randomization of ints and floats."""
+
+    assert RandomSearch.get_random_value([1, 5, 8], seed=10) == 1
+    assert RandomSearch.get_random_value([0.01, 0.0001, 1], seed=5) == 0.6229394047202129
+
+
+def test_get_random_intersect(search_config, trainer_config):
+    """Tests for the correct generation of a randomized intersect."""
+
+    search = RandomSearch(search_config, trainer_config)
+    random_intersect = search.get_randomized_intersect(seed=9871237)
+
+    assert random_intersect == [('beta', 0.008715030393329336),
+                                ('hidden_units', 477),
+                                ('learning_rate', 0.0008715030393329336),
+                                ('num_layers', 1),
+                                ('num_epoch', 4)]
