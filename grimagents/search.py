@@ -169,10 +169,10 @@ class ExportGridSearchConfiguration(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_intersect}\' into \'{self.search_config_path}\''
+            f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_index}\' into \'{self.search_config_path}\''
         )
 
-        intersect = self.grid_search.get_intersect(self.args.export_intersect)
+        intersect = self.grid_search.get_intersect(self.args.export_index)
         intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
         command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 
@@ -221,7 +221,7 @@ def main():
         EditGrimConfigFile(args).execute()
     elif args.search_count:
         OutputGridSearchCount(args).execute()
-    elif args.export_intersect:
+    elif args.export_index:
         ExportGridSearchConfiguration(args).execute()
     elif args.random:
         PerformRandomSearch(args).execute()
