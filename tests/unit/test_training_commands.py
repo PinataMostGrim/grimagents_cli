@@ -19,7 +19,6 @@ TEST_CONFIG = {
     "--num-envs": "",
     "--no-graphics": False,
     "--timestamp": False,
-    "--log-filename": "",
 }
 
 
@@ -210,7 +209,6 @@ def test_training_command_set_methods():
         "--num-envs": "",
         "--no-graphics": False,
         "--timestamp": False,
-        "--log-filename": "",
     }
     command = TrainingWrapperCommand(test_config)
 
@@ -219,7 +217,6 @@ def test_training_command_set_methods():
     command.set_run_id('ball')
     command.set_num_envs('4')
     command.set_no_graphics_enabled(True)
-    command.set_log_filename('3DBall.log')
     command.set_timestamp_enabled(True)
 
     command_string = command.get_command_as_string()
@@ -228,13 +225,11 @@ def test_training_command_set_methods():
     assert '--run-id ball' in command_string
     assert '--num-envs 4' in command_string
     assert '--no-graphics' in command_string
-    assert '--log-filename 3DBall.log' in command_string
     assert '--run-id ball-' in command_string
 
 
 def test_training_command_timestamp(monkeypatch):
-    """Test for TrainingWrapperCommand correctly applying a timestamp and setting
-    the log_filename."""
+    """Test for TrainingWrapperCommand correctly applying a timestamp."""
 
     def mock_return():
         return '2019-06-29_17-13-41'
@@ -248,20 +243,10 @@ def test_training_command_timestamp(monkeypatch):
         "--timestamp": True,
     }
 
-    # Result if a log-filename key does not already exist
     command = TrainingWrapperCommand(test_config)
     command_string = command.get_command_as_string()
 
     assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
-    assert '--log-filename 3DBall' in command_string
-
-    # Result if an empty log-filename key already exists
-    command.set_log_filename("")
-    assert '--log-filename 3DBall' in command.get_command_as_string()
-
-    # Result if a log-filename key exists and has content
-    command.set_log_filename('ball')
-    assert '--log-filename ball' in command.get_command_as_string()
 
 
 def test_training_command_inference():
