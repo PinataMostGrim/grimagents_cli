@@ -82,7 +82,8 @@ def load_json_file(file_path: Path):
     """Load json data from a file.
 
     Raises:
-      FileNotFoundError
+      FileNotFoundError: When file can't be found
+      JSONDecodeError: When the json file can't be parsed
     """
 
     try:
@@ -90,6 +91,9 @@ def load_json_file(file_path: Path):
             data = json.load(f)
     except FileNotFoundError as exception:
         command_log.error(f'File \'{file_path}\' not found')
+        raise exception
+    except json.decoder.JSONDecodeError as exception:
+        command_log.error(f'Unable to parse \'{file_path}\', {exception}')
         raise exception
 
     return data
