@@ -65,12 +65,6 @@ class TrainingWrapperCommand(Command):
 
         # Process --timestamp argument
         if config_util.TIMESTAMP in command_arguments and command_arguments[config_util.TIMESTAMP]:
-            if (
-                config_util.LOG_FILE_NAME not in command_arguments
-                or not command_arguments[config_util.LOG_FILE_NAME]
-            ):
-                # Explicitly set a log-filename if it doesn't exist to prevent a million log files being generated.
-                command_arguments[config_util.LOG_FILE_NAME] = command_arguments[config_util.RUN_ID]
 
             timestamp = common.get_timestamp()
             command_arguments[
@@ -166,9 +160,6 @@ class TrainingWrapperCommand(Command):
 
     def set_timestamp_enabled(self, value):
         self.arguments[config_util.TIMESTAMP] = value
-
-    def set_log_filename(self, value):
-        self.arguments[config_util.LOG_FILE_NAME] = value
 
     def set_base_port(self, value):
         self.arguments[config_util.BASE_PORT] = value
