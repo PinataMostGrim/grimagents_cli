@@ -125,7 +125,6 @@ grimagents --resume
 ### grimwrapper
 ```
 usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
-                   [--log-filename LOG_FILENAME]
                    trainer_config_path ...
 
 CLI application that wraps mlagents-learn with logging to file and automatic
@@ -141,8 +140,6 @@ optional arguments:
   --run-id <run-id>     Run id for the training session
   --export-path EXPORT_PATH
                         Export trained models to this path
-  --log-filename LOG_FILENAME
-                        Write log output to this file. Defaults to run-id.
 ```
 
 

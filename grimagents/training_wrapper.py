@@ -2,11 +2,9 @@
 """CLI application that wraps 'mlagents-learn' with several quality of life improvements.
 
 Features:
-- Logs mlagents-learn output to file
-- Optionally exports trained models to another location after training finishes (for example, into a Unity project)
+- Optionally copies trained models to another location after training finishes (for example, into a Unity project)
 
 Notes:
-- training_wrapper can be executed as a stand-alone script for logging and export features
 - Potentially works with Linux (untested)
 - See readme.md for more documentation
 """
@@ -30,6 +28,8 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 
 def main():
 
+    configure_logging()
+
     if not common.is_pipenv_present():
         training_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
@@ -38,9 +38,6 @@ def main():
 
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
-
-    log_filename = args.log_filename if args.log_filename else run_id
-    configure_logging(log_filename)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
@@ -68,8 +65,6 @@ def main():
 
             for line in p.stdout:
                 line = line.rstrip()
-                training_log.info(line)
-
                 match = brain_regex.search(line)
                 if match:
                     exported_brains.append(match.group(1))
@@ -95,7 +90,6 @@ def main():
             )
 
         training_log.info('-' * 63)
-        training_log.info('')
         logging.shutdown()
 
 
@@ -116,9 +110,6 @@ def parse_args(argv):
     )
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'
-    )
-    wrapper_parser.add_argument(
-        '--log-filename', type=str, help='Write log output to this file. Defaults to run-id.'
     )
 
     parser = argparse.ArgumentParser(
@@ -142,7 +133,7 @@ def parse_args(argv):
     return args
 
 
-def configure_logging(log_filename: str):
+def configure_logging():
     """Configures logging for a training session."""
 
     log_config = {

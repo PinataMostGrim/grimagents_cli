@@ -2,7 +2,7 @@
 
 Notes:
 - All path values should be a relative path from the MLAgents project root folder
-- `--export-path` and `--logname` configuration values are consumed by training_wrapper
+- The `--export-path` configuration value is consumed by training_wrapper.py
 """
 
 import logging
@@ -24,7 +24,6 @@ NUM_ENVS = '--num-envs'
 INFERENCE = '--inference'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
-LOG_FILE_NAME = '--log-filename'
 SEARCH = 'search'
 
 
@@ -44,7 +43,6 @@ _DEFAULT_GRIM_CONFIG = {
     INFERENCE: False,
     NO_GRAPHICS: False,
     TIMESTAMP: False,
-    LOG_FILE_NAME: None,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
