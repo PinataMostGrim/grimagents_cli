@@ -273,8 +273,8 @@ def parse_args(argv):
     )
 
     parser = argparse.ArgumentParser(
-        prog='search',
-        description='CLI application that performs a hyperparameter grid search',
+        prog='grimsearch',
+        description='CLI application that performs a hyperparameter search',
         parents=[options_parser],
     )
     parser.add_argument(

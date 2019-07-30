@@ -122,7 +122,7 @@ def parse_args(argv):
     )
 
     parser = argparse.ArgumentParser(
-        prog='training_wrapper',
+        prog='grimwrapper',
         description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
         parents=[wrapper_parser],
     )
