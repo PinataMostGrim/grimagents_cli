@@ -1,34 +1,58 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap [Unity MLAgents](https://github.com/Unity-Technologies/ml-agents) `mlagents-learn` with several quality of life improvements. Features include:
-- Load training arguments from a configuration file
-- Hyperparameter grid search
+**grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with several quality of life improvements.
+
+**main** features include:
+- Initiate training using arguments loaded from a configuration file
+- Easily resume the last training run
+- *(Optional)* Automatically add time-stamp to training run-ids
+- *(Optional)* Override loaded configuration values with command line arguments
+- *(Optional)* Launch training session in a new console window
+
+**grimwrapper** features include:
 - Log `mlagents-learn` output to file
-- Quickly resume the last training run
-- *(Optional)* override loaded configuration values with command line arguments
-- *(Optional)* time-stamp training run-ids
-- *(Optional)* launch training in a new console window
-- *(Optional)* export trained models to another location after training finishes (for example, into a Unity project)
+- *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
+
+**grimsearch** features include:
+- Grid search and random search for hyperparameters
 
 
 ## Requirements
 - Windows
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the MLAgents project folder using Python 3.6
+- A virtual environment setup for the `MLAgents` project folder using Python 3.6
 
 
 ## Installation
-- Copy or clone this repository into the MLAgents project in a folder named `grim-agents`
-- Copy or move `grimagents.bat`, `training_wrapper.bat`, and `search.bat` into the MLAgents project root folder. These batch files automatically add the `grimagents` package folder to `PYTHONPATH` and execute their module using Pipenv.
-- *(Optional)* Give the grim-agents folder another name and update `grimagents.bat`, `training_wrapper.bat`, `search.bat`, and `settings.py` accordingly
+- Copy or clone this repository into the `MLAgents` project in a folder named `grim-agents`
+- Install `grimagents` in "editable" mode with `pipenv install -e grim-agents/`
+- Alternatively, build `grimagents` using `setup.py` and install normally
+- *(Optional)* Give the `grim-agents` folder another name and update `settings.py` accordingly
 
 
 ## Usage
-Training can be initiated from the MLAgents project root folder several ways:
-- Execute `grimagents.bat` or `training_wrapper.bat` files
-- Execute the module in python using `python -m grimagents`
-- Execute `training_wrapper.py` in python directly
+Once installed, `grimagents` can be executed from the `MLAgents` project root folder several ways:
 
-Grid search can be initiated from the MLAgents project root folder by executing `search.bat`.
+Using python directly:
+```
+pipenv run python -m grimagents -h
+pipenv run python -m grimagents.training_wrapper -h
+pipenv run python -m grimagents.search -h
+```
+
+Using console script entry points:
+```
+grimagents -h
+grimwrapper -h
+grimsearch -h
+```
+
+Using the convenience batch files in the `grim-agents` folder:
+```
+grim-agents\grimagents.bat -h
+grim-agents\grimwrapper.bat -h
+grim-agents\grimsearch.bat -h
+```
+
 
 ### grimagents
 ```
@@ -77,7 +101,7 @@ optional arguments:
 ```
 
 #### Example usages
-Create and edit a new grimagents training configuration file or edit an existing one:
+Create and edit a new grimagents configuration file or edit an existing one:
 ```
 grimagents --edit-config grim-agents\config\3DBall_grimagents.json
 ```
@@ -98,11 +122,11 @@ grimagents --resume
 ```
 
 
-### training_wrapper
+### grimwrapper
 ```
-usage: training_wrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
-                        [--log-filename LOG_FILENAME]
-                        trainer_config_path ...
+usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
+                   [--log-filename LOG_FILENAME]
+                   trainer_config_path ...
 
 CLI application that wraps mlagents-learn with logging to file and automatic
 exporting of trained policy.
@@ -122,14 +146,14 @@ optional arguments:
 ```
 
 
-### search
+### grimsearch
 ```
-usage: search [-h] [--edit-config <file>] [--search-count] [--parallel]
-              [--resume <search index>] [--export-index <search index>]
-              [--random <n>]
-              configuration_file
+usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
+                  [--resume <search index>] [--export-index <search index>]
+                  [--random <n>]
+                  configuration_file
 
-CLI application that performs a hyperparameter grid search
+CLI application that performs a hyperparameter search
 
 positional arguments:
   configuration_file    grimagents configuration file with search parameters
@@ -154,12 +178,12 @@ optional arguments:
 #### Example usages
 Create or edit a grimagents training configuration file (default search parameters are added automatically):
 ```
-search --edit-config grim-agents\config\3DBall_grimagents.json
+grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
 ```
 
 Initiate grid search with the `3DBall_grimagents.json` configuration file:
 ```
-search grim-agents\config\3DBall.json
+grimsearch grim-agents\config\3DBall.json
 ```
 
 
@@ -167,9 +191,9 @@ search grim-agents\config\3DBall.json
 #### grimagents Configuration
 Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
-All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run grimagents modules from the MLAgents project root folder and configure paths accordingly.
+All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run grimagents modules from the `MLAgents` project root folder and configure paths accordingly.
 
-`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
+`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `grimwrapper` or `mlagents-learn`.
 
 An example configuration file is included at `config\3DBall_grimagents.json`.
 
@@ -185,14 +209,14 @@ Example grimagents configuration:
 }
 ```
 
-#### search Configuration
+#### grimsearch Configuration
 Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-`search` only supports grid searching for one brain at a time. `search` will respect `--num-envs` and `--num-runs` while running a grid search and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports grid searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running a grid search and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
-As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows GridSearch to dynamically set the `buffer_size` based directly on the `batch_size`.
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
-When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter's value will not be randomized.
+When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
 ```json
 {
@@ -216,7 +240,7 @@ When the `--random` argument is used, a random value is chosen between the minim
 
 
 ## Notes
-`grimagents`, `training_wrapper`, and `search` initiate training using a Pipenv subprocess call. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested while `grimagents` and `grimsearch` require Windows.
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
