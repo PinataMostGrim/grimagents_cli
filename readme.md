@@ -222,4 +222,3 @@ The `grimagents' '--resume` argument will not remember how far through a curricu
 
 Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A very limited amount of `mlagent-learn`'s output is sent to `stdout` and only that portion will be captured by the log file.
 
-Training multiple instances at the same time can consume a fair amount of RAM due to the nested Pipenv calls.
