@@ -209,6 +209,7 @@ class PerformRandomSearch(SearchCommand):
 
 def main():
 
+    configure_logging()
     args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
@@ -227,6 +228,8 @@ def main():
         PerformRandomSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
+
+    logging.shutdown()
 
 
 def parse_args(argv):
@@ -270,8 +273,8 @@ def parse_args(argv):
     )
 
     parser = argparse.ArgumentParser(
-        prog='search',
-        description='CLI application that performs a hyperparameter grid search',
+        prog='grimsearch',
+        description='CLI application that performs a hyperparameter search',
         parents=[options_parser],
     )
     parser.add_argument(
@@ -320,6 +323,4 @@ def configure_logging():
 
 
 if __name__ == '__main__':
-    configure_logging()
     main()
-    logging.shutdown()

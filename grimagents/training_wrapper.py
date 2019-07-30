@@ -122,7 +122,7 @@ def parse_args(argv):
     )
 
     parser = argparse.ArgumentParser(
-        prog='training_wrapper',
+        prog='grimwrapper',
         description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
         parents=[wrapper_parser],
     )
@@ -176,7 +176,7 @@ def configure_logging(log_filename: str):
 def export_brains(brains: list, export_path: Path):
     """Exports a list of trained policies into a folder."""
 
-    training_log.info('Exporting brains')
+    training_log.info('Exporting brains:')
 
     if not export_path.exists():
         export_path.mkdir(parents=True, exist_ok=True)
