@@ -22,5 +22,12 @@ setuptools.setup(
     install_requires=[
         "pyyaml"
     ],
-    python_requires=">=3.6,<3.7"
+    python_requires=">=3.6,<3.7",
+    entry_points={
+        'console_scripts': [
+            'grimagents = grimagents.__main__:main',
+            'grimwrapper = grimagents.training_wrapper:main',
+            'grimsearch = grimagents.search:main'
+        ],
+    }
 )
