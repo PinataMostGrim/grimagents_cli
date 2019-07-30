@@ -1,45 +1,71 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap [Unity MLAgents](https://github.com/Unity-Technologies/ml-agents) `mlagents-learn` with several quality of life improvements. Features include:
-- Load training arguments from a configuration file
-- Optionally override loaded configuration arguments with command line arguments
-- Optionally time-stamp the training run-id
-- Optionally launch training in a new console window
+**grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with several quality of life improvements.
+
+**main** features include:
+- Initiate training using arguments loaded from a configuration file
 - Easily resume the last training run
-- Logs `mlagents-learn` output to file
-- Optionally exports trained models to another location after training finishes (for example, into a Unity project)
+- *(Optional)* Automatically add time-stamp to training run-ids
+- *(Optional)* Override loaded configuration values with command line arguments
+- *(Optional)* Launch training session in a new console window
+
+**grimwrapper** features include:
+- Log `mlagents-learn` output to file
+- *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
+
+**grimsearch** features include:
+- Grid search and random search for hyperparameters
 
 
 ## Requirements
 - Windows
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the MLAgents project folder using Python 3.6
+- A virtual environment setup for the `MLAgents` project folder using Python 3.6
 
 
 ## Installation
-- Copy or clone this repository into the MLAgents project in a folder named `grim-agents`
-- Copy or move `grimagents.bat` into the MLAgents project root folder
-- *(Optional)* Give the folder another name but update `grimagents.bat` and `settings.py` accordingly
+- Copy or clone this repository into the `MLAgents` project in a folder named `grim-agents`
+- Install `grimagents` in "editable" mode with `pipenv install -e grim-agents/`
+- Alternatively, build `grimagents` using `setup.py` and install normally
+- *(Optional)* Give the `grim-agents` folder another name and update `settings.py` accordingly
 
 
 ## Usage
-Training can be initiated several ways:
-- Execute `grimagents.bat` file
-- Execute the module in python using `python -m grimagents`
-- Execute `training_wrapper.py` in python directly
+Once installed, `grimagents` can be executed from the `MLAgents` project root folder several ways:
+
+Using python directly:
+```
+pipenv run python -m grimagents -h
+pipenv run python -m grimagents.training_wrapper -h
+pipenv run python -m grimagents.search -h
+```
+
+Using console script entry points:
+```
+grimagents -h
+grimwrapper -h
+grimsearch -h
+```
+
+Using the convenience batch files in the `grim-agents` folder:
+```
+grim-agents\grimagents.bat -h
+grim-agents\grimwrapper.bat -h
+grim-agents\grimsearch.bat -h
+```
 
 
 ### grimagents
 ```
-usage: grim-agents [-h] [--list] [--edit-config FILE]
-                   [--edit-trainer-config FILE] [--edit-curriculum FILE]
-                   [--new-window] [--tensorboard-start] [--resume] [--dry-run]
-                   [--env ENV] [--lesson LESSON] [--run-id RUN_ID]
-                   [--num-envs NUM_ENVS] [--inference]
-                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
-                   configuration_file ...
+usage: grimagents [-h] [--list] [--edit-config <file>]
+                  [--edit-trainer-config <file>] [--edit-curriculum <file>]
+                  [--new-window] [--tensorboard-start] [--resume] [--dry-run]
+                  [--trainer-config TRAINER_CONFIG] [--env ENV]
+                  [--lesson LESSON] [--run-id RUN_ID] [--base-port BASE_PORT]
+                  [--num-envs NUM_ENVS] [--inference]
+                  [--graphics | --no-graphics] [--timestamp | --no-timestamp]
+                  configuration_file ...
 
-CLI application that wraps Unity ML-Agents with some quality of life
-improvements.
+CLI application that wraps Unity ML-Agents with quality of life improvements.
 
 positional arguments:
   configuration_file    Configuration file to extract training arguments from
@@ -49,21 +75,23 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --list, -l            List mlagents-learn training options
-  --edit-config FILE    Open a grimagents configuration file for editing
-  --edit-trainer-config FILE
+  --edit-config <file>  Open a grimagents configuration file for editing
+  --edit-trainer-config <file>
                         Open a trainer configuration file for editing
-  --edit-curriculum FILE
+  --edit-curriculum <file>
                         Open a curriculum file for editing
   --new-window, -w      Run process in a new console window
   --tensorboard-start, -s
                         Start tensorboard server
   --resume, -r          Resume the last run
   --dry-run, -n         Print command without executing
+  --trainer-config TRAINER_CONFIG
   --env ENV
   --lesson LESSON
   --run-id RUN_ID
+  --base-port BASE_PORT
   --num-envs NUM_ENVS
-  --inference           Load environment in inference instead of training mode
+  --inference           Load environment in inference mode instead of training
   --graphics
   --no-graphics
   --timestamp           Append timestamp to run-id. Overrides configuration
@@ -73,34 +101,34 @@ optional arguments:
 ```
 
 #### Example usages
-Create and edit a new grimagents training configuration file or edit an existing one:
+Create and edit a new grimagents configuration file or edit an existing one:
 ```
-grimagents --edit-config grim-agents\config\3DBall.json
+grimagents --edit-config grim-agents\config\3DBall_grimagents.json
 ```
 
-Initiate training with the `3DBall.json` configuration file:
+Initiate training with the `3DBall_grimagents.json` configuration file:
 ```
 grimagents grim-agents\config\3DBall.json
 ```
 
-Initiate training with the `3DBall.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
+Initiate training with the `3DBall_grimagents.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
 ```
-grimagents grim-agents\config\3DBall.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
+grimagents grim-agents\config\3DBall_grimagents.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
 ```
 
-Resume the previous training run:
+Resume the last training run:
 ```
 grimagents --resume
 ```
 
 
-### training_wrapper
+### grimwrapper
 ```
-usage: training_wrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
-                        [--log-filename LOG_FILENAME]
-                        trainer_config_path ...
+usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
+                   trainer_config_path ...
 
-CLI application that wraps mlagents-learn with quality of life improvements.
+CLI application that wraps mlagents-learn with logging to file and automatic
+exporting of trained policy.
 
 positional arguments:
   trainer_config_path   Configuration file that holds brain hyperparameters
@@ -112,44 +140,106 @@ optional arguments:
   --run-id <run-id>     Run id for the training session
   --export-path EXPORT_PATH
                         Export trained models to this path
-  --log-filename LOG_FILENAME
-                        Write log output to this file. Defaults to run-id.
+```
+
+
+### grimsearch
+```
+usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
+                  [--resume <search index>] [--export-index <search index>]
+                  [--random <n>]
+                  configuration_file
+
+CLI application that performs a hyperparameter search
+
+positional arguments:
+  configuration_file    grimagents configuration file with search parameters
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --edit-config <file>  Open a grimagents configuration file for editing. Adds
+                        a default search entry if one is not present.
+  --search-count        Output the total number of searches a grimagents
+                        configuration file will attempt
+  --parallel            Perform all searches in parallel (be careful with this
+                        one!)
+  --resume <search index>
+                        Resume grid search from <search index> (counting from
+                        zero)
+  --export-index <search index>
+                        Export trainer configuration for grid search <index>
+  --random <n>, -r <n>  Execute <n> random searches instead of performing a
+                        grid search
+```
+
+#### Example usages
+Create or edit a grimagents training configuration file (default search parameters are added automatically):
+```
+grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
+```
+
+Initiate grid search with the `3DBall_grimagents.json` configuration file:
+```
+grimsearch grim-agents\config\3DBall.json
 ```
 
 
 ## Configuration
-Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+#### grimagents Configuration
+Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
-All paths stored in configuration files should be relative paths from the MLAgents project root folder to the target asset or folder. This example configuration file is included at `config\3DBall.json`.
+All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run grimagents modules from the `MLAgents` project root folder and configure paths accordingly.
 
-If multiple `trainer-config-path` values are present (and defined as a json array), a unique training process will be launched for each trainer config file specified.
+`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `grimwrapper` or `mlagents-learn`.
 
-`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `training_wrapper` or `mlagents-learn`.
+An example configuration file is included at `config\3DBall_grimagents.json`.
 
-#### Example configuration file
+
+Example grimagents configuration:
 ```json
 {
-    "trainer-config-path": "config\\3DBall.yaml",
-    "--env": "builds\\3DBall\\Unity Environment.exe",
+    "trainer-config-path": "config\\3DBall_config.yaml",
+    "--env": "builds\\3DBall\\3DBall.exe",
     "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-    "--curriculum": "",
-    "--keep-checkpoints": "",
-    "--lesson": "",
     "--run-id": "3DBall",
-    "--num-runs": "",
-    "--save-freq": "",
-    "--seed": "",
-    "--base-port": "",
-    "--num-envs": "",
-    "--no-graphics": false,
     "--timestamp": true
+}
+```
+
+#### grimsearch Configuration
+Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
+
+`grimsearch` only supports grid searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running a grid search and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
+
+When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
+
+```json
+{
+    "trainer-config-path": "config\\3DBall_config.yaml",
+    "--env": "builds\\3DBall\\3DBall.exe",
+    "--export-path": "",
+    "--run-id": "3DBall",
+    "--timestamp": true,
+    "search": {
+        "brain": {
+            "name": "3DBallLearning",
+            "hyperparameters":
+            {
+                "beta": [1e-4, 1e-2],
+                "buffer_size_multiple": [4, 10]
+            }
+        }
+    }
 }
 ```
 
 
 ## Notes
-Both `grimagents` and `training_wrapper` initiate training using a Pipenv process call and both initiate training with the current working directory set to the project's root folder. `training_wrapper` potentially works with Linux but is untested while `grimagents` requires Windows.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested while `grimagents` and `grimsearch` require Windows.
 
-The `--resume` argument will not remember how far through a curriculum the previous training run progressed but it will accept a `--lesson` override argument.
+The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
-Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A limited amount of `mlagent-learn`'s output is sent to `stdout` so only that portion will be captured by the log file.
+Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A very limited amount of `mlagent-learn`'s output is sent to `stdout` and only that portion will be captured by the log file.
+

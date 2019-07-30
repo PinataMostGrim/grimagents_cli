@@ -1,20 +1,16 @@
 {
-    "trainer-config-path": [
-        "config\\3DBall.yaml"
-    ],
-    "--env": "builds\\3DBall\\Unity Environment.exe",
+    "trainer-config-path": "config\\3DBall_config.yaml",
+    "--env": "builds\\3DBall\\3DBall.exe",
     "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-    "--curriculum": "",
-    "--keep-checkpoints": "",
-    "--lesson": "",
     "--run-id": "3DBall",
-    "--num-runs": "",
-    "--save-freq": "",
-    "--seed": "",
-    "--base-port": "",
-    "--num-envs": "",
-    "--inference": false,
-    "--no-graphics": false,
     "--timestamp": true,
-    "--log-filename": ""
+    "search": {
+        "brain": {
+            "name": "3DBallLearning",
+            "hyperparameters":
+            {
+                "beta": [1e-4, 1e-2]
+            }
+        }
+    }
 }

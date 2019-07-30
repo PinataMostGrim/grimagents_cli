@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """CLI application that wraps 'mlagents-learn' with several quality of life improvements.
 
-- Initiates training with mlagents-learn
-- Logs mlagents-learn output to file
-- Optionally exports trained models to another location after training finishes (for example, into a Unity project)
+Features:
+- Optionally copies trained models to another location after training finishes (for example, into a Unity project)
 
 Notes:
-- training_wrapper can be executed as a stand-alone script for logging and export features
-- The training process is executed with the project's root folder set as the current working directory
 - Potentially works with Linux (untested)
+- See readme.md for more documentation
 """
 
 import argparse
@@ -21,8 +19,8 @@ import time
 from pathlib import Path
 from subprocess import Popen, PIPE
 
-import settings as settings
-import common as common
+import grimagents.settings as settings
+import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -30,11 +28,16 @@ training_log = logging.getLogger('grimagents.training_wrapper')
 
 def main():
 
+    configure_logging()
+
+    if not common.is_pipenv_present():
+        training_log.error(
+            'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
+        )
+        return
+
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
-
-    log_filename = args.log_filename if args.log_filename else run_id
-    configure_logging(log_filename)
 
     brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
     exported_brains = []
@@ -51,9 +54,8 @@ def main():
         run_id,
     ] + args.args
 
-    cwd = settings.get_project_folder_absolute()
     try:
-        with Popen(command, stdout=PIPE, cwd=cwd, bufsize=1, universal_newlines=True) as p:
+        with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)
@@ -63,8 +65,6 @@ def main():
 
             for line in p.stdout:
                 line = line.rstrip()
-                training_log.info(line)
-
                 match = brain_regex.search(line)
                 if match:
                     exported_brains.append(match.group(1))
@@ -90,40 +90,11 @@ def main():
             )
 
         training_log.info('-' * 63)
-        training_log.info('')
         logging.shutdown()
-
-
-def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained policies into a folder."""
-
-    training_log.info('Exporting brains')
-
-    if not export_path.exists():
-        export_path.mkdir(parents=True, exist_ok=True)
-
-    for brain in brains:
-        source = Path(brain)
-        if not source.exists():
-            continue
-
-        destination = export_path / source.name
-        destination.write_bytes(source.read_bytes())
-
-        training_log.info(f'Exported {destination}')
 
 
 def parse_args(argv):
     """Builds a Namespace object with parsed arguments."""
-
-    # It is important to keep command line argument in parity with mlagents-learn.
-    # As intermixed parsing was not introduced into ArgParser until Python 3.7,
-    # we need to separate parsing into two parsers to accomplish this.
-
-    # The issue with ArgParse in Python 3.6 is that optional arguments will get
-    # collected by argparse.REMAINDER if they are not placed before positional
-    # arguments. As this places an idiosyncratic restriction on the wrapper's
-    # command line argument positioning, another solution needs to be found.
 
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
@@ -136,13 +107,10 @@ def parse_args(argv):
     wrapper_parser.add_argument(
         '--export-path', type=str, help='Export trained models to this path'
     )
-    wrapper_parser.add_argument(
-        '--log-filename', type=str, help='Write log output to this file. Defaults to run-id.'
-    )
 
     parser = argparse.ArgumentParser(
-        prog='training_wrapper',
-        description='CLI application that wraps mlagents-learn with quality of life improvements.',
+        prog='grimwrapper',
+        description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
         parents=[wrapper_parser],
     )
 
@@ -161,7 +129,7 @@ def parse_args(argv):
     return args
 
 
-def configure_logging(log_filename: str):
+def configure_logging():
     """Configures logging for a training session."""
 
     log_config = {
@@ -183,18 +151,32 @@ def configure_logging(log_filename: str):
         "root": {"level": "INFO"},
     }
 
-    log_folder = settings.get_log_folder_absolute()
-    if not log_folder.exists():
-        log_folder.mkdir(parents=True, exist_ok=True)
+    log_file = settings.get_log_file_path()
 
-    log_filename = Path(log_filename)
-    if not log_filename.suffix == '.log':
-        log_filename = log_filename.with_suffix('.log')
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    log_path = log_folder / log_filename.name
-
-    log_config['handlers']['file']['filename'] = log_path
+    log_config['handlers']['file']['filename'] = log_file
     logging.config.dictConfig(log_config)
+
+
+def export_brains(brains: list, export_path: Path):
+    """Exports a list of trained policies into a folder."""
+
+    training_log.info('Exporting brains:')
+
+    if not export_path.exists():
+        export_path.mkdir(parents=True, exist_ok=True)
+
+    for brain in brains:
+        source = Path(brain)
+        if not source.exists():
+            continue
+
+        destination = export_path / source.name
+        destination.write_bytes(source.read_bytes())
+
+        training_log.info(f'Exported {destination}')
 
 
 if __name__ == '__main__':

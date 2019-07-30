@@ -4,12 +4,12 @@ import json
 import logging
 import os
 import subprocess
+import yaml
 
-from io import StringIO
 from pathlib import Path
-from subprocess import PIPE, CREATE_NEW_CONSOLE
+from subprocess import CREATE_NEW_CONSOLE
 
-from . import settings as settings
+import grimagents.settings as settings
 
 
 TRAINING_HISTORY_COUNT = 10
@@ -26,6 +26,9 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     """Executes a command in terminal. Optionally opens a new window or
     echos the provided command."""
 
+    # Subprocess requires all elements of command be strings
+    command = [str(element) for element in command]
+
     if show_command or dry_run:
         command_log.info(' '.join(command))
 
@@ -37,27 +40,6 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
         subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
     else:
         subprocess.run(command, cwd=cwd)
-
-
-def execute_command_and_capture(command: list, cwd=None, show_command=True):
-    """Executes a command in terminal, captures output,
-    prints it, and returns it.
-    """
-
-    if show_command:
-        command_log.info(' '.join(command))
-
-    with subprocess.Popen(
-        command, cwd=cwd, stdout=PIPE, bufsize=1, universal_newlines=True
-    ) as p, StringIO() as buf:
-
-        for line in p.stdout:
-            command_log.info(line, end='')
-            buf.write(line)
-
-        output = buf.getvalue()
-
-    return output
 
 
 def open_file(file_path: Path):
@@ -97,11 +79,47 @@ def write_json_file(json_data, file_path: Path):
 
 
 def load_json_file(file_path: Path):
-    """Load json data from a file."""
+    """Load json data from a file.
+
+    Raises:
+      FileNotFoundError: When file can't be found
+      JSONDecodeError: When the json file can't be parsed
+    """
 
     try:
         with file_path.open('r') as f:
             data = json.load(f)
+    except FileNotFoundError as exception:
+        command_log.error(f'File \'{file_path}\' not found')
+        raise exception
+    except json.decoder.JSONDecodeError as exception:
+        command_log.error(f'Unable to parse \'{file_path}\', {exception}')
+        raise exception
+
+    return data
+
+
+def write_yaml_file(yaml_data, file_path: Path):
+    """Write yaml data to a file."""
+
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    command_log.debug(f'Creating file \'{file_path}\'')
+    with file_path.open(mode='w') as f:
+        yaml.dump(yaml_data, f, indent=4)
+
+
+def load_yaml_file(file_path: Path):
+    """Load yaml data from a file.
+
+    Raises:
+      FileNotFoundError
+    """
+
+    try:
+        with file_path.open('r') as f:
+            data = yaml.safe_load(f)
     except FileNotFoundError as exception:
         command_log.error(f'File \'{file_path}\' not found')
         raise exception
@@ -135,16 +153,20 @@ def load_history():
 def save_to_history(command: list):
     """Saves a training command to the history file."""
 
-    history_file = settings.get_history_file_path()
-    dict = load_history()
+    try:
+        history_file = settings.get_history_file_path()
+        dict = load_history()
 
-    while len(dict['history']) >= TRAINING_HISTORY_COUNT:
-        dict['history'].pop()
+        while len(dict['history']) >= TRAINING_HISTORY_COUNT:
+            dict['history'].pop()
 
-    dict['history'].insert(0, command)
+        dict['history'].insert(0, command)
 
-    with history_file.open(mode='w') as file:
-        json.dump(dict, file, indent=4)
+        with history_file.open(mode='w') as file:
+            json.dump(dict, file, indent=4)
+
+    except json.decoder.JSONDecodeError as error:
+        command_log.warning(f'Unable to save training command to history, {error}')
 
 
 def load_last_history():

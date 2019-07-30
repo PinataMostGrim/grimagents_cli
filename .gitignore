@@ -9,6 +9,11 @@ __pycache__/
 *.vscode/
 *.code-workspace
 
+# Python build files
+dist/
+build/
+*.egg-info*
+
 # Misc files
 grimagents/history
 logs/*

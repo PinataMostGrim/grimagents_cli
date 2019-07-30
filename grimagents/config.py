@@ -1,38 +1,48 @@
-"""Loads configuration files, fetches loaded configuration values and parses
-training arguments from configuration values.
+"""Creates new configuration files, loads configuration files for editing, and validates loaded configurations.
 
 Notes:
-- All path configuration values should be a relative path from MLAgents' project root folder to the target asset or folder
-- `--export-path` and `--logname` configuration values apply to training_wrapper
+- All path values should be a relative path from the MLAgents project root folder
+- The `--export-path` configuration value is consumed by training_wrapper.py
 """
 
 import logging
-
 from pathlib import Path
-from . import command_util as command_util
+
+import yaml
+
+import grimagents.command_util as command_util
 
 
-# Default configuration values
+# Configuration keys
 TRAINER_CONFIG_PATH = 'trainer-config-path'
+ENV = '--env'
+LESSON = '--lesson'
 RUN_ID = '--run-id'
+EXPORT_PATH = '--export-path'
+BASE_PORT = '--base-port'
+NUM_ENVS = '--num-envs'
+INFERENCE = '--inference'
+NO_GRAPHICS = '--no-graphics'
+TIMESTAMP = '--timestamp'
+SEARCH = 'search'
+
 
 _DEFAULT_GRIM_CONFIG = {
     TRAINER_CONFIG_PATH: '',
-    '--env': '',
-    '--export-path': '',
+    ENV: '',
+    EXPORT_PATH: '',
     '--curriculum': '',
     '--keep-checkpoints': '',
-    '--lesson': '',
+    LESSON: '',
     RUN_ID: 'ppo',
     '--num-runs': '',
     '--save-freq': '',
     '--seed': '',
-    '--base-port': '',
-    '--num-envs': '',
-    '--inference': False,
-    '--no-graphics': False,
-    '--timestamp': False,
-    '--log-filename': None,
+    BASE_PORT: '',
+    NUM_ENVS: '',
+    INFERENCE: False,
+    NO_GRAPHICS: False,
+    TIMESTAMP: False,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
@@ -68,6 +78,31 @@ _DEFAULT_CURRICULUM = {
 }
 
 
+_DEFAULT_SEARCH_CONFIG = {
+    "brain": {
+        "name": "BRAIN_NAME",
+        "hyperparameters": {
+            "batch_size": [512, 5120],
+            "beta": [1e-4, 1e-2],
+            "buffer_size_multiple": [4, 10],
+            "curiosity_strength": [0.001, 0.1],
+            "curiosity_enc_size": [64, 256],
+            "epsilon": [0.1, 0.3],
+            "gamma": [0.8, 0.995],
+            "hidden_units": [32, 512],
+            "lambd": [0.9, 0.95],
+            "learning_rate": [1e-5, 1e-3],
+            "max_steps": [5e5, 1e7],
+            "memory_size": [64, 512],
+            "num_layers": [1, 3],
+            "num_epoch": [3, 10],
+            "time_horizon": [32, 2048],
+            "sequence_length": [4, 128],
+        },
+    }
+}
+
+
 config_log = logging.getLogger('grimagents.config')
 
 
@@ -79,7 +114,7 @@ class InvalidConfigurationError(ConfigurationError):
     """An error occurred while loading a configuration file."""
 
 
-def edit_grim_config_file(file_path: Path):
+def edit_grim_config_file(file_path: Path, add_search=False):
     """Opens a grimagents configuration file with the system's default editor.
     Creates a configuration file with default values if file does not already exist.
     """
@@ -89,6 +124,12 @@ def edit_grim_config_file(file_path: Path):
 
     if not file_path.exists():
         create_grim_config_file(file_path)
+
+    if add_search:
+        config = command_util.load_json_file(file_path)
+        if SEARCH not in config:
+            config[SEARCH] = get_default_search_config()
+            command_util.write_json_file(config, file_path)
 
     command_util.open_file(file_path)
 
@@ -105,11 +146,28 @@ def get_default_grim_config():
     return _DEFAULT_GRIM_CONFIG.copy()
 
 
+def get_default_trainer_config():
+    """Fetches the default trainer configuration."""
+
+    return yaml.safe_load(_DEFAULT_TRAINER_CONFIG)
+
+
+def get_default_curriculum():
+    """Fetches the default curriculum."""
+
+    return _DEFAULT_CURRICULUM.copy()
+
+
+def get_default_search_config():
+    """Fetches a copy of the default search configuration dictionary."""
+
+    return _DEFAULT_SEARCH_CONFIG.copy()
+
+
 def load_grim_config_file(file_path: Path):
     """Loads a grimagents configuration dictionary from file.
 
     Raises:
-      FileNotFoundError: An error occurred while attempting to load a configuration file.
       InvalidConfigurationError: The specified configuration file is not valid.
     """
 
@@ -137,6 +195,10 @@ def validate_grim_configuration(configuration):
     # configuration, but it should not contain any keys that do not exist
     # in the full configuration.
     for key, value in configuration.items():
+        # 'search' is not defined in the default configuration but is still a valid key.
+        if key == SEARCH:
+            continue
+
         try:
             default_config[key]
         except KeyError:
@@ -156,6 +218,14 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
+def load_trainer_configuration(file_path: Path):
+    """Loads a MLAgents trainer configuration from a yaml file.
+    """
+
+    configuration = command_util.load_yaml_file(file_path)
+    return configuration
+
+
 def edit_trainer_configuration_file(file_path: Path):
     """Opens a trainer configuration file for editing. Creates a configuration
     file with default values if file does not already exit.
@@ -173,7 +243,7 @@ def edit_trainer_configuration_file(file_path: Path):
 def create_trainer_configuration_file(file_path: Path):
     """Creates a trainer configuration file with default values at the specified path."""
 
-    command_util.write_file(_DEFAULT_TRAINER_CONFIG, file_path)
+    command_util.write_yaml_file(get_default_trainer_config(), file_path)
 
 
 def edit_curriculum_file(file_path: Path):
@@ -193,4 +263,4 @@ def edit_curriculum_file(file_path: Path):
 def create_curriculum_file(file_path: Path):
     """Creates a curriculum file with default values at the specified path."""
 
-    command_util.write_json_file(_DEFAULT_CURRICULUM, file_path)
+    command_util.write_json_file(get_default_curriculum(), file_path)
