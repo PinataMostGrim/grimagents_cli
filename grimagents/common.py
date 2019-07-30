@@ -8,19 +8,18 @@ def is_pipenv_present():
     """Returns True if a virtual environment can be accessed through Pipenv and False if it can't.
     """
 
-    process = subprocess.run(
-        ['pipenv', '--venv'],
-        universal_newlines=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    # TODO: Handle case where pipenv is not present on PATH
-
-    if 'No virtualenv has been created for this project yet!' in process.stderr:
+    try:
+        process = subprocess.run(
+            ['pipenv', '--venv'],
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except FileNotFoundError:
+        # Guard against Pipenv not being accessible via a subprocess call.
         return False
 
-    return True
+    return process.returncode == 0
 
 
 def get_timestamp():
