@@ -96,10 +96,6 @@ def main():
 def parse_args(argv):
     """Builds a Namespace object with parsed arguments."""
 
-    # It is important to keep command line argument in parity with mlagents-learn.
-    # As intermixed parsing was not introduced into ArgParser until Python 3.7,
-    # we need to separate parsing into two parsers to accomplish this.
-
     wrapper_parser = argparse.ArgumentParser(add_help=False)
     wrapper_parser.add_argument(
         '--run-id',
