@@ -246,7 +246,7 @@ def parse_args(argv):
     # Parser for arguments that are passed on to the training wrapper
     parser = argparse.ArgumentParser(
         prog='grimagents',
-        description='CLI application that wraps Unity ML-Agents with quality of life improvements.',
+        description='CLI application that wraps Unity ML-Agents with more automation.',
         parents=[options_parser, overrides_parser],
     )
 

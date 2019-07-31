@@ -1,5 +1,5 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with several quality of life improvements.
+**grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
 
 **main** features include:
 - Initiate training using arguments loaded from a configuration file
@@ -65,7 +65,7 @@ usage: grimagents [-h] [--list] [--edit-config <file>]
                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                   configuration_file ...
 
-CLI application that wraps Unity ML-Agents with quality of life improvements.
+CLI application that wraps Unity ML-Agents with more automation.
 
 positional arguments:
   configuration_file    Configuration file to extract training arguments from
@@ -127,8 +127,8 @@ grimagents --resume
 usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
                    trainer_config_path ...
 
-CLI application that wraps mlagents-learn with logging to file and automatic
-exporting of trained policy.
+CLI application that wraps mlagents-learn with automatic exporting of trained
+policies.
 
 positional arguments:
   trainer_config_path   Configuration file that holds brain hyperparameters
