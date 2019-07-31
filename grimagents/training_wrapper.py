@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI application that wraps 'mlagents-learn' with several quality of life improvements.
+"""CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
 - Optionally copies trained models to another location after training finishes (for example, into a Unity project)
@@ -110,7 +110,7 @@ def parse_args(argv):
 
     parser = argparse.ArgumentParser(
         prog='grimwrapper',
-        description='CLI application that wraps mlagents-learn with logging to file and automatic exporting of trained policy.',
+        description='CLI application that wraps mlagents-learn with automatic exporting of trained policies.',
         parents=[wrapper_parser],
     )
 
