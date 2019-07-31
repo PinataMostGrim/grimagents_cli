@@ -9,11 +9,10 @@
 - *(Optional)* Launch training session in a new console window
 
 **grimwrapper** features include:
-- Log `mlagents-learn` output to file
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
 
 **grimsearch** features include:
-- Grid search and random search for hyperparameters
+- Grid search and random search hyperparameters
 
 
 ## Requirements
@@ -241,5 +240,5 @@ When the `--random` argument is used, a random value is chosen between the minim
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
-Log files are written into `grim-agents\logs` by default, but this can be changed in `settings.py`. A very limited amount of `mlagent-learn`'s output is sent to `stdout` and only that portion will be captured by the log file.
+grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
