@@ -39,7 +39,7 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    brain_regex = re.compile(r'\A.*DONE: wrote (.*\.nn) file.')
+    exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
     exported_brains = []
 
     # Note: As these arguments are being passed directly into popen,
@@ -55,7 +55,7 @@ def main():
     ] + args.args
 
     try:
-        with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True) as p:
+        with Popen(command, stdout=sys.stderr, stderr=PIPE, bufsize=2, universal_newlines=True) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)
@@ -63,9 +63,13 @@ def main():
 
             start_time = time.perf_counter()
 
-            for line in p.stdout:
+            for line in p.stderr:
+                # Print intercepted line so it is visible in the console
                 line = line.rstrip()
-                match = brain_regex.search(line)
+                print(line)
+
+                # Search for exported brains
+                match = exported_brain_regex.search(line)
                 if match:
                     exported_brains.append(match.group(1))
 
