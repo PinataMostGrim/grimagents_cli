@@ -42,6 +42,9 @@ def main():
     exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
     exported_brains = []
 
+    mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)")
+    mean_reward = 0
+
     # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
     # paths with spaces in them.
@@ -68,6 +71,11 @@ def main():
                 line = line.rstrip()
                 print(line)
 
+                # Store last mean reward
+                match = mean_reward_regex.search(line)
+                if match:
+                    mean_reward = match.group(2)
+
                 # Search for exported brains
                 match = exported_brain_regex.search(line)
                 if match:
@@ -93,6 +101,7 @@ def main():
                 f'Training was not completed successfully. (error code {p.returncode})'
             )
 
+        training_log.info(f'Final Mean Reward: {mean_reward}')
         training_log.info('-' * 63)
         logging.shutdown()
 
