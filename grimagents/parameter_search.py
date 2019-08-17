@@ -18,16 +18,14 @@ class InvalidIntersectIndex(GridSearchError):
     pass
 
 
-class GridSearch:
-    """Object that facilitates performing hyperparameter grid searches."""
-
+class ParameterSearch:
+    """Object that facilitates performing hyperparameter searches."""
     def __init__(self, search_config, trainer_config):
         self.search_config = None
         self.trainer_config = None
         self.brain_name = ''
         self.hyperparameters = []
         self.hyperparameter_sets = []
-        self.search_permutations = []
         self.brain_config = {}
 
         self.set_search_config(search_config)
@@ -39,7 +37,6 @@ class GridSearch:
         self.brain_name = self.search_config['brain']['name']
         self.hyperparameters = self.get_search_hyperparameters(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
-        self.search_permutations = self.get_search_permutations(self.hyperparameter_sets)
 
     @staticmethod
     def get_search_hyperparameters(search_config):
@@ -56,12 +53,6 @@ class GridSearch:
             search_sets.append(values)
 
         return search_sets
-
-    @staticmethod
-    def get_search_permutations(hyperparameter_sets):
-        """Returns a two dimensional list of grid search permutations."""
-
-        return list(itertools.product(*hyperparameter_sets))
 
     def set_trainer_config(self, trainer_config):
 
@@ -98,27 +89,6 @@ class GridSearch:
 
         return result
 
-    def get_intersect(self, index):
-        """Returns a two dimensional list containing the search parameters to use for a given intersect (index) in the grid search.
-
-        Raises:
-          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
-        """
-
-        try:
-            result = dict(zip(self.hyperparameters, self.search_permutations[index]))
-        except IndexError:
-            raise InvalidIntersectIndex(
-                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
-            )
-
-        return result
-
-    def get_intersect_count(self):
-        """Returns the total count of search permutations for this GridSearch."""
-
-        return len(self.search_permutations)
-
     def get_brain_config_for_intersect(self, intersect):
         """Returns a brain configuration dictionary with values overridden by the grid search intersect.
         """
@@ -146,7 +116,43 @@ class GridSearch:
         return brain_config['default']['batch_size']
 
 
-class RandomSearch(GridSearch):
+class GridSearch(ParameterSearch):
+    """Object that facilitates performing hyperparameter grid searches."""
+
+    def __init__(self, search_config, trainer_config):
+
+        super().__init__(search_config, trainer_config)
+        self.search_permutations = self.get_search_permutations(self.hyperparameter_sets)
+
+    @staticmethod
+    def get_search_permutations(hyperparameter_sets):
+        """Returns a two dimensional list of grid search permutations."""
+
+        return list(itertools.product(*hyperparameter_sets))
+
+    def get_intersect(self, index):
+        """Returns a dictionary containing the search parameters to use for a given intersect (index) in the grid search.
+
+        Raises:
+          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+        """
+
+        try:
+            result = dict(zip(self.hyperparameters, self.search_permutations[index]))
+        except IndexError:
+            raise InvalidIntersectIndex(
+                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
+            )
+
+        return result
+
+    def get_intersect_count(self):
+        """Returns the total count of search permutations for this GridSearch."""
+
+        return len(self.search_permutations)
+
+
+class RandomSearch(ParameterSearch):
     """Object that facilitates performing hyperparameter random searches."""
 
     @staticmethod
@@ -174,7 +180,7 @@ class RandomSearch(GridSearch):
         return result
 
 
-class BayesianSearch(GridSearch):
+class BayesianSearch(ParameterSearch):
     """Object that facilitates performing hyperparameter bayesian searches."""
 
     @staticmethod
