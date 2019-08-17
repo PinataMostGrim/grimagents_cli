@@ -88,7 +88,7 @@ class SearchCommand(Command):
         if self.args.parallel:
             command = ['cmd', '/K'] + command
             base_port = self.grim_config.get('--base-port', 5005)
-            command = command + ['--base-port', base_port + index]
+            command = command + ['--base-port', base_port + self.search_counter]
             command = [str(element) for element in command]
             subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
