@@ -1,6 +1,6 @@
 import pytest
 
-from grimagents.grid_search import (
+from grimagents.parameter_search import (
     GridSearch,
     RandomSearch,
     InvalidTrainerConfig,

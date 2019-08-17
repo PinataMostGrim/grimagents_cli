@@ -23,7 +23,7 @@ import grimagents.config as config_util
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.grid_search import GridSearch, RandomSearch
+from grimagents.parameter_search import GridSearch, RandomSearch
 
 
 search_log = logging.getLogger('grimagents.search')
