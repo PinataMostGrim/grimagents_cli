@@ -42,7 +42,7 @@ def main():
     exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
     exported_brains = []
 
-    mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)")
+    mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
     mean_reward = 0
 
     # Note: As these arguments are being passed directly into popen,
@@ -92,13 +92,13 @@ def main():
         end_time = time.perf_counter()
         training_duration = common.get_human_readable_duration(end_time - start_time)
 
-        training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}.')
+        training_log.info(f'\nTraining run \'{run_id}\' ended after {training_duration}')
 
         if p.returncode == 0:
-            training_log.info('Training completed successfully.')
+            training_log.info('Training completed successfully')
         else:
             training_log.warning(
-                f'Training was not completed successfully. (error code {p.returncode})'
+                f'Training was not completed successfully (error code {p.returncode})'
             )
 
         training_log.info(f'Final Mean Reward: {mean_reward}')
