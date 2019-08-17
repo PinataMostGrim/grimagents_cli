@@ -44,7 +44,7 @@ def main():
         ExportGridSearchConfiguration(args).execute()
     elif args.random:
         PerformRandomSearch(args).execute()
-    elif args.bayes:
+    elif args.bayesian:
         PerformBayesianSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
@@ -92,11 +92,12 @@ def parse_args(argv):
         help='Execute <n> random searches instead of performing a grid search',
     )
     options_parser.add_argument(
-        '--bayes',
+        '--bayesian',
         '-b',
-        metavar='<n>',
+        metavar=('<exploration_steps>', '<optimization_steps>'),
         type=int,
-        help='Execute <n> bayesian searches instead of performing a grid search',
+        nargs=2,
+        help='Execute Bayesian Search using a number of exploration steps and optimization steps',
     )
 
     parser = argparse.ArgumentParser(

@@ -226,7 +226,7 @@ class PerformBayesianSearch(SearchCommand):
             pbounds=bounds,
             random_state=1)
 
-        optimizer.maximize(init_points=2, n_iter=self.args.bayes)
+        optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
         print(optimizer.max)
 
     def perform_bayes_search(self, **kwargs):
