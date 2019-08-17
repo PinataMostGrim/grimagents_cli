@@ -13,9 +13,11 @@ See readme.md for more documentation.
 import argparse
 import logging
 import logging.config
+import re
 import subprocess
 import sys
 
+from bayes_opt import BayesianOptimization
 from pathlib import Path
 
 import grimagents.command_util as command_util
@@ -23,10 +25,11 @@ import grimagents.config as config_util
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.parameter_search import GridSearch, RandomSearch
+from grimagents.parameter_search import GridSearch, RandomSearch, BayesianSearch
 
 
 search_log = logging.getLogger('grimagents.search')
+reward_regex = re.compile(r'Final Mean Reward: (\d*[.,]?\d*)')
 
 
 class Command:
@@ -62,7 +65,7 @@ class SearchCommand(Command):
 
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
 
-        self.run_counter = 0
+        self.search_counter = 0
 
     def perform_search_with_configuration(self, intersect, search_brain_config):
         """Executes a search using the provided intersect and matching brain_config."""
@@ -70,13 +73,13 @@ class SearchCommand(Command):
         # Write trainer configuration file for current intersect
         if self.args.parallel:
             self.search_config_path = self.search_config_path.with_name(
-                f'search_config{self.run_counter:02d}.yaml'
+                f'search_config{self.search_counter:02d}.yaml'
             )
 
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
         # Execute training with the intersect config and run_id
-        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.run_counter:02d}'
+        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
         command = [
             'pipenv',
             'run',
@@ -107,7 +110,7 @@ class SearchCommand(Command):
             command = [str(element) for element in command]
             subprocess.run(command)
 
-        self.run_counter += 1
+        self.search_counter += 1
 
 
 class GridSearchCommand(SearchCommand):
@@ -211,6 +214,89 @@ class PerformRandomSearch(SearchCommand):
             search_log.info('Random search complete\n')
 
 
+class PerformBayesianSearch(SearchCommand):
+    def __init__(self, args):
+
+        super().__init__(args)
+        self.bayes_search = BayesianSearch(self.search_config, self.trainer_config)
+
+    def execute(self):
+
+        # TODO: Warning about --parallel flag being incompatible with bayes search
+
+        search_log.info('-' * 63)
+        search_log.info('Performing bayesian search for hyperparameters:')
+        for i in range(len(self.bayes_search.hyperparameters)):
+            search_log.info(
+                f'    {self.bayes_search.hyperparameters[i]}: {self.bayes_search.hyperparameter_sets[i]}'
+            )
+        search_log.info('-' * 63)
+
+        bounds = self.bayes_search.get_parameter_bounds(self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets)
+
+        optimizer = BayesianOptimization(
+            f=self.perform_bayes_search,
+            pbounds=bounds,
+            random_state=1)
+
+        optimizer.maximize(init_points=2, n_iter=self.args.bayes)
+        print(optimizer.max)
+
+    def perform_bayes_search(self, **kwargs):
+        """Executes a search using the provided intersect and matching brain_config."""
+
+        # Sanitize configuration from BayesianOptimization object and write trainer configuration to file
+        intersect = self.bayes_search.sanitize_parameter_values(kwargs)
+        bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
+        command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
+
+        # # Execute training with the intersect config and run_id
+        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
+        command = [
+            'pipenv',
+            'run',
+            'python',
+            '-m',
+            'grimagents',
+            self.grim_config_path,
+            '--trainer-config',
+            self.search_config_path,
+            '--run-id',
+            run_id,
+        ]
+
+        search_log.info('-' * 63)
+        search_log.info(f'Search {run_id}:')
+        for key, value in intersect.items():
+            search_log.info(f'    {key}: {value}')
+        search_log.info('-' * 63)
+
+        command = [str(element) for element in command]
+        subprocess.run(command)
+
+        self.search_counter += 1
+        return self.get_last_mean_reward_from_log()
+
+
+    @staticmethod
+    def get_last_mean_reward_from_log():
+        """Returns the last Final Mean Reward value recorded in the grimagents log file,
+        or 0 if no value is found.
+
+        """
+
+        log_file = settings.get_log_file_path()
+        last_lines = command_util.load_last_lines_from_file(log_file, 50)
+
+        reward = 0
+        for line in last_lines:
+            match = reward_regex.search(line)
+            if match:
+                reward = match.group(1)
+
+        return float(reward)
+
+
 def main():
 
     configure_logging()
@@ -230,6 +316,8 @@ def main():
         ExportGridSearchConfiguration(args).execute()
     elif args.random:
         PerformRandomSearch(args).execute()
+    elif args.bayes:
+        PerformBayesianSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
 
@@ -274,6 +362,13 @@ def parse_args(argv):
         metavar='<n>',
         type=int,
         help='Execute <n> random searches instead of performing a grid search',
+    )
+    options_parser.add_argument(
+        '--bayes',
+        '-b',
+        metavar='<n>',
+        type=int,
+        help='Execute <n> bayesian searches instead of performing a grid search',
     )
 
     parser = argparse.ArgumentParser(

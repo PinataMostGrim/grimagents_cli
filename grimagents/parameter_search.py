@@ -172,3 +172,40 @@ class RandomSearch(GridSearch):
 
         result = dict(zip(self.hyperparameters, randomized_hyperparameters))
         return result
+
+
+class BayesianSearch(GridSearch):
+    """Object that facilitates performing hyperparameter bayesian searches."""
+
+    @staticmethod
+    def get_parameter_bounds(parameter_names, parameter_values):
+        """Returns a parameter bounds dictionary for consumption by a BayesianOptimization object.
+        """
+
+        bounds = {}
+        for i in range(len(parameter_names)):
+
+            # The BayesianOptimization object requires two values for every parameter
+            # so we duplicate an existing element if only one is present.
+            if len(parameter_values[i]) < 2:
+                parameter_values[i].append(parameter_values[i][0])
+
+            bounds[parameter_names[i]] = parameter_values[i]
+
+        return bounds
+
+    @staticmethod
+    def sanitize_parameter_values(bounds):
+        """Enforces int type on parameters that should be int, and ensures native value types are used.
+
+        BayesianOptimization objects like to return numpy floats, which cause problems with yaml serialization.
+
+        """
+        for key, value in bounds.items():
+            if key == 'batch_size' or key == 'buffer_size_multiple' or key == 'hidden_units' or key == 'num_epoch' or key == 'num_layers' or key == 'time_horizon' or key == 'sequence_length' or key == 'curiosity_enc_size':
+                bounds[key] = int(value)
+                continue
+
+            bounds[key] = value.item()
+
+        return bounds
