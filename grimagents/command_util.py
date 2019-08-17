@@ -1,5 +1,6 @@
 """Facilitates executing system commands and opening files."""
 
+import collections
 import json
 import logging
 import os
@@ -185,3 +186,17 @@ def load_last_history():
     except IndexError:
         command_log.error('History file is empty')
         raise CommandUtilError('History file is empty')
+
+
+def load_last_lines_from_file(file_path: Path, line_count):
+    """ Returns the last <n> number of lines from a file.
+
+    While the entire file is read, lines are read into a circular buffer so as to not consume large amounts of memory.
+    """
+
+    queue = collections.deque(maxlen=line_count)
+    with file_path.open('r') as f:
+        for line in f:
+            queue.append(line.rstrip())
+
+    return [line for line in queue]
