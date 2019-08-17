@@ -208,7 +208,8 @@ class PerformBayesianSearch(SearchCommand):
 
     def execute(self):
 
-        # TODO: Warning about --parallel flag being incompatible with bayes search
+        if self.args.parallel:
+            search_log.warning('The \'--parallel\' argument is not compatible with Bayesian Search and will be ignored.')
 
         search_log.info('-' * 63)
         search_log.info('Performing bayesian search for hyperparameters:')
@@ -231,7 +232,6 @@ class PerformBayesianSearch(SearchCommand):
     def perform_bayes_search(self, **kwargs):
         """Executes a search using the provided intersect and matching brain_config."""
 
-        # Sanitize configuration from BayesianOptimization object and write trainer configuration to file
         intersect = self.bayes_search.sanitize_parameter_values(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
