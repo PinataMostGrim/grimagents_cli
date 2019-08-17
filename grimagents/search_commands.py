@@ -96,8 +96,6 @@ class SearchCommand(Command):
             command = [str(element) for element in command]
             subprocess.run(command)
 
-        self.search_counter += 1
-
 
 class GridSearchCommand(SearchCommand):
     def __init__(self, args):
@@ -146,6 +144,7 @@ class PerformGridSearch(GridSearchCommand):
 
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
+            self.search_counter = i
 
             self.perform_search_with_configuration(intersect, intersect_brain_config)
 
@@ -190,6 +189,7 @@ class PerformRandomSearch(SearchCommand):
 
             intersect = self.random_search.get_randomized_intersect()
             intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
+            self.search_counter = i
 
             self.perform_search_with_configuration(intersect, intersect_brain_config)
 
