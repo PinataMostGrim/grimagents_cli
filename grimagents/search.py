@@ -62,19 +62,21 @@ class SearchCommand(Command):
 
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
 
-    def perform_search_with_configuration(self, intersect, search_brain_config, index=0):
+        self.run_counter = 0
+
+    def perform_search_with_configuration(self, intersect, search_brain_config):
         """Executes a search using the provided intersect and matching brain_config."""
 
         # Write trainer configuration file for current intersect
         if self.args.parallel:
             self.search_config_path = self.search_config_path.with_name(
-                f'search_config{index:02d}.yaml'
+                f'search_config{self.run_counter:02d}.yaml'
             )
 
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
         # Execute training with the intersect config and run_id
-        run_id = self.grim_config[config_util.RUN_ID] + f'_{index:02d}'
+        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.run_counter:02d}'
         command = [
             'pipenv',
             'run',
@@ -104,6 +106,8 @@ class SearchCommand(Command):
         else:
             command = [str(element) for element in command]
             subprocess.run(command)
+
+        self.run_counter += 1
 
 
 class GridSearchCommand(SearchCommand):
@@ -154,7 +158,7 @@ class PerformGridSearch(GridSearchCommand):
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
 
-            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
+            self.perform_search_with_configuration(intersect, intersect_brain_config)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -198,7 +202,7 @@ class PerformRandomSearch(SearchCommand):
             intersect = self.random_search.get_randomized_intersect()
             intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
 
-            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
+            self.perform_search_with_configuration(intersect, intersect_brain_config)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
