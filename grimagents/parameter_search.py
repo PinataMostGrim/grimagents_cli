@@ -106,7 +106,7 @@ class GridSearch:
         """
 
         try:
-            result = list(zip(self.hyperparameters, self.search_permutations[index]))
+            result = dict(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
             raise InvalidIntersectIndex(
                 f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
@@ -124,8 +124,8 @@ class GridSearch:
         """
 
         result = self.brain_config.copy()
-        for hyperparameter in intersect:
-            result[self.brain_name][hyperparameter[0]] = hyperparameter[1]
+        for key, value in intersect.items():
+            result[self.brain_name][key] = value
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
         if 'buffer_size_multiple' in result[self.brain_name]:
@@ -147,6 +147,7 @@ class GridSearch:
 
 
 class RandomSearch(GridSearch):
+    """Object that facilitates performing hyperparameter random searches."""
 
     @staticmethod
     def get_random_value(values, seed=None):
@@ -156,6 +157,7 @@ class RandomSearch(GridSearch):
             random.seed(seed)
 
         for element in values:
+            # If values contain one or more floats, return a random float
             if isinstance(element, float):
                 return random.uniform(min(values), max(values))
 
@@ -168,5 +170,5 @@ class RandomSearch(GridSearch):
         for i in range(len(self.hyperparameters)):
             randomized_hyperparameters.append(self.get_random_value(self.hyperparameter_sets[i], seed=seed))
 
-        result = list(zip(self.hyperparameters, randomized_hyperparameters))
+        result = dict(zip(self.hyperparameters, randomized_hyperparameters))
         return result

@@ -90,8 +90,8 @@ class SearchCommand(Command):
 
         search_log.info('-' * 63)
         search_log.info(f'Search {run_id}:')
-        for j in range(len(intersect)):
-            search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
+        for key, value in intersect.items():
+            search_log.info(f'    {key}: {value}')
         search_log.info('-' * 63)
 
         if self.args.parallel:
