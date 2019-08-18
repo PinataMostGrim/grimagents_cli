@@ -28,6 +28,55 @@ exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
 mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
 
 
+class TrainingRunInfo():
+    def __init__(self):
+
+        self.step = 0
+        self.steps_remaining = 0
+        self.max_steps = 0
+        self.time_elapsed = 0
+        self.time_remaining = 0
+        self.mean_reward = 0
+        self.exported_brains = []
+
+        self.steps_regex = re.compile(r'Step: ([\d]+)\. ')
+        self.time_regex = re.compile(r'Time Elapsed: ([\.\d]+) s')
+        self.max_steps_regex = re.compile(r'max_steps:\t(.+)$')
+        self.mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
+        self.exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
+
+    def update_from_training_output(self, line):
+
+        if self.max_steps == 0:
+            match = self.max_steps_regex.search(line)
+            if match:
+                self.max_steps = int(float(match.group(1)))
+
+        match = self.steps_regex.search(line)
+        if match:
+            self.step = int(match.group(1))
+            self.steps_remaining = self.max_steps - self.step
+
+        match = self.time_regex.search(line)
+        if match:
+            self.time_elapsed = float(match.group(1))
+
+        match = mean_reward_regex.search(line)
+        if match:
+            self.mean_reward = match.group(2)
+
+        match = exported_brain_regex.search(line)
+        if match:
+            self.exported_brains.append(match.group(1))
+
+        if self.max_steps != 0 and self.step != 0:
+            self.time_remaining = (self.time_elapsed / self.step) * self.steps_remaining
+
+    def line_has_time_elapsed(self, line):
+
+        return self.time_regex.search(line) is not None
+
+
 def main():
 
     configure_logging()
