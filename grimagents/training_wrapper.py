@@ -28,7 +28,7 @@ exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
 mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
 
 
-class TrainingRunInfo():
+class TrainingRunInfo:
     def __init__(self):
 
         self.step = 0
@@ -92,9 +92,6 @@ def main():
 
     training_info = TrainingRunInfo()
 
-    # Note: As these arguments are being passed directly into popen,
-    # the trainer path does not need to be enclosed in quotes to support
-    # paths with spaces in them.
     command = [
         'pipenv',
         'run',
@@ -123,7 +120,9 @@ def main():
                 training_info.update_from_training_output(line)
 
                 if training_info.line_has_time_elapsed(line):
-                    print(f'Estimated time remaining: {common.get_human_readable_duration(training_info.time_remaining)}')
+                    print(
+                        f'Estimated time remaining: {common.get_human_readable_duration(training_info.time_remaining)}'
+                    )
 
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
