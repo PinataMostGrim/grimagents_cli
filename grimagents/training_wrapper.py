@@ -24,6 +24,8 @@ import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
+exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
+mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
 
 
 def main():
@@ -39,10 +41,7 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
     exported_brains = []
-
-    mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
     mean_reward = 0
 
     # Note: As these arguments are being passed directly into popen,
