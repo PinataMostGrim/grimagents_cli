@@ -1,8 +1,10 @@
+import numpy
 import pytest
 
 from grimagents.parameter_search import (
     GridSearch,
     RandomSearch,
+    BayesianSearch,
     InvalidTrainerConfig,
     InvalidIntersectIndex,
 )
@@ -214,3 +216,48 @@ def test_get_random_intersect(search_config, trainer_config):
     random_intersect = search.get_randomized_intersect(seed=9871237)
 
     assert random_intersect == {'beta': 0.008715030393329336, 'hidden_units': 477, 'learning_rate': 0.0008715030393329336, 'num_layers': 1, 'num_epoch': 4}
+
+
+def test_get_parameter_bounds():
+    """Tests for the correct construction of a parameter bounds dictionary.
+    """
+
+    parameter_names  = ['batch_size', 'buffer_size_multiple', 'beta']
+    parameter_values = [[64, 128], [4], [0.001, 0.0001]]
+
+    result = BayesianSearch.get_parameter_bounds(parameter_names, parameter_values)
+
+    # Test for a dictionary return type
+    assert type(result) is dict
+
+    # Test for a second value inserted for any parameter that only contains one value
+    assert result == {'batch_size': [64, 128], 'buffer_size_multiple': [4, 4], 'beta': [0.001, 0.0001]}
+
+
+def test_sanitize_parameter_values():
+    """Tests that only native value types are returned and values that should be int are converted to int.
+    """
+
+    bounds = {
+        'batch_size': numpy.float64(144.0682249028942),
+        'beta': numpy.float64(0.0028687875149226343),
+        'buffer_size_multiple': numpy.float64(50.017156222601734),
+        'hidden_units': numpy.float64(121.0682249028942),
+        'num_epoch': numpy.float64(5.028942),
+        'num_layers': numpy.float64(2.49028942),
+        'time_horizon': numpy.float64(64.049292),
+        'sequence_length': numpy.float64(144.9028),
+        'curiosity_enc_size': numpy.float64(184.6824928),
+    }
+
+    assert BayesianSearch.sanitize_parameter_values(bounds) == {
+        'batch_size': 144,
+        'beta': 0.0028687875149226343,
+        'buffer_size_multiple': 50,
+        'hidden_units': 121,
+        'num_epoch': 5,
+        'num_layers': 2,
+        'time_horizon': 64,
+        'sequence_length': 144,
+        'curiosity_enc_size': 184
+    }
