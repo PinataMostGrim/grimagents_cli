@@ -58,7 +58,9 @@ def main():
     ] + args.args
 
     try:
-        with Popen(command, stdout=sys.stderr, stderr=PIPE, bufsize=2, universal_newlines=True) as p:
+        with Popen(
+            command, stdout=sys.stderr, stderr=PIPE, bufsize=2, universal_newlines=True
+        ) as p:
 
             training_log.info(f'{" ".join(command[2:])}')
             training_log.info('-' * 63)

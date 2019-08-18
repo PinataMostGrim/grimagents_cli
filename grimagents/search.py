@@ -19,7 +19,14 @@ import sys
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.search_commands import EditGrimConfigFile, OutputGridSearchCount, PerformGridSearch, ExportGridSearchConfiguration, PerformRandomSearch, PerformBayesianSearch
+from grimagents.search_commands import (
+    EditGrimConfigFile,
+    OutputGridSearchCount,
+    PerformGridSearch,
+    ExportGridSearchConfiguration,
+    PerformRandomSearch,
+    PerformBayesianSearch,
+)
 
 
 search_log = logging.getLogger('grimagents.search')

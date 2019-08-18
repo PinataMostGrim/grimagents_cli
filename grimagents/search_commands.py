@@ -210,7 +210,9 @@ class PerformBayesianSearch(SearchCommand):
     def execute(self):
 
         if self.args.parallel:
-            search_log.warning('The \'--parallel\' argument is not compatible with Bayesian Search and will be ignored.')
+            search_log.warning(
+                'The \'--parallel\' argument is not compatible with Bayesian Search and will be ignored.'
+            )
 
         search_log.info('-' * 63)
         search_log.info('Performing bayesian search for hyperparameters:')
@@ -220,12 +222,13 @@ class PerformBayesianSearch(SearchCommand):
             )
         search_log.info('-' * 63)
 
-        bounds = self.bayes_search.get_parameter_bounds(self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets)
+        bounds = self.bayes_search.get_parameter_bounds(
+            self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets
+        )
 
         optimizer = BayesianOptimization(
-            f=self.perform_bayes_search,
-            pbounds=bounds,
-            random_state=1)
+            f=self.perform_bayes_search, pbounds=bounds, random_state=1
+        )
 
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
 
@@ -273,7 +276,6 @@ class PerformBayesianSearch(SearchCommand):
 
         self.search_counter += 1
         return self.get_last_mean_reward_from_log()
-
 
     @staticmethod
     def get_last_mean_reward_from_log():

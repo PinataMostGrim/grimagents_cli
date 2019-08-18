@@ -20,6 +20,7 @@ class InvalidIntersectIndex(GridSearchError):
 
 class ParameterSearch:
     """Object that facilitates performing hyperparameter searches."""
+
     def __init__(self, search_config, trainer_config):
         self.search_config = None
         self.trainer_config = None
@@ -100,7 +101,9 @@ class ParameterSearch:
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
         if 'buffer_size_multiple' in result[self.brain_name]:
             batch_size = self.get_batch_size_value(result, self.brain_name)
-            result[self.brain_name]['buffer_size'] = batch_size * result[self.brain_name]['buffer_size_multiple']
+            result[self.brain_name]['buffer_size'] = (
+                batch_size * result[self.brain_name]['buffer_size_multiple']
+            )
             del result[self.brain_name]['buffer_size_multiple']
 
         return result
@@ -175,7 +178,9 @@ class RandomSearch(ParameterSearch):
 
         randomized_hyperparameters = []
         for i in range(len(self.hyperparameters)):
-            randomized_hyperparameters.append(self.get_random_value(self.hyperparameter_sets[i], seed=seed))
+            randomized_hyperparameters.append(
+                self.get_random_value(self.hyperparameter_sets[i], seed=seed)
+            )
 
         result = dict(zip(self.hyperparameters, randomized_hyperparameters))
         return result
@@ -209,7 +214,16 @@ class BayesianSearch(ParameterSearch):
         """
 
         for key, value in bounds.items():
-            if key == 'batch_size' or key == 'buffer_size_multiple' or key == 'hidden_units' or key == 'num_epoch' or key == 'num_layers' or key == 'time_horizon' or key == 'sequence_length' or key == 'curiosity_enc_size':
+            if (
+                key == 'batch_size'
+                or key == 'buffer_size_multiple'
+                or key == 'hidden_units'
+                or key == 'num_epoch'
+                or key == 'num_layers'
+                or key == 'time_horizon'
+                or key == 'sequence_length'
+                or key == 'curiosity_enc_size'
+            ):
                 bounds[key] = int(value)
                 continue
 
