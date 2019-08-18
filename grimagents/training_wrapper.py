@@ -122,6 +122,8 @@ def main():
 
                 training_info.update_from_training_output(line)
 
+                if training_info.line_has_time_elapsed(line):
+                    print(f'Estimated time remaining: {common.get_human_readable_duration(training_info.time_remaining)}')
 
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
