@@ -2,7 +2,7 @@
 """CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
-- Optionally copies trained models to another location after training finishes (for example, into a Unity project)
+- Optionally copies trained policies to another location after training finishes (for example, into a Unity project)
 
 Notes:
 - Potentially works with Linux (untested)
@@ -119,7 +119,7 @@ def parse_args(argv):
         help='Run id for the training session',
     )
     wrapper_parser.add_argument(
-        '--export-path', type=str, help='Export trained models to this path'
+        '--export-path', type=str, help='Export trained policies to this path'
     )
 
     parser = argparse.ArgumentParser(

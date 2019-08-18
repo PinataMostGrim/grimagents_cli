@@ -215,12 +215,14 @@ def parse_args(argv):
 
     # Parser for arguments that may override configuration values
     overrides_parser = argparse.ArgumentParser(add_help=False)
-    overrides_parser.add_argument('--trainer-config', type=str)
-    overrides_parser.add_argument('--env', type=str)
-    overrides_parser.add_argument('--lesson', type=int)
-    overrides_parser.add_argument('--run-id', type=str)
-    overrides_parser.add_argument('--base-port', type=int)
-    overrides_parser.add_argument('--num-envs', type=int)
+    overrides_parser.add_argument(
+        '--trainer-config', type=str, help='Overrides configuration setting'
+    )
+    overrides_parser.add_argument('--env', type=str, help='Overrides configuration setting')
+    overrides_parser.add_argument('--lesson', type=int, help='Overrides configuration setting')
+    overrides_parser.add_argument('--run-id', type=str, help='Overrides configuration setting')
+    overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
+    overrides_parser.add_argument('--num-envs', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument(
         '--inference',
         action='store_true',
@@ -228,8 +230,12 @@ def parse_args(argv):
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()
-    graphics_group.add_argument('--graphics', action='store_true')
-    graphics_group.add_argument('--no-graphics', action='store_true')
+    graphics_group.add_argument(
+        '--graphics', action='store_true', help='Overrides configuration setting'
+    )
+    graphics_group.add_argument(
+        '--no-graphics', action='store_true', help='Overrides configuration setting'
+    )
 
     timestamp_group = overrides_parser.add_mutually_exclusive_group()
     timestamp_group.add_argument(
