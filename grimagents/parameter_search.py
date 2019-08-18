@@ -159,6 +159,7 @@ class RandomSearch(ParameterSearch):
     def get_random_value(values, seed=None):
         """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise.
         """
+
         if seed is not None:
             random.seed(seed)
 
@@ -201,12 +202,12 @@ class BayesianSearch(ParameterSearch):
         return bounds
 
     @staticmethod
-    def sanitize_parameter_values(bounds):
-        """Enforces int type on parameters that should be int, and ensures native value types are used.
+    def sanitize_parameter_values(bounds: dict):
+        """Enforces int type on parameters that should be int and ensures native value types are used.
 
-        BayesianOptimization objects like to return numpy floats, which cause problems with yaml serialization.
-
+        BayesianOptimization objects return numpy floats, which cause problems with yaml serialization.
         """
+
         for key, value in bounds.items():
             if key == 'batch_size' or key == 'buffer_size_multiple' or key == 'hidden_units' or key == 'num_epoch' or key == 'num_layers' or key == 'time_horizon' or key == 'sequence_length' or key == 'curiosity_enc_size':
                 bounds[key] = int(value)

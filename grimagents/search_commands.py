@@ -80,7 +80,7 @@ class SearchCommand(Command):
         ]
 
         search_log.info('-' * 63)
-        search_log.info(f'Search {run_id}:')
+        search_log.info(f'Search: {run_id}')
         for key, value in intersect.items():
             search_log.info(f'    {key}: {value}')
         search_log.info('-' * 63)
@@ -205,6 +205,7 @@ class PerformBayesianSearch(SearchCommand):
 
         super().__init__(args)
         self.bayes_search = BayesianSearch(self.search_config, self.trainer_config)
+        self.output_config_path = self.trainer_config_path.with_name('bayes_config.yaml')
 
     def execute(self):
 
@@ -227,7 +228,17 @@ class PerformBayesianSearch(SearchCommand):
             random_state=1)
 
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
-        print(optimizer.max)
+
+        search_log.info('-' * 63)
+        search_log.info(f'Best Configuration ({optimizer.max["target"]}):')
+
+        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer.max["params"])
+        for key, value in best_intersect.items():
+            search_log.info(f'    {key}: {value}')
+
+        search_log.info('-' * 30)
+        self.save_max_to_file(optimizer.max)
+        search_log.info('-' * 63)
 
     def perform_bayes_search(self, **kwargs):
         """Executes a search using the provided intersect and matching brain_config."""
@@ -252,7 +263,7 @@ class PerformBayesianSearch(SearchCommand):
         ]
 
         search_log.info('-' * 63)
-        search_log.info(f'Search {run_id}:')
+        search_log.info(f'Search: {run_id}')
         for key, value in intersect.items():
             search_log.info(f'    {key}: {value}')
         search_log.info('-' * 63)
@@ -268,7 +279,6 @@ class PerformBayesianSearch(SearchCommand):
     def get_last_mean_reward_from_log():
         """Returns the last Final Mean Reward value recorded in the grimagents log file,
         or 0 if no value is found.
-
         """
 
         log_file = settings.get_log_file_path()
@@ -281,3 +291,13 @@ class PerformBayesianSearch(SearchCommand):
                 reward = match.group(1)
 
         return float(reward)
+
+    def save_max_to_file(self, max: dict):
+        """Sanitizes a BayesianOptimization object's max parameter, and writes it to a brain configuration file.
+        """
+
+        search_log.info(f'Saving best configuration to file \'{self.output_config_path}\'')
+
+        intersect = self.bayes_search.sanitize_parameter_values(max['params'])
+        best_config = self.bayes_search.get_brain_config_for_intersect(intersect)
+        command_util.write_yaml_file(best_config, self.output_config_path)
