@@ -90,8 +90,7 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    exported_brains = []
-    mean_reward = 0
+    training_info = TrainingRunInfo()
 
     # Note: As these arguments are being passed directly into popen,
     # the trainer path does not need to be enclosed in quotes to support
@@ -121,15 +120,8 @@ def main():
                 line = line.rstrip()
                 print(line)
 
-                # Store last mean reward
-                match = mean_reward_regex.search(line)
-                if match:
-                    mean_reward = match.group(2)
+                training_info.update_from_training_output(line)
 
-                # Search for exported brains
-                match = exported_brain_regex.search(line)
-                if match:
-                    exported_brains.append(match.group(1))
 
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
@@ -137,7 +129,7 @@ def main():
 
     finally:
         if args.export_path:
-            export_brains(exported_brains, Path(args.export_path))
+            export_brains(training_info.exported_brains, Path(args.export_path))
 
         end_time = time.perf_counter()
         training_duration = common.get_human_readable_duration(end_time - start_time)
@@ -151,7 +143,7 @@ def main():
                 f'Training was not completed successfully (error code {p.returncode})'
             )
 
-        training_log.info(f'Final Mean Reward: {mean_reward}')
+        training_log.info(f'Final Mean Reward: {training_info.mean_reward}')
         training_log.info('-' * 63)
         logging.shutdown()
 
@@ -239,7 +231,7 @@ def export_brains(brains: list, export_path: Path):
         destination = export_path / source.name
         destination.write_bytes(source.read_bytes())
 
-        training_log.info(f'Exported {destination}')
+        training_log.info(f'\t{destination}')
 
 
 if __name__ == '__main__':
