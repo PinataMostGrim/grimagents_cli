@@ -9,6 +9,7 @@
 - *(Optional)* Launch training session in a new console window
 
 **grimwrapper** features include:
+- Display estimated time remaining
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
 
 **grimsearch** features include:
@@ -260,3 +261,4 @@ The `grimagents' '--resume` argument will not remember how far through a curricu
 
 grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
+Bayesian search will output the best configuration discovered into a yaml file named `'bayes_config.yaml` next to the trainer config file used for the search.

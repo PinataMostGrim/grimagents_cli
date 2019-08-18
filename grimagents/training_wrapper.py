@@ -2,6 +2,7 @@
 """CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
+- Displays estimated time remaining in training run
 - Optionally copies trained policies to another location after training finishes (for example, into a Unity project)
 
 Notes:
@@ -113,7 +114,7 @@ def main():
             start_time = time.perf_counter()
 
             for line in p.stderr:
-                # Print intercepted line so it is visible in the console
+                # Print intercepted line so it is visible on the console
                 line = line.rstrip()
                 print(line)
 
