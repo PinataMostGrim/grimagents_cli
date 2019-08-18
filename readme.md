@@ -3,7 +3,7 @@
 
 **main** features include:
 - Initiate training using arguments loaded from a configuration file
-- Easily resume the last training run
+- Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
 - *(Optional)* Launch training session in a new console window
@@ -12,7 +12,7 @@
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
 
 **grimsearch** features include:
-- Grid search and random search hyperparameters
+- Grid search, Random search, and Bayesian search for hyperparameters
 
 
 ## Requirements
@@ -85,14 +85,16 @@ optional arguments:
   --resume, -r          Resume the last run
   --dry-run, -n         Print command without executing
   --trainer-config TRAINER_CONFIG
-  --env ENV
-  --lesson LESSON
-  --run-id RUN_ID
+                        Overrides configuration setting
+  --env ENV             Overrides configuration setting
+  --lesson LESSON       Overrides configuration setting
+  --run-id RUN_ID       Overrides configuration setting
   --base-port BASE_PORT
-  --num-envs NUM_ENVS
+                        Overrides configuration setting
+  --num-envs NUM_ENVS   Overrides configuration setting
   --inference           Load environment in inference mode instead of training
-  --graphics
-  --no-graphics
+  --graphics            Overrides configuration setting
+  --no-graphics         Overrides configuration setting
   --timestamp           Append timestamp to run-id. Overrides configuration
                         setting.
   --no-timestamp        Do not append timestamp to run-id. Overrides
@@ -138,7 +140,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --run-id <run-id>     Run id for the training session
   --export-path EXPORT_PATH
-                        Export trained models to this path
+                        Export trained policies to this path
 ```
 
 
@@ -147,6 +149,7 @@ optional arguments:
 usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
                   [--resume <search index>] [--export-index <search index>]
                   [--random <n>]
+                  [--bayesian <exploration_steps> <optimization_steps>]
                   configuration_file
 
 CLI application that performs a hyperparameter search
@@ -169,6 +172,9 @@ optional arguments:
                         Export trainer configuration for grid search <index>
   --random <n>, -r <n>  Execute <n> random searches instead of performing a
                         grid search
+  --bayesian <exploration_steps> <optimization_steps>, -b <exploration_steps> <optimization_steps>
+                        Execute Bayesian Search using a number of exploration
+                        steps and optimization steps
 ```
 
 #### Example usages
@@ -179,7 +185,17 @@ grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
 
 Initiate grid search with the `3DBall_grimagents.json` configuration file:
 ```
-grimsearch grim-agents\config\3DBall.json
+grimsearch grim-agents\config\3DBall_grimagents.json
+```
+
+Initiate 5 random searches with the `3DBall_grimagents.json` configuration file:
+```
+grimsearch grim-agents\config\3DBall_grimagents.json --random 5
+```
+
+Initiate a Bayesian search with the `3DBall_grimagents.json` configuration file using 5 exploration steps and 10 optimization steps:
+```
+grimsearch grim-agents\config\3DBall_grimagents.json --bayesian 5 10
 ```
 
 
@@ -213,6 +229,8 @@ Each hyperparameter value added to the search configuration will dramatically in
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
+
+When the `--bayesian` argument is used, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter involved in the search; a minimum and maximum. The `--parallel` argument will not work in conjunction with Bayesian optimization as this implementation is a serial process.
 
 ```json
 {

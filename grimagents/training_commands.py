@@ -16,13 +16,17 @@ class Command:
 
 
 class TrainingWrapperCommand(Command):
-    """Training Wrapper command"""
+    """Faciliates converting grimagents configuration values into a list of training_wrapper command line arguments.
+
+    """
 
     def __init__(self, arguments: dict):
         self.arguments = arguments.copy()
 
     def apply_argument_overrides(self, args):
-        """Replaces values in the arguments dictionary with the overrides stored in args."""
+        """Replaces values in the arguments dictionary with the overrides stored in args.
+
+        """
 
         if args.trainer_config is not None:
             self.set_trainer_config(args.trainer_config)
@@ -58,6 +62,7 @@ class TrainingWrapperCommand(Command):
         """Converts a configuration dictionary into command line arguments
         for mlagents-learn and filters out values that should not be sent to
         the training process.
+
         """
 
         # We copy arguments in order to mutate it in the event a time-stamp is present.
@@ -163,7 +168,3 @@ class TrainingWrapperCommand(Command):
 
     def set_base_port(self, value):
         self.arguments[config_util.BASE_PORT] = value
-
-
-class MLAgentsLearnCommand(Command):
-    pass
