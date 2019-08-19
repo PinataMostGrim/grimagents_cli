@@ -251,7 +251,7 @@ class PerformBayesianSearch(SearchCommand):
         for key, value in best_intersect.items():
             search_log.info(f'    {key}: {value}')
 
-        search_log.info('-' * 30)
+        search_log.info('-' * 63)
         self.save_max_to_file(optimizer.max)
         search_log.info('-' * 63)
 
@@ -310,7 +310,7 @@ class PerformBayesianSearch(SearchCommand):
         """Sanitizes a BayesianOptimization object's max parameter, and writes it to a brain configuration file.
         """
 
-        search_log.info(f'Saving best configuration to file \'{self.output_config_path}\'')
+        search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
         intersect = self.bayes_search.sanitize_parameter_values(max['params'])
         best_config = self.bayes_search.get_brain_config_for_intersect(intersect)
