@@ -6,6 +6,7 @@ import sys
 from bayes_opt import BayesianOptimization
 from bayes_opt.observer import JSONLogger
 from bayes_opt.event import Events
+from bayes_opt.util import load_logs
 from pathlib import Path
 
 import grimagents.command_util as command_util
@@ -231,6 +232,10 @@ class PerformBayesianSearch(SearchCommand):
         optimizer = BayesianOptimization(
             f=self.perform_bayes_search, pbounds=bounds, random_state=1, verbose=0
         )
+
+        if self.args.bayes_load:
+            search_log.info(f'Loading Bayesian optimization observations from \'{self.args.bayes_save}\'')
+            load_logs(optimizer, logs=[self.args.bayes_load])
 
         if self.args.bayes_save:
             search_log.info(f'Saving Bayesian optimization observations to \'{self.args.bayes_save}\'')

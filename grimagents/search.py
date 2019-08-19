@@ -113,6 +113,13 @@ def parse_args(argv):
         type=str,
         help='Save Bayesian optimization progress to file',
     )
+    options_parser.add_argument(
+        '--bayes-load',
+        '-l',
+        metavar=('<file_path>'),
+        type=str,
+        help='Loads Bayesian optimization progress from file',
+    )
 
     parser = argparse.ArgumentParser(
         prog='grimsearch',
