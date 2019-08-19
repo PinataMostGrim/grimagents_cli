@@ -2,6 +2,7 @@
 """CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
+- Displays estimated time remaining in training run
 - Optionally copies trained policies to another location after training finishes (for example, into a Unity project)
 
 Notes:
@@ -28,6 +29,55 @@ exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
 mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
 
 
+class TrainingRunInfo:
+    def __init__(self):
+
+        self.step = 0
+        self.steps_remaining = 0
+        self.max_steps = 0
+        self.time_elapsed = 0
+        self.time_remaining = 0
+        self.mean_reward = 0
+        self.exported_brains = []
+
+        self.steps_regex = re.compile(r'Step: ([\d]+)\. ')
+        self.time_regex = re.compile(r'Time Elapsed: ([\.\d]+) s')
+        self.max_steps_regex = re.compile(r'max_steps:\t(.+)$')
+        self.mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
+        self.exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
+
+    def update_from_training_output(self, line):
+
+        if self.max_steps == 0:
+            match = self.max_steps_regex.search(line)
+            if match:
+                self.max_steps = int(float(match.group(1)))
+
+        match = self.steps_regex.search(line)
+        if match:
+            self.step = int(match.group(1))
+            self.steps_remaining = self.max_steps - self.step
+
+        match = self.time_regex.search(line)
+        if match:
+            self.time_elapsed = float(match.group(1))
+
+        match = mean_reward_regex.search(line)
+        if match:
+            self.mean_reward = match.group(2)
+
+        match = exported_brain_regex.search(line)
+        if match:
+            self.exported_brains.append(match.group(1))
+
+        if self.max_steps != 0 and self.step != 0:
+            self.time_remaining = (self.time_elapsed / self.step) * self.steps_remaining
+
+    def line_has_time_elapsed(self, line):
+
+        return self.time_regex.search(line) is not None
+
+
 def main():
 
     configure_logging()
@@ -41,12 +91,8 @@ def main():
     args = parse_args(sys.argv[1:])
     run_id = args.run_id
 
-    exported_brains = []
-    mean_reward = 0
+    training_info = TrainingRunInfo()
 
-    # Note: As these arguments are being passed directly into popen,
-    # the trainer path does not need to be enclosed in quotes to support
-    # paths with spaces in them.
     command = [
         'pipenv',
         'run',
@@ -68,19 +114,16 @@ def main():
             start_time = time.perf_counter()
 
             for line in p.stderr:
-                # Print intercepted line so it is visible in the console
+                # Print intercepted line so it is visible on the console
                 line = line.rstrip()
                 print(line)
 
-                # Store last mean reward
-                match = mean_reward_regex.search(line)
-                if match:
-                    mean_reward = match.group(2)
+                training_info.update_from_training_output(line)
 
-                # Search for exported brains
-                match = exported_brain_regex.search(line)
-                if match:
-                    exported_brains.append(match.group(1))
+                if training_info.line_has_time_elapsed(line):
+                    print(
+                        f'Estimated time remaining: {common.get_human_readable_duration(training_info.time_remaining)}'
+                    )
 
     except KeyboardInterrupt:
         training_log.warning('KeyboardInterrupt, aborting')
@@ -88,7 +131,7 @@ def main():
 
     finally:
         if args.export_path:
-            export_brains(exported_brains, Path(args.export_path))
+            export_brains(training_info.exported_brains, Path(args.export_path))
 
         end_time = time.perf_counter()
         training_duration = common.get_human_readable_duration(end_time - start_time)
@@ -102,7 +145,7 @@ def main():
                 f'Training was not completed successfully (error code {p.returncode})'
             )
 
-        training_log.info(f'Final Mean Reward: {mean_reward}')
+        training_log.info(f'Final Mean Reward: {training_info.mean_reward}')
         training_log.info('-' * 63)
         logging.shutdown()
 
@@ -190,7 +233,7 @@ def export_brains(brains: list, export_path: Path):
         destination = export_path / source.name
         destination.write_bytes(source.read_bytes())
 
-        training_log.info(f'Exported {destination}')
+        training_log.info(f'\t{destination}')
 
 
 if __name__ == '__main__':

@@ -227,7 +227,7 @@ class PerformBayesianSearch(SearchCommand):
         )
 
         optimizer = BayesianOptimization(
-            f=self.perform_bayes_search, pbounds=bounds, random_state=1
+            f=self.perform_bayes_search, pbounds=bounds, random_state=1, verbose=0
         )
 
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
