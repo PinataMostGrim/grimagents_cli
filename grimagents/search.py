@@ -109,16 +109,16 @@ def parse_args(argv):
     options_parser.add_argument(
         '--bayes-save',
         '-s',
-        metavar=('<file_path>'),
+        metavar=('<folder_path>'),
         type=str,
-        help='Save Bayesian optimization progress to file',
+        help='Save Bayesian optimization progress log to folder',
     )
     options_parser.add_argument(
         '--bayes-load',
         '-l',
-        metavar=('<file_path>'),
+        metavar=('<folder_path>'),
         type=str,
-        help='Loads Bayesian optimization progress from file',
+        help='Loads Bayesian optimization progress logs from folder',
     )
 
     parser = argparse.ArgumentParser(
