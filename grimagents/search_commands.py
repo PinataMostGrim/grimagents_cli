@@ -225,6 +225,7 @@ class PerformBayesianSearch(SearchCommand):
             )
         search_log.info('-' * 63)
 
+        # Load bounds from configuration and create an optimization object
         bounds = self.bayes_search.get_parameter_bounds(
             self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets
         )
@@ -240,7 +241,7 @@ class PerformBayesianSearch(SearchCommand):
             bayes_logger = JSONLogger(path=str(bayes_log_path))
             optimizer.subscribe(Events.OPTMIZATION_STEP, bayes_logger)
 
-        # Load search observations from logs
+        # Load search observations from log files
         if self.args.bayes_load:
             log_files_list = self.find_bayes_log_paths()
             search_log.info(f'Loading Bayesian optimization observations from:')
@@ -249,6 +250,7 @@ class PerformBayesianSearch(SearchCommand):
 
             load_logs(optimizer, logs=log_files_list)
 
+        # Perform Bayesian searches
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
 
         search_log.info('-' * 63)
@@ -263,7 +265,7 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
 
     def perform_bayes_search(self, **kwargs):
-        """Executes a search using the provided intersect and matching brain_config."""
+        """Executes a training run using the provided intersect and returns the final mean reward."""
 
         intersect = self.bayes_search.sanitize_parameter_values(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
