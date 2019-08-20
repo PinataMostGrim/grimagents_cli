@@ -326,9 +326,14 @@ class PerformBayesianSearch(SearchCommand):
     def get_bayes_log_path(self):
         """Generates a timestamped log file name for Bayesian optimization observations."""
 
-        log_folder_path = self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        log_folder_path = (
+            self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        )
 
-        log_file_path = log_folder_path / f'{self.grim_config[config_util.RUN_ID]}_{common.get_timestamp()}.json'
+        log_file_path = (
+            log_folder_path
+            / f'{self.grim_config[config_util.RUN_ID]}_{common.get_timestamp()}.json'
+        )
 
         if not log_file_path.parent.exists():
             log_file_path.parent.mkdir(parents=True)
@@ -339,7 +344,9 @@ class PerformBayesianSearch(SearchCommand):
         """Returns a list of all json files in the Bayesian optimization observation logs folder.
         """
 
-        log_folder_path = log_folder_path = self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        log_folder_path = log_folder_path = (
+            self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        )
         log_file_list = log_folder_path.glob('*.json')
 
         return list(log_file_list)
