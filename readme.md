@@ -151,6 +151,7 @@ usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
                   [--resume <search index>] [--export-index <search index>]
                   [--random <n>]
                   [--bayesian <exploration_steps> <optimization_steps>]
+                  [--bayes-save] [--bayes-load]
                   configuration_file
 
 CLI application that performs a hyperparameter search
@@ -176,6 +177,8 @@ optional arguments:
   --bayesian <exploration_steps> <optimization_steps>, -b <exploration_steps> <optimization_steps>
                         Execute Bayesian Search using a number of exploration
                         steps and optimization steps
+  --bayes-save, -s      Save Bayesian optimization progress log to folder
+  --bayes-load, -l      Loads Bayesian optimization progress logs from folder
 ```
 
 #### Example usages
@@ -261,4 +264,4 @@ The `grimagents' '--resume` argument will not remember how far through a curricu
 
 grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
-Bayesian search will output the best configuration discovered into a yaml file named `'bayes_config.yaml` next to the trainer config file used for the search.
+Bayesian search will output the best configuration discovered into a yaml file named `'bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, a log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will look for log files in the same folder.

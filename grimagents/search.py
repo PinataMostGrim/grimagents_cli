@@ -106,6 +106,18 @@ def parse_args(argv):
         nargs=2,
         help='Execute Bayesian Search using a number of exploration steps and optimization steps',
     )
+    options_parser.add_argument(
+        '--bayes-save',
+        '-s',
+        action='store_true',
+        help='Save Bayesian optimization progress log to folder',
+    )
+    options_parser.add_argument(
+        '--bayes-load',
+        '-l',
+        action='store_true',
+        help='Loads Bayesian optimization progress logs from folder',
+    )
 
     parser = argparse.ArgumentParser(
         prog='grimsearch',

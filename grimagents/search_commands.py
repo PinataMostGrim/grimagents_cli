@@ -4,6 +4,9 @@ import subprocess
 import sys
 
 from bayes_opt import BayesianOptimization
+from bayes_opt.observer import JSONLogger
+from bayes_opt.event import Events
+from bayes_opt.util import load_logs
 from pathlib import Path
 
 import grimagents.command_util as command_util
@@ -222,6 +225,7 @@ class PerformBayesianSearch(SearchCommand):
             )
         search_log.info('-' * 63)
 
+        # Load bounds from configuration and create an optimization object
         bounds = self.bayes_search.get_parameter_bounds(
             self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets
         )
@@ -230,6 +234,23 @@ class PerformBayesianSearch(SearchCommand):
             f=self.perform_bayes_search, pbounds=bounds, random_state=1, verbose=0
         )
 
+        # Save search observations to log file
+        if self.args.bayes_save:
+            bayes_log_path = self.get_bayes_log_path()
+            search_log.info(f'Saving Bayesian optimization observations to \'{bayes_log_path}\'')
+            bayes_logger = JSONLogger(path=str(bayes_log_path))
+            optimizer.subscribe(Events.OPTMIZATION_STEP, bayes_logger)
+
+        # Load search observations from log files
+        if self.args.bayes_load:
+            log_files_list = self.find_bayes_log_paths()
+            search_log.info(f'Loading Bayesian optimization observations from:')
+            for log in log_files_list:
+                search_log.info(f'{str(log)}')
+
+            load_logs(optimizer, logs=log_files_list)
+
+        # Perform Bayesian searches
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
 
         search_log.info('-' * 63)
@@ -239,12 +260,12 @@ class PerformBayesianSearch(SearchCommand):
         for key, value in best_intersect.items():
             search_log.info(f'    {key}: {value}')
 
-        search_log.info('-' * 30)
+        search_log.info('-' * 63)
         self.save_max_to_file(optimizer.max)
         search_log.info('-' * 63)
 
     def perform_bayes_search(self, **kwargs):
-        """Executes a search using the provided intersect and matching brain_config."""
+        """Executes a training run using the provided intersect and returns the final mean reward."""
 
         intersect = self.bayes_search.sanitize_parameter_values(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
@@ -295,11 +316,39 @@ class PerformBayesianSearch(SearchCommand):
         return float(reward)
 
     def save_max_to_file(self, max: dict):
-        """Sanitizes a BayesianOptimization object's max parameter, and writes it to a brain configuration file.
+        """Sanitizes a BayesianOptimization object's max parameter and writes it to a brain configuration file.
         """
 
-        search_log.info(f'Saving best configuration to file \'{self.output_config_path}\'')
+        search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
         intersect = self.bayes_search.sanitize_parameter_values(max['params'])
         best_config = self.bayes_search.get_brain_config_for_intersect(intersect)
         command_util.write_yaml_file(best_config, self.output_config_path)
+
+    def get_bayes_log_path(self):
+        """Generates a timestamped log file name for Bayesian optimization observations."""
+
+        log_folder_path = (
+            self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        )
+
+        log_file_path = (
+            log_folder_path
+            / f'{self.grim_config[config_util.RUN_ID]}_{common.get_timestamp()}.json'
+        )
+
+        if not log_file_path.parent.exists():
+            log_file_path.parent.mkdir(parents=True)
+
+        return log_file_path
+
+    def find_bayes_log_paths(self):
+        """Returns a list of all json files in the Bayesian optimization observation logs folder.
+        """
+
+        log_folder_path = log_folder_path = (
+            self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+        )
+        log_file_list = log_folder_path.glob('*.json')
+
+        return list(log_file_list)
