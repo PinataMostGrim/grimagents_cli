@@ -116,7 +116,7 @@ class InvalidConfigurationError(ConfigurationError):
 
 def edit_grim_config_file(file_path: Path, add_search=False):
     """Opens a grimagents configuration file with the system's default editor.
-    Creates a configuration file with default values if file does not already exist.
+    Creates a configuration file with default values if file does not already exist. If 'add_search' is True, will add default search configuration values.
     """
 
     if not file_path.suffix == '.json':

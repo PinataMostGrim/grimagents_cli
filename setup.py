@@ -8,7 +8,7 @@ with readme_path.open(mode='r') as f:
 
 setuptools.setup(
     name="grimagents",
-    version="1.0.2",
+    version="1.1.0",
     description="Collection of command line applications that wrap Unity Machine Learning Agents with more automation",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -23,7 +23,8 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(),
     install_requires=[
-        "pyyaml"
+        "pyyaml",
+        "bayesian-optimization"
     ],
     python_requires=">=3.6,<3.7",
     entry_points={

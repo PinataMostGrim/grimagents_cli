@@ -1,24 +1,26 @@
 # grimagents
 **grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
 
-**main** features include:
+The main module's features include:
 - Initiate training using arguments loaded from a configuration file
-- Easily resume the last training run
+- Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
 - *(Optional)* Launch training session in a new console window
 
 **grimwrapper** features include:
+- Display estimated time remaining
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
 
 **grimsearch** features include:
-- Grid search and random search hyperparameters
+- Grid search, Random search, and Bayesian search for hyperparameters
 
 
 ## Requirements
 - Windows
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using Python 3.6
+- ml-agents 8.2.0 (untested with 0.9)
 
 
 ## Installation
@@ -85,14 +87,16 @@ optional arguments:
   --resume, -r          Resume the last run
   --dry-run, -n         Print command without executing
   --trainer-config TRAINER_CONFIG
-  --env ENV
-  --lesson LESSON
-  --run-id RUN_ID
+                        Overrides configuration setting
+  --env ENV             Overrides configuration setting
+  --lesson LESSON       Overrides configuration setting
+  --run-id RUN_ID       Overrides configuration setting
   --base-port BASE_PORT
-  --num-envs NUM_ENVS
+                        Overrides configuration setting
+  --num-envs NUM_ENVS   Overrides configuration setting
   --inference           Load environment in inference mode instead of training
-  --graphics
-  --no-graphics
+  --graphics            Overrides configuration setting
+  --no-graphics         Overrides configuration setting
   --timestamp           Append timestamp to run-id. Overrides configuration
                         setting.
   --no-timestamp        Do not append timestamp to run-id. Overrides
@@ -138,7 +142,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --run-id <run-id>     Run id for the training session
   --export-path EXPORT_PATH
-                        Export trained models to this path
+                        Export trained policies to this path
 ```
 
 
@@ -147,6 +151,8 @@ optional arguments:
 usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
                   [--resume <search index>] [--export-index <search index>]
                   [--random <n>]
+                  [--bayesian <exploration_steps> <optimization_steps>]
+                  [--bayes-save] [--bayes-load]
                   configuration_file
 
 CLI application that performs a hyperparameter search
@@ -169,6 +175,11 @@ optional arguments:
                         Export trainer configuration for grid search <index>
   --random <n>, -r <n>  Execute <n> random searches instead of performing a
                         grid search
+  --bayesian <exploration_steps> <optimization_steps>, -b <exploration_steps> <optimization_steps>
+                        Execute Bayesian Search using a number of exploration
+                        steps and optimization steps
+  --bayes-save, -s      Save Bayesian optimization progress log to folder
+  --bayes-load, -l      Loads Bayesian optimization progress logs from folder
 ```
 
 #### Example usages
@@ -179,7 +190,17 @@ grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
 
 Initiate grid search with the `3DBall_grimagents.json` configuration file:
 ```
-grimsearch grim-agents\config\3DBall.json
+grimsearch grim-agents\config\3DBall_grimagents.json
+```
+
+Initiate 5 random searches with the `3DBall_grimagents.json` configuration file:
+```
+grimsearch grim-agents\config\3DBall_grimagents.json --random 5
+```
+
+Initiate a Bayesian search with the `3DBall_grimagents.json` configuration file using 5 exploration steps and 10 optimization steps:
+```
+grimsearch grim-agents\config\3DBall_grimagents.json --bayesian 5 10
 ```
 
 
@@ -214,6 +235,8 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
+When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum. The `--parallel` argument will not work in conjunction with Bayesian optimization as this implementation is a serial process.
+
 ```json
 {
     "trainer-config-path": "config\\3DBall_config.yaml",
@@ -242,3 +265,4 @@ The `grimagents' '--resume` argument will not remember how far through a curricu
 
 grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
+Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search.

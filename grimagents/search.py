@@ -4,6 +4,7 @@ CLI application that performs hyperparameter searches using grimagents and a gri
 Features:
 - Grid Search for hyperparameters
 - Random Search for hyperparameters
+- Bayesian Search for hyperparameters
 - Resume Grid Search
 - Export trainer configuration file for a given Grid Search index
 
@@ -13,198 +14,22 @@ See readme.md for more documentation.
 import argparse
 import logging
 import logging.config
-import subprocess
 import sys
 
-from pathlib import Path
-
-import grimagents.command_util as command_util
-import grimagents.config as config_util
 import grimagents.common as common
 import grimagents.settings as settings
 
-from grimagents.grid_search import GridSearch, RandomSearch
+from grimagents.search_commands import (
+    EditGrimConfigFile,
+    OutputGridSearchCount,
+    PerformGridSearch,
+    ExportGridSearchConfiguration,
+    PerformRandomSearch,
+    PerformBayesianSearch,
+)
 
 
 search_log = logging.getLogger('grimagents.search')
-
-
-class Command:
-    def __init__(self, args):
-        self.args = args
-
-    def execute(self):
-        pass
-
-
-class EditGrimConfigFile(Command):
-    """Opens a grimagents configuration file for editing or creates on if a file does not already exist. Appends a search entry to the configuration file if it does not already have one.
-    """
-
-    def execute(self):
-        file_path = Path(self.args.edit_config)
-        config_util.edit_grim_config_file(file_path, add_search=True)
-
-
-class SearchCommand(Command):
-    def __init__(self, args):
-
-        self.args = args
-
-        # Gather configurations
-        self.grim_config_path = Path(args.configuration_file)
-        self.grim_config = config_util.load_grim_config_file(self.grim_config_path)
-
-        self.search_config = self.grim_config[config_util.SEARCH]
-
-        self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
-        self.trainer_config = config_util.load_trainer_configuration(self.trainer_config_path)
-
-        self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
-
-    def perform_search_with_configuration(self, intersect, search_brain_config, index=0):
-        """Executes a search using the provided intersect and matching brain_config."""
-
-        # Write trainer configuration file for current intersect
-        if self.args.parallel:
-            self.search_config_path = self.search_config_path.with_name(
-                f'search_config{index:02d}.yaml'
-            )
-
-        command_util.write_yaml_file(search_brain_config, self.search_config_path)
-
-        # Execute training with the intersect config and run_id
-        run_id = self.grim_config[config_util.RUN_ID] + f'_{index:02d}'
-        command = [
-            'pipenv',
-            'run',
-            'python',
-            '-m',
-            'grimagents',
-            self.grim_config_path,
-            '--trainer-config',
-            self.search_config_path,
-            '--run-id',
-            run_id,
-        ]
-
-        search_log.info('-' * 63)
-        search_log.info(f'Search {run_id}:')
-        for j in range(len(intersect)):
-            search_log.info(f'    {intersect[j][0]}: {intersect[j][1]}')
-        search_log.info('-' * 63)
-
-        if self.args.parallel:
-            command = ['cmd', '/K'] + command
-            base_port = self.grim_config.get('--base-port', 5005)
-            command = command + ['--base-port', base_port + index]
-            command = [str(element) for element in command]
-            subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
-
-        else:
-            command = [str(element) for element in command]
-            subprocess.run(command)
-
-
-class GridSearchCommand(SearchCommand):
-    def __init__(self, args):
-
-        super().__init__(args)
-        self.grid_search = GridSearch(self.search_config, self.trainer_config)
-
-
-class OutputGridSearchCount(GridSearchCommand):
-    """Prints out the total number of training runs a grimagents configuration file will attempt.
-    """
-
-    def execute(self):
-
-        search_log.info(
-            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
-        )
-
-
-class PerformGridSearch(GridSearchCommand):
-    """Perform a hyperparameter grid search using values from a grimagents configuration file.
-    """
-
-    def execute(self):
-
-        if self.args.resume:
-            count = self.grid_search.get_intersect_count()
-            if self.args.resume > count:
-                search_log.warning(
-                    f'\'{self.trainer_config_path}\' will only perform {count} training runs, unable to resume at index {self.args.resume}'
-                )
-                sys.exit()
-            start_index = self.args.resume
-        else:
-            start_index = 0
-
-        search_log.info('-' * 63)
-        search_log.info('Performing grid search for hyperparameters:')
-        for i in range(len(self.grid_search.hyperparameters)):
-            search_log.info(
-                f'    {self.grid_search.hyperparameters[i]}: {self.grid_search.hyperparameter_sets[i]}'
-            )
-        search_log.info('-' * 63)
-
-        for i in range(start_index, self.grid_search.get_intersect_count()):
-
-            intersect = self.grid_search.get_intersect(i)
-            intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
-
-            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
-
-        if not self.args.parallel and self.search_config_path.exists():
-            self.search_config_path.unlink()
-
-        if not self.args.parallel:
-            search_log.info('Grid search complete\n')
-
-
-class ExportGridSearchConfiguration(GridSearchCommand):
-    """Exports a trainer config file for a given GridSearch intersect."""
-
-    def execute(self):
-
-        search_log.info(
-            f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_index}\' into \'{self.search_config_path}\''
-        )
-
-        intersect = self.grid_search.get_intersect(self.args.export_index)
-        intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
-        command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
-
-
-class PerformRandomSearch(SearchCommand):
-    def __init__(self, args):
-
-        super().__init__(args)
-        self.random_search = RandomSearch(self.search_config, self.trainer_config)
-
-    def execute(self):
-
-        search_log.info('-' * 63)
-        search_log.info('Performing random search for hyperparameters:')
-        for i in range(len(self.random_search.hyperparameters)):
-            search_log.info(
-                f'    {self.random_search.hyperparameters[i]}: {self.random_search.hyperparameter_sets[i]}'
-            )
-        search_log.info('-' * 63)
-
-        for i in range(self.args.random):
-
-            intersect = self.random_search.get_randomized_intersect()
-            intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
-
-            self.perform_search_with_configuration(intersect, intersect_brain_config, i)
-
-        if not self.args.parallel and self.search_config_path.exists():
-            self.search_config_path.unlink()
-
-        if not self.args.parallel:
-            search_log.info('Random search complete\n')
 
 
 def main():
@@ -226,6 +51,8 @@ def main():
         ExportGridSearchConfiguration(args).execute()
     elif args.random:
         PerformRandomSearch(args).execute()
+    elif args.bayesian:
+        PerformBayesianSearch(args).execute()
     else:
         PerformGridSearch(args).execute()
 
@@ -270,6 +97,26 @@ def parse_args(argv):
         metavar='<n>',
         type=int,
         help='Execute <n> random searches instead of performing a grid search',
+    )
+    options_parser.add_argument(
+        '--bayesian',
+        '-b',
+        metavar=('<exploration_steps>', '<optimization_steps>'),
+        type=int,
+        nargs=2,
+        help='Execute Bayesian Search using a number of exploration steps and optimization steps',
+    )
+    options_parser.add_argument(
+        '--bayes-save',
+        '-s',
+        action='store_true',
+        help='Save Bayesian optimization progress log to folder',
+    )
+    options_parser.add_argument(
+        '--bayes-load',
+        '-l',
+        action='store_true',
+        help='Loads Bayesian optimization progress logs from folder',
     )
 
     parser = argparse.ArgumentParser(

@@ -18,8 +18,8 @@ class InvalidIntersectIndex(GridSearchError):
     pass
 
 
-class GridSearch:
-    """Object that facilitates performing hyperparameter grid searches."""
+class ParameterSearch:
+    """Object that facilitates performing hyperparameter searches."""
 
     def __init__(self, search_config, trainer_config):
         self.search_config = None
@@ -27,7 +27,6 @@ class GridSearch:
         self.brain_name = ''
         self.hyperparameters = []
         self.hyperparameter_sets = []
-        self.search_permutations = []
         self.brain_config = {}
 
         self.set_search_config(search_config)
@@ -39,7 +38,6 @@ class GridSearch:
         self.brain_name = self.search_config['brain']['name']
         self.hyperparameters = self.get_search_hyperparameters(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
-        self.search_permutations = self.get_search_permutations(self.hyperparameter_sets)
 
     @staticmethod
     def get_search_hyperparameters(search_config):
@@ -56,12 +54,6 @@ class GridSearch:
             search_sets.append(values)
 
         return search_sets
-
-    @staticmethod
-    def get_search_permutations(hyperparameter_sets):
-        """Returns a two dimensional list of grid search permutations."""
-
-        return list(itertools.product(*hyperparameter_sets))
 
     def set_trainer_config(self, trainer_config):
 
@@ -98,39 +90,20 @@ class GridSearch:
 
         return result
 
-    def get_intersect(self, index):
-        """Returns a two dimensional list containing the search parameters to use for a given intersect (index) in the grid search.
-
-        Raises:
-          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
-        """
-
-        try:
-            result = list(zip(self.hyperparameters, self.search_permutations[index]))
-        except IndexError:
-            raise InvalidIntersectIndex(
-                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
-            )
-
-        return result
-
-    def get_intersect_count(self):
-        """Returns the total count of search permutations for this GridSearch."""
-
-        return len(self.search_permutations)
-
     def get_brain_config_for_intersect(self, intersect):
         """Returns a brain configuration dictionary with values overridden by the grid search intersect.
         """
 
         result = self.brain_config.copy()
-        for hyperparameter in intersect:
-            result[self.brain_name][hyperparameter[0]] = hyperparameter[1]
+        for key, value in intersect.items():
+            result[self.brain_name][key] = value
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
         if 'buffer_size_multiple' in result[self.brain_name]:
             batch_size = self.get_batch_size_value(result, self.brain_name)
-            result[self.brain_name]['buffer_size'] = batch_size * result[self.brain_name]['buffer_size_multiple']
+            result[self.brain_name]['buffer_size'] = (
+                batch_size * result[self.brain_name]['buffer_size_multiple']
+            )
             del result[self.brain_name]['buffer_size_multiple']
 
         return result
@@ -146,16 +119,55 @@ class GridSearch:
         return brain_config['default']['batch_size']
 
 
-class RandomSearch(GridSearch):
+class GridSearch(ParameterSearch):
+    """Object that facilitates performing hyperparameter grid searches."""
+
+    def __init__(self, search_config, trainer_config):
+
+        super().__init__(search_config, trainer_config)
+        self.search_permutations = self.get_search_permutations(self.hyperparameter_sets)
+
+    @staticmethod
+    def get_search_permutations(hyperparameter_sets):
+        """Returns a two dimensional list of grid search permutations."""
+
+        return list(itertools.product(*hyperparameter_sets))
+
+    def get_intersect(self, index):
+        """Returns a dictionary containing the search parameters to use for a given intersect (index) in the grid search.
+
+        Raises:
+          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+        """
+
+        try:
+            result = dict(zip(self.hyperparameters, self.search_permutations[index]))
+        except IndexError:
+            raise InvalidIntersectIndex(
+                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
+            )
+
+        return result
+
+    def get_intersect_count(self):
+        """Returns the total count of search permutations for this GridSearch."""
+
+        return len(self.search_permutations)
+
+
+class RandomSearch(ParameterSearch):
+    """Object that facilitates performing hyperparameter random searches."""
 
     @staticmethod
     def get_random_value(values, seed=None):
         """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise.
         """
+
         if seed is not None:
             random.seed(seed)
 
         for element in values:
+            # If values contain one or more floats, return a random float
             if isinstance(element, float):
                 return random.uniform(min(values), max(values))
 
@@ -166,7 +178,55 @@ class RandomSearch(GridSearch):
 
         randomized_hyperparameters = []
         for i in range(len(self.hyperparameters)):
-            randomized_hyperparameters.append(self.get_random_value(self.hyperparameter_sets[i], seed=seed))
+            randomized_hyperparameters.append(
+                self.get_random_value(self.hyperparameter_sets[i], seed=seed)
+            )
 
-        result = list(zip(self.hyperparameters, randomized_hyperparameters))
+        result = dict(zip(self.hyperparameters, randomized_hyperparameters))
         return result
+
+
+class BayesianSearch(ParameterSearch):
+    """Object that facilitates performing hyperparameter bayesian searches."""
+
+    @staticmethod
+    def get_parameter_bounds(parameter_names, parameter_values):
+        """Returns a parameter bounds dictionary for consumption by a BayesianOptimization object.
+        """
+
+        bounds = {}
+        for i in range(len(parameter_names)):
+
+            # The BayesianOptimization object requires two values for every parameter
+            # so we duplicate an existing element if only one is present.
+            if len(parameter_values[i]) < 2:
+                parameter_values[i].append(parameter_values[i][0])
+
+            bounds[parameter_names[i]] = parameter_values[i]
+
+        return bounds
+
+    @staticmethod
+    def sanitize_parameter_values(bounds: dict):
+        """Enforces int type on parameters that should be int and ensures native value types are used.
+
+        BayesianOptimization objects return numpy floats, which cause problems with yaml serialization.
+        """
+
+        for key, value in bounds.items():
+            if (
+                key == 'batch_size'
+                or key == 'buffer_size_multiple'
+                or key == 'hidden_units'
+                or key == 'num_epoch'
+                or key == 'num_layers'
+                or key == 'time_horizon'
+                or key == 'sequence_length'
+                or key == 'curiosity_enc_size'
+            ):
+                bounds[key] = int(value)
+                continue
+
+            bounds[key] = value.item()
+
+        return bounds
