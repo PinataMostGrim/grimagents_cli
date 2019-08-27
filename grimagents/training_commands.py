@@ -125,7 +125,7 @@ class ResumeTraining(Command):
         return command
 
 
-class TrainingWrapperArguments():
+class TrainingWrapperArguments:
     """Faciliates converting grimagents configuration values into a list of training_wrapper command line arguments.
     """
 

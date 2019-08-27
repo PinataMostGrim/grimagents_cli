@@ -24,7 +24,15 @@ import sys
 import grimagents.settings as settings
 import grimagents.common as common
 
-from grimagents.training_commands import ListTrainingOptions, EditGrimConfigFile, EditTrainerConfigFile, EditCurriculumFile, StartTensorboard, PerformTraining, ResumeTraining
+from grimagents.training_commands import (
+    ListTrainingOptions,
+    EditGrimConfigFile,
+    EditTrainerConfigFile,
+    EditCurriculumFile,
+    StartTensorboard,
+    PerformTraining,
+    ResumeTraining,
+)
 
 
 main_log = logging.getLogger('grimagents.main')
