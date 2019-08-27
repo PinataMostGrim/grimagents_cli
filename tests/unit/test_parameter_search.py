@@ -107,11 +107,29 @@ def test_get_intersect(search_config, trainer_config):
 
     search = GridSearch(search_config, trainer_config)
 
-    assert search.get_intersect(0) == {'beta': 0.0001, 'hidden_units': 32, 'learning_rate': 1e-05, 'num_layers': 1, 'num_epoch': 3}
+    assert search.get_intersect(0) == {
+        'beta': 0.0001,
+        'hidden_units': 32,
+        'learning_rate': 1e-05,
+        'num_layers': 1,
+        'num_epoch': 3,
+    }
 
-    assert search.get_intersect(15) == {'beta': 0.0001, 'hidden_units': 512, 'learning_rate': 0.001, 'num_layers': 3, 'num_epoch': 10}
+    assert search.get_intersect(15) == {
+        'beta': 0.0001,
+        'hidden_units': 512,
+        'learning_rate': 0.001,
+        'num_layers': 3,
+        'num_epoch': 10,
+    }
 
-    assert search.get_intersect(31) == {'beta': 0.01, 'hidden_units': 512, 'learning_rate': 0.001, 'num_layers': 3, 'num_epoch': 10}
+    assert search.get_intersect(31) == {
+        'beta': 0.01,
+        'hidden_units': 512,
+        'learning_rate': 0.001,
+        'num_layers': 3,
+        'num_epoch': 10,
+    }
 
 
 def test_get_intersect_count(search_config, trainer_config):
@@ -215,14 +233,20 @@ def test_get_random_intersect(search_config, trainer_config):
     search = RandomSearch(search_config, trainer_config)
     random_intersect = search.get_randomized_intersect(seed=9871237)
 
-    assert random_intersect == {'beta': 0.008715030393329336, 'hidden_units': 477, 'learning_rate': 0.0008715030393329336, 'num_layers': 1, 'num_epoch': 4}
+    assert random_intersect == {
+        'beta': 0.008715030393329336,
+        'hidden_units': 477,
+        'learning_rate': 0.0008715030393329336,
+        'num_layers': 1,
+        'num_epoch': 4,
+    }
 
 
 def test_get_parameter_bounds():
     """Tests for the correct construction of a parameter bounds dictionary.
     """
 
-    parameter_names  = ['batch_size', 'buffer_size_multiple', 'beta']
+    parameter_names = ['batch_size', 'buffer_size_multiple', 'beta']
     parameter_values = [[64, 128], [4], [0.001, 0.0001]]
 
     result = BayesianSearch.get_parameter_bounds(parameter_names, parameter_values)
@@ -231,7 +255,11 @@ def test_get_parameter_bounds():
     assert type(result) is dict
 
     # Test for a second value inserted for any parameter that only contains one value
-    assert result == {'batch_size': [64, 128], 'buffer_size_multiple': [4, 4], 'beta': [0.001, 0.0001]}
+    assert result == {
+        'batch_size': [64, 128],
+        'buffer_size_multiple': [4, 4],
+        'beta': [0.001, 0.0001],
+    }
 
 
 def test_sanitize_parameter_values():
@@ -259,5 +287,5 @@ def test_sanitize_parameter_values():
         'num_layers': 2,
         'time_horizon': 64,
         'sequence_length': 144,
-        'curiosity_enc_size': 184
+        'curiosity_enc_size': 184,
     }

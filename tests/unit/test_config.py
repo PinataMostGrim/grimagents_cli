@@ -12,7 +12,7 @@ CURRICULUM_FILE = 'curriculum.json'
 
 VALID_CONFIGURATION = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
 
-INVALID_CONFIGURATION = {"--env": "builds\\3DBall\\Unity Environment.exe", "--run-id": "3DBall"}
+INVALID_CONFIGURATION = {"--env": "builds\\3DBall\\3DBall.exe", "--run-id": "3DBall"}
 
 
 def get_grim_config_file_path():
@@ -94,7 +94,7 @@ def test_invalid_configuration_error(fixture_grim_config_file):
 def test_configuration_validation():
     """Test for validating or rejecting grimagent configurations."""
 
-    configuration = {"--env": "builds\\3DBall\\Unity Environment.exe"}
+    configuration = {"--env": "builds\\3DBall\\3DBall.exe"}
     assert config.validate_grim_configuration(configuration) is False
 
     configuration['trainer-config-path'] = 'config\\3DBall.yaml'
