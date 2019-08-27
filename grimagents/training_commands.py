@@ -98,11 +98,11 @@ class PerformTraining(Command):
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
 
-        training_command = TrainingWrapperArguments(config)
-        training_command.apply_argument_overrides(args)
-        training_command.set_additional_arguments(args.args)
+        training_arguments = TrainingWrapperArguments(config)
+        training_arguments.apply_argument_overrides(args)
+        training_arguments.set_additional_arguments(args.args)
 
-        return training_command.get_command()
+        return training_arguments.get_arguments()
 
 
 class ResumeTraining(Command):
@@ -127,16 +127,13 @@ class ResumeTraining(Command):
 
 class TrainingWrapperArguments():
     """Faciliates converting grimagents configuration values into a list of training_wrapper command line arguments.
-
     """
 
     def __init__(self, arguments: dict):
         self.arguments = arguments.copy()
 
     def apply_argument_overrides(self, args):
-        """Replaces values in the arguments dictionary with the overrides stored in args.
-
-        """
+        """Replaces values in the arguments dictionary with the overrides stored in args."""
 
         if args.trainer_config is not None:
             self.set_trainer_config(args.trainer_config)
@@ -168,11 +165,10 @@ class TrainingWrapperArguments():
     def set_additional_arguments(self, args):
         self.arguments[ADDITIONAL_ARGS] = args
 
-    def get_command(self):
+    def get_arguments(self):
         """Converts a configuration dictionary into command line arguments
         for mlagents-learn and filters out values that should not be sent to
         the training process.
-
         """
 
         # We copy arguments in order to mutate it in the event a time-stamp is present.
@@ -246,8 +242,8 @@ class TrainingWrapperArguments():
 
         return result
 
-    def get_command_as_string(self):
-        return ' '.join([str(element) for element in self.get_command()])
+    def get_arguments_as_string(self):
+        return ' '.join([str(element) for element in self.get_arguments()])
 
     def set_trainer_config(self, value):
         self.arguments[config_util.TRAINER_CONFIG_PATH] = value
