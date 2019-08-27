@@ -1,7 +1,7 @@
 # grimagents
 **grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
 
-**main** features include:
+The main module's features include:
 - Initiate training using arguments loaded from a configuration file
 - Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
@@ -20,6 +20,7 @@
 - Windows
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using Python 3.6
+- ml-agents 8.2.0 (untested with 0.9)
 
 
 ## Installation
@@ -234,7 +235,7 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
-When the `--bayesian` argument is used, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter involved in the search; a minimum and maximum. The `--parallel` argument will not work in conjunction with Bayesian optimization as this implementation is a serial process.
+When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum. The `--parallel` argument will not work in conjunction with Bayesian optimization as this implementation is a serial process.
 
 ```json
 {
@@ -264,4 +265,4 @@ The `grimagents' '--resume` argument will not remember how far through a curricu
 
 grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
-Bayesian search will output the best configuration discovered into a yaml file named `'bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, a log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will look for log files in the same folder.
+Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search.
