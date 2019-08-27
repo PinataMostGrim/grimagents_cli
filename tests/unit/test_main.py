@@ -1,7 +1,7 @@
 import pytest
 
 from argparse import Namespace
-from grimagents.__main__ import Command, PerformTraining, ResumeTraining
+from grimagents.training_commands import Command, PerformTraining, ResumeTraining
 
 import grimagents.config
 
