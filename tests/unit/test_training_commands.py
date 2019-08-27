@@ -12,7 +12,7 @@ from grimagents.training_commands import Command, PerformTraining, ResumeTrainin
 def test_config():
     return {
         "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--env": "builds\\3DBall\\3DBall.exe",
         "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
         "--curriculum": "",
         "--keep-checkpoints": "",
@@ -64,7 +64,7 @@ def test_perform_training_command(monkeypatch, namespace_args, test_config):
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result[3] = 'grimagents\\training_wrapper.py'
 
-    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--train']
+    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\3DBall.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--train']
 
 
 def test_perform_training_command_dry_run(monkeypatch, namespace_args, test_config):
@@ -127,7 +127,7 @@ def test_resume_training(monkeypatch):
         "grimagents\\training_wrapper.py",
         "config\\3DBall.yaml",
         "--env",
-        "builds\\3DBall\\Unity Environment.exe",
+        "builds\\3DBall\\3DBall.exe",
         "--run-id",
         "3DBall_01-2019-07-12_23-55-05",
         "--train",
@@ -149,7 +149,7 @@ def test_resume_training(monkeypatch):
         'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
-        'builds\\3DBall\\Unity Environment.exe',
+        'builds\\3DBall\\3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
         '--train',
@@ -165,7 +165,7 @@ def test_resume_training(monkeypatch):
         'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
-        'builds\\3DBall\\Unity Environment.exe',
+        'builds\\3DBall\\3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
         '--train',
@@ -191,7 +191,7 @@ def test_create_training_arguments(test_config):
         'grimagents\\training_wrapper.py',
         'config\\3DBall.yaml',
         '--env',
-        'builds\\3DBall\\Unity Environment.exe',
+        'builds\\3DBall\\3DBall.exe',
         '--export-path',
         'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
         '--run-id',
@@ -237,7 +237,7 @@ def test_training_arguments_add_additional_args(test_config):
     result = arguments.get_arguments()
     result[3] = 'grimagents\\training_wrapper.py'
 
-    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--slow', '--load', '--train']
+    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\3DBall.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--slow', '--load', '--train']
 
 
 def test_override_configuration_values(test_config):
@@ -289,7 +289,7 @@ def test_training_arguments_set_methods(test_config):
 
     arguments = TrainingWrapperArguments(test_config)
 
-    arguments.set_env('builds\\3DBall\\3DBall.exe')
+    arguments.set_env('builds\\3DBall\\3DBallHard.exe')
     arguments.set_lesson('3')
     arguments.set_run_id('ball')
     arguments.set_num_envs('4')
@@ -297,7 +297,7 @@ def test_training_arguments_set_methods(test_config):
     arguments.set_timestamp_enabled(True)
 
     arguments_string = arguments.get_arguments_as_string()
-    assert '--env builds\\3DBall\\3DBall.exe' in arguments_string
+    assert '--env builds\\3DBall\\3DBallHard.exe' in arguments_string
     assert '--lesson 3' in arguments_string
     assert '--run-id ball' in arguments_string
     assert '--num-envs 4' in arguments_string
@@ -333,7 +333,7 @@ def test_training_arguments_inference(test_config):
 
     # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
     arguments = TrainingWrapperArguments(test_config)
-    arguments_list = ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall', '--slow']
+    arguments_list = ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\3DBall.exe', '--run-id', '3DBall', '--slow']
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = arguments.get_arguments()
