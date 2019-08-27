@@ -1,32 +1,42 @@
+import pytest
+
 from argparse import Namespace
 
-from grimagents.training_commands import TrainingWrapperArguments
 import grimagents.common
 
-
-TEST_CONFIG = {
-    "trainer-config-path": "config\\3DBall.yaml",
-    "--env": "builds\\3DBall\\Unity Environment.exe",
-    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-    "--curriculum": "",
-    "--keep-checkpoints": "",
-    "--lesson": "",
-    "--run-id": "3DBall",
-    "--num-runs": "",
-    "--save-freq": "",
-    "--seed": "",
-    "--base-port": "",
-    "--num-envs": "",
-    "--no-graphics": False,
-    "--timestamp": False,
-}
+from grimagents.training_commands import TrainingWrapperArguments
 
 
-def test_create_training_command():
+@pytest.fixture
+def test_config():
+    return {
+        "trainer-config-path": "config\\3DBall.yaml",
+        "--env": "builds\\3DBall\\Unity Environment.exe",
+        "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+        "--curriculum": "",
+        "--keep-checkpoints": "",
+        "--lesson": "",
+        "--run-id": "3DBall",
+        "--num-runs": "",
+        "--save-freq": "",
+        "--seed": "",
+        "--base-port": "",
+        "--num-envs": "",
+        "--no-graphics": False,
+        "--timestamp": False,
+    }
+
+
+def test_create_training_command(test_config):
     """Test for creating TrainingWrapperArguments with default configuration."""
 
-    command = TrainingWrapperArguments(TEST_CONFIG)
-    command_list = [
+    command = TrainingWrapperArguments(test_config)
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result = command.get_command()
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == [
         'pipenv',
         'run',
         'python',
@@ -41,89 +51,48 @@ def test_create_training_command():
         '--train',
     ]
 
-    # The absolute path to training_wrapper.py will differ based on the system running this test.
-    result = command.get_command()
-    result[3] = 'grimagents\\training_wrapper.py'
 
-    assert result == command_list
-
-
-def test_training_command_handles_no_graphics():
+def test_training_command_handles_no_graphics(test_config):
     """Test for correct handling of the --no-graphics argument."""
 
     # '--no-graphics' should be present
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--no-graphics": True,
-    }
+    test_config['--no-graphics'] = True
     command = TrainingWrapperArguments(test_config)
     assert '--no-graphics' in command.get_command()
 
     # '--no-graphics' should not be present
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--no-graphics": False,
-    }
+    test_config['--no-graphics'] = False
     command = TrainingWrapperArguments(test_config)
     assert '--no-graphics' not in command.get_command()
 
 
-def test_training_command_excludes_timestamp():
+def test_training_command_excludes_timestamp(test_config):
     """Test for ensuring TrainingWrapperArguments excludes the '--timestamp' argument."""
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--timestamp": True,
-    }
+    test_config['--timestamp'] = True
     command = TrainingWrapperArguments(test_config)
     assert '--timestamp' not in command.get_command()
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--timestamp": False,
-    }
+    test_config['--timestamp'] = False
     command = TrainingWrapperArguments(test_config)
     assert '--timestamp' not in command.get_command()
 
 
-def test_training_command_add_additional_args():
+def test_training_command_add_additional_args(test_config):
     """Test for TrainingWrapperArguments correctly setting additional arguments."""
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\Unity Environment.exe",
-        "--run-id": "3DBall",
-    }
     command = TrainingWrapperArguments(test_config)
     additional_args = ['--slow', '--load']
     command.set_additional_arguments(additional_args)
-    command_list = [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
-        '--env',
-        'builds\\3DBall\\Unity Environment.exe',
-        '--run-id',
-        '3DBall',
-        '--slow',
-        '--load',
-        '--train',
-    ]
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = command.get_command()
     result[3] = 'grimagents\\training_wrapper.py'
 
-    assert result == command_list
+    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--run-id', '3DBall', '--slow', '--load', '--train']
 
 
-def test_override_configuration_values():
+def test_override_configuration_values(test_config):
     """Test for correct handling of TrainingWrapperArguments argument overrides.
 
     Ensures the following arguments are overridden:
@@ -153,63 +122,23 @@ def test_override_configuration_values():
         args=['--load', '--slow'],
     )
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--env": "builds\\3DBall\\Unity Environment.exe",
-        "--timestamp": True,
-    }
+    test_config['--timestamp'] = True
 
     training_command = TrainingWrapperArguments(test_config)
     training_command.set_additional_arguments(args.args)
     training_command.apply_argument_overrides(args)
 
     result = training_command.get_command()
+
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result[3] = 'grimagents\\training_wrapper.py'
 
-    assert result == [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents\\training_wrapper.py',
-        'config\\PushBlock_grimagents.json',
-        '--run-id',
-        'PushBlock',
-        '--env',
-        'builds\\PushBlock\\PushBlock.exe',
-        '--load',
-        '--slow',
-        '--lesson',
-        '2',
-        '--base-port',
-        5010,
-        '--num-envs',
-        '2',
-        '--no-graphics',
-        '--train',
-    ]
+    assert result == ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\PushBlock_grimagents.json', '--env', 'builds\\PushBlock\\PushBlock.exe', '--export-path', 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels', '--lesson', '2', '--run-id', 'PushBlock', '--base-port', 5010, '--num-envs', '2', '--no-graphics', '--load', '--slow', '--train']
 
 
-def test_training_command_set_methods():
+def test_training_command_set_methods(test_config):
     """Tests that TrainingWrapperArguments correctly sets argument values."""
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\Unity Environment.exe",
-        "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-        "--curriculum": "",
-        "--keep-checkpoints": "",
-        "--lesson": "",
-        "--run-id": "3DBall",
-        "--num-runs": "",
-        "--save-freq": "",
-        "--seed": "",
-        "--base-port": "",
-        "--num-envs": "",
-        "--no-graphics": False,
-        "--timestamp": False,
-    }
     command = TrainingWrapperArguments(test_config)
 
     command.set_env('builds\\3DBall\\3DBall.exe')
@@ -228,7 +157,7 @@ def test_training_command_set_methods():
     assert '--run-id ball-' in command_string
 
 
-def test_training_command_timestamp(monkeypatch):
+def test_training_command_timestamp(monkeypatch, test_config):
     """Test for TrainingWrapperArguments correctly applying a timestamp."""
 
     def mock_return():
@@ -236,20 +165,14 @@ def test_training_command_timestamp(monkeypatch):
 
     monkeypatch.setattr(grimagents.common, "get_timestamp", mock_return)
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\Unity Environment.exe",
-        "--run-id": "3DBall",
-        "--timestamp": True,
-    }
-
+    test_config['--timestamp'] = True
     command = TrainingWrapperArguments(test_config)
     command_string = command.get_command_as_string()
 
     assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
 
 
-def test_training_command_inference():
+def test_training_command_inference(test_config):
     """Tests for correct processing of the '--inference' argument.
 
     - Ensures get_command() can handle no additional args being set
@@ -258,25 +181,11 @@ def test_training_command_inference():
     - Ensures the '--slow' argument is appended and not duplicated
     """
 
-    test_config = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-        "--inference": True,
-    }
+    test_config['--inference'] = True
 
     # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
     command = TrainingWrapperArguments(test_config)
-    command_list = [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
-        '--run-id',
-        '3DBall',
-        '--slow',
-    ]
+    command_list = ['pipenv', 'run', 'python', 'grimagents\\training_wrapper.py', 'config\\3DBall.yaml', '--env', 'builds\\3DBall\\Unity Environment.exe', '--run-id', '3DBall', '--slow']
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = command.get_command()
