@@ -29,7 +29,7 @@ import grimagents.command_util as command_util
 import grimagents.settings as settings
 import grimagents.common as common
 
-from grimagents.training_commands import TrainingWrapperCommand
+from grimagents.training_commands import TrainingWrapperArguments
 
 
 main_log = logging.getLogger('grimagents.main')
@@ -122,7 +122,7 @@ class PerformTraining(Command):
         config_path = Path(args.configuration_file)
         config = config_util.load_grim_config_file(config_path)
 
-        training_command = TrainingWrapperCommand(config)
+        training_command = TrainingWrapperArguments(config)
         training_command.apply_argument_overrides(args)
         training_command.set_additional_arguments(args.args)
 

@@ -7,15 +7,7 @@ ADDITIONAL_ARGS = 'additional-args'
 SLOW = '--slow'
 
 
-class Command:
-    def __init__(self):
-        self._arguments = {}
-
-    def get_command(self):
-        return ['echo', __class__.__name__, self.arguments]
-
-
-class TrainingWrapperCommand(Command):
+class TrainingWrapperArguments():
     """Faciliates converting grimagents configuration values into a list of training_wrapper command line arguments.
 
     """

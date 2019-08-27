@@ -1,6 +1,6 @@
 from argparse import Namespace
 
-from grimagents.training_commands import TrainingWrapperCommand
+from grimagents.training_commands import TrainingWrapperArguments
 import grimagents.common
 
 
@@ -23,9 +23,9 @@ TEST_CONFIG = {
 
 
 def test_create_training_command():
-    """Test for creating TrainingWrapperCommand with default configuration."""
+    """Test for creating TrainingWrapperArguments with default configuration."""
 
-    command = TrainingWrapperCommand(TEST_CONFIG)
+    command = TrainingWrapperArguments(TEST_CONFIG)
     command_list = [
         'pipenv',
         'run',
@@ -57,7 +57,7 @@ def test_training_command_handles_no_graphics():
         "--run-id": "3DBall",
         "--no-graphics": True,
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     assert '--no-graphics' in command.get_command()
 
     # '--no-graphics' should not be present
@@ -66,7 +66,7 @@ def test_training_command_handles_no_graphics():
         "--run-id": "3DBall",
         "--no-graphics": False,
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     assert '--no-graphics' not in command.get_command()
 
 
@@ -78,7 +78,7 @@ def test_training_command_excludes_timestamp():
         "--run-id": "3DBall",
         "--timestamp": True,
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     assert '--timestamp' not in command.get_command()
 
     test_config = {
@@ -86,19 +86,19 @@ def test_training_command_excludes_timestamp():
         "--run-id": "3DBall",
         "--timestamp": False,
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     assert '--timestamp' not in command.get_command()
 
 
 def test_training_command_add_additional_args():
-    """Test for TrainingWrapperCommand correctly setting additional arguments."""
+    """Test for TrainingWrapperArguments correctly setting additional arguments."""
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
         "--env": "builds\\3DBall\\Unity Environment.exe",
         "--run-id": "3DBall",
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     additional_args = ['--slow', '--load']
     command.set_additional_arguments(additional_args)
     command_list = [
@@ -124,7 +124,7 @@ def test_training_command_add_additional_args():
 
 
 def test_override_configuration_values():
-    """Test for correct handling of TrainingWrapperCommand argument overrides.
+    """Test for correct handling of TrainingWrapperArguments argument overrides.
 
     Ensures the following arguments are overridden:
         --trainer-config
@@ -160,7 +160,7 @@ def test_override_configuration_values():
         "--timestamp": True,
     }
 
-    training_command = TrainingWrapperCommand(test_config)
+    training_command = TrainingWrapperArguments(test_config)
     training_command.set_additional_arguments(args.args)
     training_command.apply_argument_overrides(args)
 
@@ -192,7 +192,7 @@ def test_override_configuration_values():
 
 
 def test_training_command_set_methods():
-    """Tests that TrainingWrapperCommand correctly sets argument values."""
+    """Tests that TrainingWrapperArguments correctly sets argument values."""
 
     test_config = {
         "trainer-config-path": "config\\3DBall.yaml",
@@ -210,7 +210,7 @@ def test_training_command_set_methods():
         "--no-graphics": False,
         "--timestamp": False,
     }
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
 
     command.set_env('builds\\3DBall\\3DBall.exe')
     command.set_lesson('3')
@@ -229,7 +229,7 @@ def test_training_command_set_methods():
 
 
 def test_training_command_timestamp(monkeypatch):
-    """Test for TrainingWrapperCommand correctly applying a timestamp."""
+    """Test for TrainingWrapperArguments correctly applying a timestamp."""
 
     def mock_return():
         return '2019-06-29_17-13-41'
@@ -243,7 +243,7 @@ def test_training_command_timestamp(monkeypatch):
         "--timestamp": True,
     }
 
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     command_string = command.get_command_as_string()
 
     assert '--run-id 3DBall-2019-06-29_17-13-41' in command_string
@@ -266,7 +266,7 @@ def test_training_command_inference():
     }
 
     # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     command_list = [
         'pipenv',
         'run',
@@ -285,7 +285,7 @@ def test_training_command_inference():
     assert result == command_list
 
     # '--slow' isn't duplicated
-    command = TrainingWrapperCommand(test_config)
+    command = TrainingWrapperArguments(test_config)
     additional_args = ['--slow']
     command.set_additional_arguments(additional_args)
 
