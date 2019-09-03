@@ -234,13 +234,6 @@ class PerformBayesianSearch(SearchCommand):
             f=self.perform_bayes_search, pbounds=bounds, random_state=1, verbose=0
         )
 
-        # Save search observations to log file
-        if self.args.bayes_save:
-            bayes_log_path = self.get_bayes_log_path()
-            search_log.info(f'Saving Bayesian optimization observations to \'{bayes_log_path}\'')
-            bayes_logger = JSONLogger(path=str(bayes_log_path))
-            optimizer.subscribe(Events.OPTMIZATION_STEP, bayes_logger)
-
         # Load search observations from log files
         if self.args.bayes_load:
             log_files_list = self.find_bayes_log_paths()
@@ -249,6 +242,13 @@ class PerformBayesianSearch(SearchCommand):
                 search_log.info(f'{str(log)}')
 
             load_logs(optimizer, logs=log_files_list)
+
+        # Save search observations to log file
+        if self.args.bayes_save:
+            bayes_log_path = self.get_bayes_log_path()
+            search_log.info(f'Saving Bayesian optimization observations to \'{bayes_log_path}\'')
+            bayes_logger = JSONLogger(path=str(bayes_log_path))
+            optimizer.subscribe(Events.OPTMIZATION_STEP, bayes_logger)
 
         # Perform Bayesian searches
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
