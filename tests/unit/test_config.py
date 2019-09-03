@@ -1,6 +1,8 @@
 import json
-from pathlib import Path
 import pytest
+import yaml
+
+from pathlib import Path
 
 import grimagents.config as config
 import grimagents.command_util as command_util
@@ -10,9 +12,28 @@ GRIM_CONFIG_FILE = 'grim_config.json'
 TRAINER_CONFIG_FILE = 'trainer_config.yaml'
 CURRICULUM_FILE = 'curriculum.json'
 
-VALID_CONFIGURATION = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
+VALID_GRIM_CONFIG = {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
 
-INVALID_CONFIGURATION = {"--env": "builds\\3DBall\\3DBall.exe", "--run-id": "3DBall"}
+INVALID_GRIM_CONFIG = {"--env": "builds\\3DBall\\3DBall.exe", "--run-id": "3DBall"}
+
+TRAINER_CONFIG = {
+    'default': {
+        'trainer': 'ppo',
+        'batch_size': 1024,
+        'beta': 5.0e-3,
+        'buffer_size': 10240,
+        'epsilon': 0.2,
+        'gamma': 0.99,
+        'hidden_units': 128,
+        'lambd': 0.95,
+        'learning_rate': 3.0e-4,
+        'max_steps': 5.0e4,
+        'num_epoch': 3,
+        'num_layers': 2,
+        'time_horizon': 64,
+        'sequence_length': 64
+    }
+}
 
 
 def get_grim_config_file_path():
@@ -72,10 +93,10 @@ def test_load_grim_config_file(fixture_grim_config_file):
 
     path = get_grim_config_file_path()
     with path.open(mode='w') as f:
-        json.dump(VALID_CONFIGURATION, f, indent=4)
+        json.dump(VALID_GRIM_CONFIG, f, indent=4)
 
     file_data = config.load_grim_config_file(path)
-    assert file_data == VALID_CONFIGURATION
+    assert file_data == VALID_GRIM_CONFIG
 
 
 def test_invalid_configuration_error(fixture_grim_config_file):
@@ -85,7 +106,7 @@ def test_invalid_configuration_error(fixture_grim_config_file):
 
     path = get_grim_config_file_path()
     with path.open(mode='w') as f:
-        json.dump(INVALID_CONFIGURATION, f, indent=4)
+        json.dump(INVALID_GRIM_CONFIG, f, indent=4)
 
     with pytest.raises(config.InvalidConfigurationError):
         config.load_grim_config_file(path)
@@ -102,6 +123,17 @@ def test_configuration_validation():
 
     configuration['--run-id'] = '3DBall'
     assert config.validate_grim_configuration(configuration) is True
+
+
+def test_load_trainer_configuration(fixture_trainer_config_file):
+    """Tests for the correct loading of a trainer configuration dictionary from file. """
+
+    path = get_trainer_config_file_path()
+    with path.open(mode='w') as f:
+        yaml.dump(TRAINER_CONFIG, f, indent=4)
+
+    loaded_configuration = config.load_trainer_configuration(path)
+    assert loaded_configuration['default']['buffer_size'] == 10240
 
 
 def test_create_trainer_config_file(fixture_trainer_config_file):
