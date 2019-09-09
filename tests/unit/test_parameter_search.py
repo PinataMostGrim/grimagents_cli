@@ -23,7 +23,7 @@ def search_config():
                 "num_epoch": [3, 10],
             },
         }
-    }.copy()
+    }
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def trainer_config():
         },
         "BRAIN_NAME": {"beta": 5.0e-3, "epsilon": 0.2},
         "OTHER_BRAIN_NAME": {"batch_size": 1024, "buffer_size": 10240, "epsilon": 0.2},
-    }.copy()
+    }
 
 
 def test_get_search_hyperparameters(search_config):
