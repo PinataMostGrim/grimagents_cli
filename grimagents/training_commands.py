@@ -96,7 +96,7 @@ class PerformTraining(Command):
     def create_command(self, args):
 
         config_path = Path(args.configuration_file)
-        config = config_util.load_grim_config_file(config_path)
+        config = config_util.load_grim_configuration_file(config_path)
 
         training_arguments = TrainingWrapperArguments(config)
         training_arguments.apply_argument_overrides(args)

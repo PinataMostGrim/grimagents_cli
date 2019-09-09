@@ -61,7 +61,7 @@ def test_perform_training_command(monkeypatch, namespace_args, test_config):
     def mock_load_config(config_path):
         return test_config
 
-    monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
+    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
 
     perform_training = PerformTraining()
     result = perform_training.create_command(namespace_args)
@@ -97,7 +97,7 @@ def test_perform_training_command_dry_run(monkeypatch, namespace_args, test_conf
     def mock_override_execute_command(command, new_window, show_command, dry_run):
         pass
 
-    monkeypatch.setattr(grimagents.config, "load_grim_config_file", mock_load_config)
+    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
     monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
 
     perform_training = PerformTraining()

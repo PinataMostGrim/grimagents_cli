@@ -164,7 +164,7 @@ def get_default_search_config():
     return _DEFAULT_SEARCH_CONFIG.copy()
 
 
-def load_grim_config_file(file_path: Path):
+def load_grim_configuration_file(file_path: Path):
     """Loads a grimagents configuration dictionary from file.
 
     Raises:

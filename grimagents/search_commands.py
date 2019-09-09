@@ -45,7 +45,7 @@ class SearchCommand(Command):
 
         # Gather configurations
         self.grim_config_path = Path(args.configuration_file)
-        self.grim_config = config_util.load_grim_config_file(self.grim_config_path)
+        self.grim_config = config_util.load_grim_configuration_file(self.grim_config_path)
 
         self.search_config = self.grim_config[config_util.SEARCH]
 

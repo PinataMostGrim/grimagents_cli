@@ -102,13 +102,13 @@ def test_create_grim_config_file(grim_config, fixture_cleanup_grim_config):
     assert data == file_data
 
 
-def test_load_grim_config_file(grim_config, fixture_cleanup_grim_config):
+def test_load_grim_configuration_file(grim_config, fixture_cleanup_grim_config):
     """Test for loading a valid grimagents configuration file."""
 
     with grim_config.open(mode='w') as f:
         json.dump(VALID_GRIM_CONFIG, f, indent=4)
 
-    file_data = config.load_grim_config_file(grim_config)
+    file_data = config.load_grim_configuration_file(grim_config)
     assert file_data == VALID_GRIM_CONFIG
 
 
@@ -121,7 +121,7 @@ def test_invalid_configuration_error(grim_config, fixture_cleanup_grim_config):
         json.dump(INVALID_GRIM_CONFIG, f, indent=4)
 
     with pytest.raises(config.InvalidConfigurationError):
-        config.load_grim_config_file(grim_config)
+        config.load_grim_configuration_file(grim_config)
 
 
 def test_configuration_validation():
