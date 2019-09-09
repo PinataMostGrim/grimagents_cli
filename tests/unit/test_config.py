@@ -143,7 +143,7 @@ def test_load_trainer_configuration(trainer_config, fixture_cleanup_trainer_conf
     with trainer_config.open(mode='w') as f:
         yaml.dump(TRAINER_CONFIG, f, indent=4)
 
-    loaded_configuration = config.load_trainer_configuration(trainer_config)
+    loaded_configuration = config.load_trainer_configuration_file(trainer_config)
     assert loaded_configuration['default']['buffer_size'] == 10240
 
 

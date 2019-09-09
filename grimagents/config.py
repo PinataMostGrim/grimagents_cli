@@ -218,7 +218,7 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
-def load_trainer_configuration(file_path: Path):
+def load_trainer_configuration_file(file_path: Path):
     """Loads a MLAgents trainer configuration from a yaml file.
     """
 

@@ -50,7 +50,7 @@ class SearchCommand(Command):
         self.search_config = self.grim_config[config_util.SEARCH]
 
         self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
-        self.trainer_config = config_util.load_trainer_configuration(self.trainer_config_path)
+        self.trainer_config = config_util.load_trainer_configuration_file(self.trainer_config_path)
 
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
 
