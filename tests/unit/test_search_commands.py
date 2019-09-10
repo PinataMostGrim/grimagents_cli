@@ -11,6 +11,7 @@ from grimagents.search_commands import (
     SearchCommand,
     PerformGridSearch,
     ExportGridSearchConfiguration,
+    PerformRandomSearch,
 )
 
 
@@ -113,6 +114,15 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
         grimagents.config, "load_trainer_configuration_file", mock_load_trainer_configuration
     )
 
+    def mock_perform_search_with_configuration(self, intersect, brain_config):
+        pass
+
+    monkeypatch.setattr(
+        grimagents.search_commands.SearchCommand,
+        'perform_search_with_configuration',
+        mock_perform_search_with_configuration,
+    )
+
     def mock_write_yaml_file(yaml_data, file_path):
         pass
 
@@ -139,18 +149,9 @@ def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
         return trainer_config
 
     monkeypatch.setattr(
-        grimagents.parameter_search.GridSearch,
+        grimagents.parameter_search.ParameterSearch,
         'get_brain_config_for_intersect',
         mock_get_brain_config_for_intersect,
-    )
-
-    def mock_perform_search_with_configuration(self, intersect, brain_config):
-        pass
-
-    monkeypatch.setattr(
-        grimagents.search_commands.SearchCommand,
-        'perform_search_with_configuration',
-        mock_perform_search_with_configuration,
     )
 
 
@@ -246,7 +247,7 @@ def test_resume_perform_grid_search(
     with pytest.raises(IndexError):
         search.execute()
 
-    # Correct number of searchs are run when resuming
+    # Correct number of searches are run when resuming
     class Counter:
         def __init__(self):
             self.count = 0
@@ -285,5 +286,50 @@ def test_export_grid_search_configuration(
     namespace_args.export_index = 1
     export = ExportGridSearchConfiguration(namespace_args)
     export.execute()
+
+
+def test_perform_random_search(
+    monkeypatch,
+    patch_search_command,
+    namespace_args,
+    trainer_config,
+    intersect,
+    test_file,
+    fixture_cleanup_test_file,
+):
+    """Tests for the correct execution of a random search."""
+
+    def mock_get_randomized_intersect(self):
+        return intersect
+
+    monkeypatch.setattr(
+        grimagents.parameter_search.RandomSearch,
+        'get_randomized_intersect',
+        mock_get_randomized_intersect,
+    )
+
+    def mock_get_brain_config_for_intersect(self, intersect):
+        return trainer_config
+
+    monkeypatch.setattr(
+        grimagents.parameter_search.ParameterSearch,
+        'get_brain_config_for_intersect',
+        mock_get_brain_config_for_intersect,
+    )
+
+    namespace_args.random = 4
+    search = PerformRandomSearch(namespace_args)
+
+    search.search_config_path = test_file
+    with test_file.open('w') as f:
+        f.write('Test search configuration')
+
+    search.execute()
+
+    # Correct number of searches are run
+    assert search.search_counter == 3
+
+    # Removal of test configuration file
+    assert not test_file.exists()
 
 
