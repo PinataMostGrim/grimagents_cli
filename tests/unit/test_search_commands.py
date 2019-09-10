@@ -7,7 +7,16 @@ from pathlib import Path
 import grimagents.config
 import grimagents.command_util
 
-from grimagents.search_commands import SearchCommand
+from grimagents.search_commands import (
+    SearchCommand,
+    PerformGridSearch,
+    ExportGridSearchConfiguration,
+)
+
+
+@pytest.fixture
+def test_file():
+    return Path(__file__).parent / 'test_file'
 
 
 @pytest.fixture
@@ -82,22 +91,21 @@ def namespace_args():
         edit_config=None,
         export_index=None,
         parallel=False,
-        random=4,
+        random=None,
         resume=None,
         search_count=False,
     )
 
 
 @pytest.fixture
-def patch_load_grim_config(monkeypatch, grim_config):
+def patch_search_command(monkeypatch, grim_config, trainer_config):
+    """Patches external methods used in initializing and performing searches with SearchCommand objects."""
+
     def mock_load_grim_config(file_path: Path):
         return grim_config
 
     monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_grim_config)
 
-
-@pytest.fixture
-def patch_load_trainer_config(monkeypatch, trainer_config):
     def mock_load_trainer_configuration(file_path: Path):
         return trainer_config
 
@@ -105,10 +113,57 @@ def patch_load_trainer_config(monkeypatch, trainer_config):
         grimagents.config, "load_trainer_configuration_file", mock_load_trainer_configuration
     )
 
+    def mock_write_yaml_file(yaml_data, file_path):
+        pass
 
-def test_search_command_init(
-    patch_load_grim_config, patch_load_trainer_config, grim_config, trainer_config, namespace_args
-):
+    monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
+
+
+@pytest.fixture
+def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
+    """Patches external methods used by calling PerformGridSearch.execute()."""
+
+    def mock_get_intersect_count(self):
+        return 10
+
+    monkeypatch.setattr(
+        grimagents.parameter_search.GridSearch, 'get_intersect_count', mock_get_intersect_count
+    )
+
+    def mock_get_intersect(self, index):
+        return intersect
+
+    monkeypatch.setattr(grimagents.parameter_search.GridSearch, 'get_intersect', mock_get_intersect)
+
+    def mock_get_brain_config_for_intersect(self, intersect):
+        return trainer_config
+
+    monkeypatch.setattr(
+        grimagents.parameter_search.GridSearch,
+        'get_brain_config_for_intersect',
+        mock_get_brain_config_for_intersect,
+    )
+
+    def mock_perform_search_with_configuration(self, intersect, brain_config):
+        pass
+
+    monkeypatch.setattr(
+        grimagents.search_commands.SearchCommand,
+        'perform_search_with_configuration',
+        mock_perform_search_with_configuration,
+    )
+
+
+@pytest.fixture
+def fixture_cleanup_test_file(test_file):
+    if test_file.exists():
+        test_file.unlink()
+    yield 'fixture_cleanup_test_file'
+    if test_file.exists():
+        test_file.unlink()
+
+
+def test_search_command_init(patch_search_command, namespace_args, grim_config, trainer_config):
     """Tests for the correct initialization of a SearchCommand object."""
 
     search_command = SearchCommand(namespace_args)
@@ -127,13 +182,7 @@ def test_search_command_init(
 
 
 def test_perform_search_with_configuration(
-    monkeypatch,
-    patch_load_grim_config,
-    patch_load_trainer_config,
-    grim_config,
-    trainer_config,
-    namespace_args,
-    intersect,
+    monkeypatch, patch_search_command, namespace_args, grim_config, trainer_config, intersect
 ):
     """Tests for the correct creation of search commands for grimagents."""
 
@@ -161,5 +210,80 @@ def test_perform_search_with_configuration(
     search_command = SearchCommand(namespace_args)
     search_command.perform_search_with_configuration(intersect, trainer_config)
 
+
+def test_perform_grid_search(
+    patch_search_command,
+    patch_perform_grid_search,
+    namespace_args,
+    test_file,
+    fixture_cleanup_test_file,
+):
+    """Tests for the correct execution of a grid search."""
+
+    search = PerformGridSearch(namespace_args)
+
+    search.search_config_path = test_file
+    with test_file.open('w') as f:
+        f.write('Test search configuration')
+
+    search.execute()
+
+    # Correct number of searches are run
+    assert search.search_counter == 9
+
+    # Removal of test configuration file
+    assert not test_file.exists()
+
+
+def test_resume_perform_grid_search(
+    monkeypatch, patch_search_command, patch_perform_grid_search, namespace_args
+):
+    """Tests for correct handling of the resume argument when executing a grid search."""
+
+    # Raise exception when resuming at an index higher than the search configuration can accommodate
+    namespace_args.resume = 11
+    search = PerformGridSearch(namespace_args)
+    with pytest.raises(IndexError):
+        search.execute()
+
+    # Correct number of searchs are run when resuming
+    class Counter:
+        def __init__(self):
+            self.count = 0
+
+        def increment_counter(self):
+            self.count += 1
+
+    search_counter = Counter()
+
+    def mock_perform_search_with_configuration(self, intersect, brain_config):
+        search_counter.increment_counter()
+
+    monkeypatch.setattr(
+        grimagents.search_commands.SearchCommand,
+        'perform_search_with_configuration',
+        mock_perform_search_with_configuration,
+    )
+
+    namespace_args.resume = 3
+    search = PerformGridSearch(namespace_args)
+    search.execute()
+
+    assert search_counter.count == 7
+
+
+def test_export_grid_search_configuration(
+    monkeypatch, patch_search_command, patch_perform_grid_search, namespace_args, trainer_config
+):
+    """Tests exporting a grid search trainer configuration to file."""
+
+    def mock_write_yaml_file(yaml_data, file_path):
+        assert yaml_data == trainer_config
+
+    monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
+
+    namespace_args.export_index = 1
+    export = ExportGridSearchConfiguration(namespace_args)
+    export.execute()
 
 
