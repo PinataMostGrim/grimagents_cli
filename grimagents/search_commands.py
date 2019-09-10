@@ -120,6 +120,9 @@ class OutputGridSearchCount(GridSearchCommand):
 
 class PerformGridSearch(GridSearchCommand):
     """Perform a hyperparameter grid search using values from a grimagents configuration file.
+
+    Raises:
+        IndexError: Raised if attempting to resume at a higher index count than the search configuration allows for
     """
 
     def execute(self):
@@ -127,10 +130,9 @@ class PerformGridSearch(GridSearchCommand):
         if self.args.resume:
             count = self.grid_search.get_intersect_count()
             if self.args.resume > count:
-                search_log.warning(
-                    f'\'{self.trainer_config_path}\' will only perform {count} training runs, unable to resume at index {self.args.resume}'
-                )
-                sys.exit()
+                error = f'\'{self.trainer_config_path}\' is configured for {count} training runs, unable to resume at index {self.args.resume}'
+                search_log.error(error)
+                raise IndexError(error)
             start_index = self.args.resume
         else:
             start_index = 0
