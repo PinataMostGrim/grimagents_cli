@@ -51,19 +51,19 @@ def patch_get_history_file(monkeypatch):
 
 
 @pytest.fixture
-def fixture_cleanup_test_file():
-    delete_file(get_test_file_path())
+def fixture_cleanup_test_file(test_file):
+    delete_file(test_file)
     yield 'fixture_cleanup_test_file'
-    delete_file(get_test_file_path())
+    delete_file(test_file)
 
 
 @pytest.fixture
-def fixture_cleanup_nested_test_file():
-    delete_file(get_nested_test_file_path())
-    delete_folder(get_nested_test_file_path().parent)
+def fixture_cleanup_nested_test_file(nested_test_file):
+    delete_file(nested_test_file)
+    delete_folder(nested_test_file.parent)
     yield 'fixture_cleanup_nested_test_file'
-    delete_file(get_nested_test_file_path())
-    delete_folder(get_nested_test_file_path().parent)
+    delete_file(nested_test_file)
+    delete_folder(nested_test_file.parent)
 
 
 def test_write_file(test_file, fixture_cleanup_test_file):
