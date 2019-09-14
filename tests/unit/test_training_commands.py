@@ -2,6 +2,7 @@ import pytest
 
 from argparse import Namespace
 
+import grimagents.command_util
 import grimagents.common
 import grimagents.config
 
@@ -39,6 +40,7 @@ def namespace_args():
     return Namespace(
         configuration_file='config\\3DBall_grimagents.json',
         new_window=False,
+        dry_run=False,
         trainer_config=None,
         env=None,
         lesson=None,
@@ -54,22 +56,9 @@ def namespace_args():
     )
 
 
-def test_perform_training_command(monkeypatch, namespace_args, grim_config):
-    """Tests for the correct creation of a PerformTraining command.
-    """
-
-    def mock_load_config(config_path):
-        return grim_config
-
-    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
-
-    perform_training = PerformTraining()
-    result = perform_training.create_command(namespace_args)
-
-    # The absolute path to training_wrapper.py will differ based on the system running this test.
-    result[3] = 'grimagents\\training_wrapper.py'
-
-    assert result == [
+@pytest.fixture
+def training_command_arguments():
+    return [
         'pipenv',
         'run',
         'python',
@@ -83,6 +72,48 @@ def test_perform_training_command(monkeypatch, namespace_args, grim_config):
         '3DBall',
         '--train',
     ]
+
+
+def test_perform_training_create_command(monkeypatch, namespace_args, grim_config, training_command_arguments):
+    """Tests that PerformTraining.create_command() returns a valid command line argument for training."""
+
+    def mock_load_config(config_path):
+        return grim_config
+
+    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
+
+    perform_training = PerformTraining()
+    result = perform_training.create_command(namespace_args)
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents\\training_wrapper.py'
+
+    assert result == training_command_arguments
+
+
+def test_perform_training_execute(monkeypatch, namespace_args, training_command_arguments):
+    """Tests that PerformTraining.execute() initiates training.
+
+    Ensures:
+        - The training command is saved to history
+        - The training command is sent to command_util for execution
+    """
+
+    def mock_create_command(self, args):
+        return training_command_arguments
+
+    def mock_save_to_history(command):
+        assert command == training_command_arguments
+
+    def mock_execute_command(command, new_window, show_command, dry_run):
+        assert command == training_command_arguments
+
+    monkeypatch.setattr(PerformTraining, 'create_command', mock_create_command)
+    monkeypatch.setattr(grimagents.command_util, 'save_to_history', mock_save_to_history)
+    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_execute_command)
+
+    perform_training = PerformTraining()
+    perform_training.execute(namespace_args)
 
 
 def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_config):
