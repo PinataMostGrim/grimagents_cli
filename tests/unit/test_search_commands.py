@@ -114,7 +114,7 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
         grimagents.config, "load_trainer_configuration_file", mock_load_trainer_configuration
     )
 
-    def mock_perform_search_with_configuration(self, intersect, brain_config):
+    def mock_perform_search_with_configuration(self, brain_config):
         pass
 
     monkeypatch.setattr(
@@ -209,7 +209,7 @@ def test_perform_search_with_configuration(
     monkeypatch.setattr(subprocess, 'run', mock_run)
 
     search_command = SearchCommand(namespace_args)
-    search_command.perform_search_with_configuration(intersect, trainer_config)
+    search_command.perform_search_with_configuration(trainer_config)
 
 
 def test_perform_grid_search(
@@ -257,7 +257,7 @@ def test_resume_perform_grid_search(
 
     search_counter = Counter()
 
-    def mock_perform_search_with_configuration(self, intersect, brain_config):
+    def mock_perform_search_with_configuration(self, brain_config):
         search_counter.increment_counter()
 
     monkeypatch.setattr(

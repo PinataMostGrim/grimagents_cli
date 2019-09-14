@@ -56,8 +56,10 @@ class SearchCommand(Command):
 
         self.search_counter = 0
 
-    def perform_search_with_configuration(self, intersect, search_brain_config):
-        """Executes a search using the provided intersect and matching brain_config."""
+    def perform_search_with_configuration(self, search_brain_config):
+        """Executes a search using the provided intersect and matching brain_config.
+
+        """
 
         # Write trainer configuration file for current intersect
         if self.args.parallel:
@@ -67,8 +69,8 @@ class SearchCommand(Command):
 
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
-        # Execute training with the intersect config and run_id
-        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
+        # Execute training with the search_brain_config and run_id
+        run_id = self.get_search_run_id()
         command = [
             'pipenv',
             'run',
@@ -82,12 +84,6 @@ class SearchCommand(Command):
             run_id,
         ]
 
-        search_log.info('-' * 63)
-        search_log.info(f'Search: {run_id}')
-        for key, value in intersect.items():
-            search_log.info(f'    {key}: {value}')
-        search_log.info('-' * 63)
-
         if self.args.parallel:
             command = ['cmd', '/K'] + command
             base_port = self.grim_config.get('--base-port', 5005)
@@ -98,6 +94,11 @@ class SearchCommand(Command):
         else:
             command = [str(element) for element in command]
             subprocess.run(command)
+
+    def get_search_run_id(self):
+        """Returns a run_id string for the current search."""
+
+        return self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
 
 
 class GridSearchCommand(SearchCommand):
@@ -151,7 +152,13 @@ class PerformGridSearch(GridSearchCommand):
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
             self.search_counter = i
 
-            self.perform_search_with_configuration(intersect, intersect_brain_config)
+            search_log.info('-' * 63)
+            search_log.info(f'Search: {self.get_search_run_id()}')
+            for key, value in intersect.items():
+                search_log.info(f'    {key}: {value}')
+            search_log.info('-' * 63)
+
+            self.perform_search_with_configuration(intersect_brain_config)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -196,7 +203,13 @@ class PerformRandomSearch(SearchCommand):
             intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
             self.search_counter = i
 
-            self.perform_search_with_configuration(intersect, intersect_brain_config)
+            search_log.info('-' * 63)
+            search_log.info(f'Search: {self.get_search_run_id()}')
+            for key, value in intersect.items():
+                search_log.info(f'    {key}: {value}')
+            search_log.info('-' * 63)
+
+            self.perform_search_with_configuration(intersect_brain_config)
 
         if not self.args.parallel and self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -220,7 +233,7 @@ class PerformBayesianSearch(SearchCommand):
             )
 
         search_log.info('-' * 63)
-        search_log.info('Performing bayesian search for hyperparameters:')
+        search_log.info('Performing Bayesian search for hyperparameters:')
         for i in range(len(self.bayes_search.hyperparameters)):
             search_log.info(
                 f'    {self.bayes_search.hyperparameters[i]}: {self.bayes_search.hyperparameter_sets[i]}'
