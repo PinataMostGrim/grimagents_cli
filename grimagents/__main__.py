@@ -41,13 +41,15 @@ main_log = logging.getLogger('grimagents.main')
 def main():
 
     configure_logging()
-    args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
         main_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
         return
+
+    argv = get_argvs()
+    args = parse_args(argv)
 
     if args.list:
         ListTrainingOptions().execute(args)
@@ -65,6 +67,11 @@ def main():
         PerformTraining().execute(args)
 
     logging.shutdown()
+
+
+def get_argvs():
+
+    return sys.argv[1:]
 
 
 def parse_args(argv):
@@ -154,7 +161,7 @@ def parse_args(argv):
         help='Additional arguments applied to training (ex. --slow, --debug, --load)',
     )
 
-    args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = options_parser.parse_known_args(argv)
     args, unparsed_args = overrides_parser.parse_known_args(unparsed_args, args)
 
     if len(argv) == 0:
