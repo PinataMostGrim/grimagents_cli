@@ -26,7 +26,7 @@ import grimagents.common as common
 
 training_log = logging.getLogger('grimagents.training_wrapper')
 exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
-mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
+mean_reward_regex = re.compile(r'(Mean Reward: )([^ ]+)\. ')
 
 
 class TrainingRunInfo:
@@ -43,7 +43,7 @@ class TrainingRunInfo:
         self.steps_regex = re.compile(r'Step: ([\d]+)\. ')
         self.time_regex = re.compile(r'Time Elapsed: ([\.\d]+) s')
         self.max_steps_regex = re.compile(r'max_steps:\t(.+)$')
-        self.mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
+        self.mean_reward_regex = re.compile(r'(Mean Reward: )([^ ]+)\. ')
         self.exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
 
     def update_from_training_output(self, line):
@@ -190,22 +190,22 @@ def configure_logging():
     """Configures logging for a training session."""
 
     log_config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "display": {"style": "{", "format": "{message}"},
-            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'display': {'style': '{', 'format': '{message}'},
+            'timestamp': {'style': '{', 'format': '[{asctime}][{levelname}] {message}'},
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "display",
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'display',
             },
-            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+            'file': {'class': 'logging.FileHandler', 'filename': '', 'formatter': 'timestamp'},
         },
-        "loggers": {"grimagents.training_wrapper": {"handlers": ["console", "file"]}},
-        "root": {"level": "INFO"},
+        'loggers': {'grimagents.training_wrapper': {'handlers': ['console', 'file']}},
+        'root': {'level': 'INFO'},
     }
 
     log_file = settings.get_log_file_path()

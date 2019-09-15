@@ -154,10 +154,10 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
     def mock_write_yaml_file(yaml_data, file_path):
         pass
 
-    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_grim_config)
+    monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_grim_config)
 
     monkeypatch.setattr(
-        grimagents.config, "load_trainer_configuration_file", mock_load_trainer_configuration
+        grimagents.config, 'load_trainer_configuration_file', mock_load_trainer_configuration
     )
 
     monkeypatch.setattr(
@@ -166,7 +166,7 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
         mock_perform_search_with_configuration,
     )
 
-    monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
+    monkeypatch.setattr(grimagents.command_util, 'write_yaml_file', mock_write_yaml_file)
 
 
 @pytest.fixture
@@ -372,7 +372,7 @@ def test_export_grid_search_configuration(
     def mock_write_yaml_file(yaml_data, file_path):
         assert yaml_data == trainer_config
 
-    monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
+    monkeypatch.setattr(grimagents.command_util, 'write_yaml_file', mock_write_yaml_file)
 
     namespace_args.export_index = 1
     export = ExportGridSearchConfiguration(namespace_args)
@@ -567,7 +567,7 @@ def test_save_max_to_file(
     def mock_write_yaml_file(yaml_data, file_path):
         assert yaml_data == trainer_config
 
-    monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
+    monkeypatch.setattr(grimagents.command_util, 'write_yaml_file', mock_write_yaml_file)
 
     max = {
         'target': 1.595,

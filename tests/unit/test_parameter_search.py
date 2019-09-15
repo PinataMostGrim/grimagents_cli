@@ -13,14 +13,14 @@ from grimagents.parameter_search import (
 @pytest.fixture
 def search_config():
     return {
-        "brain": {
-            "name": "BRAIN_NAME",
-            "hyperparameters": {
-                "beta": [1e-4, 1e-2],
-                "hidden_units": [32, 512],
-                "learning_rate": [1e-5, 1e-3],
-                "num_layers": [1, 3],
-                "num_epoch": [3, 10],
+        'brain': {
+            'name': 'BRAIN_NAME',
+            'hyperparameters': {
+                'beta': [1e-4, 1e-2],
+                'hidden_units': [32, 512],
+                'learning_rate': [1e-5, 1e-3],
+                'num_layers': [1, 3],
+                'num_epoch': [3, 10],
             },
         }
     }
@@ -29,18 +29,18 @@ def search_config():
 @pytest.fixture
 def trainer_config():
     return {
-        "default": {
-            "trainer": "ppo",
-            "batch_size": 1024,
-            "beta": 5.0e-3,
-            "buffer_size": 10240,
-            "epsilon": 0.2,
-            "gamma": 0.99,
-            "hidden_units": 128,
-            "lambd": 0.95,
+        'default': {
+            'trainer': 'ppo',
+            'batch_size': 1024,
+            'beta': 5.0e-3,
+            'buffer_size': 10240,
+            'epsilon': 0.2,
+            'gamma': 0.99,
+            'hidden_units': 128,
+            'lambd': 0.95,
         },
-        "BRAIN_NAME": {"beta": 5.0e-3, "epsilon": 0.2},
-        "OTHER_BRAIN_NAME": {"batch_size": 1024, "buffer_size": 10240, "epsilon": 0.2},
+        'BRAIN_NAME': {'beta': 5.0e-3, 'epsilon': 0.2},
+        'OTHER_BRAIN_NAME': {'batch_size': 1024, 'buffer_size': 10240, 'epsilon': 0.2},
     }
 
 

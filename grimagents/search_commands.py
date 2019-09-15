@@ -285,7 +285,7 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
         search_log.info(f'Best Configuration ({optimizer.max["target"]}):')
 
-        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer.max["params"])
+        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer.max['params'])
         for key, value in best_intersect.items():
             search_log.info(f'    {key}: {value}')
 

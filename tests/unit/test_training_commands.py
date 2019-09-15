@@ -17,20 +17,20 @@ from grimagents.training_commands import (
 @pytest.fixture
 def grim_config():
     return {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--env": "builds\\3DBall\\3DBall.exe",
-        "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
-        "--curriculum": "",
-        "--keep-checkpoints": "",
-        "--lesson": "",
-        "--run-id": "3DBall",
-        "--num-runs": "",
-        "--save-freq": "",
-        "--seed": "",
-        "--base-port": "",
-        "--num-envs": "",
-        "--no-graphics": False,
-        "--timestamp": False,
+        'trainer-config-path': 'config\\3DBall.yaml',
+        '--env': 'builds\\3DBall\\3DBall.exe',
+        '--export-path': 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        '--curriculum': '',
+        '--keep-checkpoints': '',
+        '--lesson': '',
+        '--run-id': '3DBall',
+        '--num-runs': '',
+        '--save-freq': '',
+        '--seed': '',
+        '--base-port': '',
+        '--num-envs': '',
+        '--no-graphics': False,
+        '--timestamp': False,
     }
 
 
@@ -82,7 +82,7 @@ def test_perform_training_create_command(
     def mock_load_config(config_path):
         return grim_config
 
-    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
+    monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_config)
 
     perform_training = PerformTraining()
     result = perform_training.create_command(namespace_args)
@@ -130,8 +130,8 @@ def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_conf
     def mock_override_execute_command(command, new_window, show_command, dry_run):
         pass
 
-    monkeypatch.setattr(grimagents.config, "load_grim_configuration_file", mock_load_config)
-    monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
+    monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_config)
+    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_override_execute_command)
 
     perform_training = PerformTraining()
     perform_training.execute(namespace_args)
@@ -153,7 +153,7 @@ def test_command_dry_run(monkeypatch):
     def mock_override_execute_command(command, new_window, show_command, dry_run):
         pass
 
-    monkeypatch.setattr(grimagents.command_util, "execute_command", mock_override_execute_command)
+    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_override_execute_command)
 
     command = Command()
     command.execute(no_dry_run_args)
@@ -172,22 +172,22 @@ def test_resume_training(monkeypatch):
     """
 
     last_history = [
-        "pipenv",
-        "run",
-        "python",
-        "grimagents\\training_wrapper.py",
-        "config\\3DBall.yaml",
-        "--env",
-        "builds\\3DBall\\3DBall.exe",
-        "--run-id",
-        "3DBall_01-2019-07-12_23-55-05",
-        "--train",
+        'pipenv',
+        'run',
+        'python',
+        'grimagents\\training_wrapper.py',
+        'config\\3DBall.yaml',
+        '--env',
+        'builds\\3DBall\\3DBall.exe',
+        '--run-id',
+        '3DBall_01-2019-07-12_23-55-05',
+        '--train',
     ]
 
     def mock_load_history():
         return last_history
 
-    monkeypatch.setattr(grimagents.command_util, "load_last_history", mock_load_history)
+    monkeypatch.setattr(grimagents.command_util, 'load_last_history', mock_load_history)
 
     resume_training = ResumeTraining()
 

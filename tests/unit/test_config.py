@@ -15,12 +15,12 @@ def delete_file(file: Path):
 
 @pytest.fixture
 def valid_grim_config():
-    return {"trainer-config-path": "config\\3DBall.yaml", "--run-id": "3DBall"}
+    return {'trainer-config-path': 'config\\3DBall.yaml', '--run-id': '3DBall'}
 
 
 @pytest.fixture
 def invalid_grim_config():
-    return {"--env": "builds\\3DBall\\3DBall.exe", "--run-id": "3DBall"}
+    return {'--env': 'builds\\3DBall\\3DBall.exe', '--run-id': '3DBall'}
 
 
 @pytest.fixture
@@ -123,7 +123,7 @@ def test_invalid_configuration_error(
 def test_configuration_validation():
     """Test for validating or rejecting grimagent configurations."""
 
-    configuration = {"--env": "builds\\3DBall\\3DBall.exe"}
+    configuration = {'--env': 'builds\\3DBall\\3DBall.exe'}
     assert config.validate_grim_configuration(configuration) is False
 
     configuration['trainer-config-path'] = 'config\\3DBall.yaml'
@@ -189,12 +189,12 @@ def test_no_overwrite_search_entry(grim_config_path, fixture_cleanup_grim_config
     def mock_open_file(file_path):
         pass
 
-    monkeypatch.setattr(command_util, "open_file", mock_open_file)
+    monkeypatch.setattr(command_util, 'open_file', mock_open_file)
 
     configuration = {
-        "trainer-config-path": "config\\3DBall.yaml",
-        "--run-id": "3DBall",
-        "search": [],
+        'trainer-config-path': 'config\\3DBall.yaml',
+        '--run-id': '3DBall',
+        'search': [],
     }
 
     with grim_config_path.open('w') as f:
