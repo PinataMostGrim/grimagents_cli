@@ -40,6 +40,10 @@ class EditGrimConfigFile(Command):
 
 class SearchCommand(Command):
     def __init__(self, args):
+        """
+        Parameters:
+            args: Namespace: A Namespace object containing command line arguments for the search.
+        """
 
         self.args = args
 
@@ -59,6 +63,8 @@ class SearchCommand(Command):
     def perform_search_with_configuration(self, search_brain_config):
         """Executes a search using the provided intersect and matching brain_config.
 
+        Parameters:
+            search_brain_config: dict: A dictionary containing a set of default hyperparameters and brain specific hyperparameters that will be used in the search. This will be written into a trainer config file for the search.
         """
 
         # Write trainer configuration file for current intersect
@@ -183,6 +189,10 @@ class ExportGridSearchConfiguration(GridSearchCommand):
 
 class PerformRandomSearch(SearchCommand):
     def __init__(self, args):
+        """
+        Parameters:
+            args: Namespace: A Namespace object containing command line arguments for the search.
+        """
 
         super().__init__(args)
         self.random_search = RandomSearch(self.search_config, self.trainer_config)
@@ -220,6 +230,10 @@ class PerformRandomSearch(SearchCommand):
 
 class PerformBayesianSearch(SearchCommand):
     def __init__(self, args):
+        """
+        Parameters:
+            args: Namespace: A Namespace object containing command line arguments for the search.
+        """
 
         super().__init__(args)
         self.bayes_search = BayesianSearch(self.search_config, self.trainer_config)
@@ -280,13 +294,18 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
 
     def perform_bayes_search(self, **kwargs):
-        """Executes a training run using the provided intersect and returns the final mean reward."""
+        """Executes a training run using the provided arguments and returns the final mean reward.
 
+        Parameters:
+            kwargs: Arguments containing hyperparameters to use in the search, provided by a BayesianSearch object.
+        """
+
+        # Construct search configuration using input from the BayesianSearch object.
         intersect = self.bayes_search.sanitize_parameter_values(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
-        # # Execute training with the intersect config and run_id
+        # Execute training with the intersect config and run_id
         run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
         command = [
             'pipenv',
@@ -331,7 +350,10 @@ class PerformBayesianSearch(SearchCommand):
         return float(reward)
 
     def save_max_to_file(self, max: dict):
-        """Sanitizes a BayesianOptimization object's max parameter and writes it to a brain configuration file.
+        """Constructs a trainer configuration dictionary from a BayesianOptimization object's max property and saves it to file.
+
+        Parameters:
+            max: dict: The max property of a BayesianOptimization object.
         """
 
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
@@ -369,9 +391,8 @@ class PerformBayesianSearch(SearchCommand):
             self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
         )
 
-        # We create the folder if it doesn't exist as the BayesionOptimization JSONLogger will throw an exception instead of doing this.
+        # We create the log folder if it doesn't exist as the BayesionOptimization JSONLogger will throw an exception instead of doing this.
         if not log_folder_path.exists():
             log_folder_path.mkdir(parents=True)
 
         return log_folder_path
-

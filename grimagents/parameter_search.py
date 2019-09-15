@@ -92,6 +92,9 @@ class ParameterSearch:
 
     def get_brain_config_for_intersect(self, intersect):
         """Returns a brain configuration dictionary with values overridden by the grid search intersect.
+
+        Parameters:
+            intersect: dict: A dictionary containing hyperparameter names paired with override values
         """
 
         result = self.brain_config.copy()
@@ -192,6 +195,10 @@ class BayesianSearch(ParameterSearch):
     @staticmethod
     def get_parameter_bounds(parameter_names, parameter_values):
         """Returns a parameter bounds dictionary for consumption by a BayesianOptimization object.
+
+        Parameters:
+            parameter_names: list: A list of hyperparameter names
+            parameter_values: list: A list of hyperparameter values
         """
 
         bounds = {}

@@ -656,5 +656,3 @@ def test_get_load_log_paths(
         assert pair[0] == pair[1]
 
     assert len(retrieved_log_paths) == 3
-
-

@@ -19,10 +19,10 @@ def test_is_pipenv_present(monkeypatch):
 
     monkeypatch.setattr(subprocess, 'run', mock_run)
 
-    # A virtual environment is accessible (subprocess.run results in a process with a return code of 0)
+    # A virtual environment is accessible (subprocess.run() results in a process with a return code of 0)
     assert common.is_pipenv_present() is True
 
-    # A virtual environment is not accessible (subprocess.run results in a process with a return code of something other than 0)
+    # A virtual environment is not accessible (subprocess.run() results in a process with a return code of something other than 0)
     process = MockProcess(1)
     assert common.is_pipenv_present() is False
 

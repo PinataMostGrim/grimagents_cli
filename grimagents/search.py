@@ -1,5 +1,5 @@
 """
-CLI application that performs hyperparameter searches using grimagents and a grimagents configuration file.
+CLI application that performs hyperparameter searches using a grimagents configuration file.
 
 Features:
 - Grid Search for hyperparameters
@@ -8,7 +8,7 @@ Features:
 - Resume Grid Search
 - Export trainer configuration file for a given Grid Search index
 
-See readme.md for more documentation.
+See readme.md for more information.
 """
 
 import argparse

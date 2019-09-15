@@ -76,7 +76,7 @@ class StartTensorboard(Command):
 
 
 class PerformTraining(Command):
-    """Launches the training wrapper script with arguments loaded from a configuration file."""
+    """Executes the training wrapper script with arguments loaded from a configuration file."""
 
     def execute(self, args: Namespace):
 

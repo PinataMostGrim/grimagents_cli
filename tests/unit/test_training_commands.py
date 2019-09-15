@@ -74,7 +74,9 @@ def training_command_arguments():
     ]
 
 
-def test_perform_training_create_command(monkeypatch, namespace_args, grim_config, training_command_arguments):
+def test_perform_training_create_command(
+    monkeypatch, namespace_args, grim_config, training_command_arguments
+):
     """Tests that PerformTraining.create_command() returns a valid command line argument for training."""
 
     def mock_load_config(config_path):
