@@ -32,6 +32,9 @@ def get_timestamp():
 def get_human_readable_duration(seconds):
     """Parses seconds into a human readable string."""
 
+    if seconds < 0:
+        return '0 seconds'
+
     seconds = int(seconds)
     days, rem = divmod(seconds, 86400)
     hours, rem = divmod(rem, 3600)

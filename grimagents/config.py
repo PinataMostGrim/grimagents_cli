@@ -70,34 +70,34 @@ _DEFAULT_TRAINER_CONFIG = """default:
 """
 
 _DEFAULT_CURRICULUM = {
-    "measure": "progress",
-    "thresholds": [0.1],
-    "min_lesson_length": 100,
-    "signal_smoothing": True,
-    "parameters": {"example_reset_parameter": [1.5, 2.0]},
+    'measure': 'progress',
+    'thresholds': [0.1],
+    'min_lesson_length': 100,
+    'signal_smoothing': True,
+    'parameters': {'example_reset_parameter': [1.5, 2.0]},
 }
 
 
 _DEFAULT_SEARCH_CONFIG = {
-    "brain": {
-        "name": "BRAIN_NAME",
-        "hyperparameters": {
-            "batch_size": [512, 5120],
-            "beta": [1e-4, 1e-2],
-            "buffer_size_multiple": [4, 10],
-            "curiosity_strength": [0.001, 0.1],
-            "curiosity_enc_size": [64, 256],
-            "epsilon": [0.1, 0.3],
-            "gamma": [0.8, 0.995],
-            "hidden_units": [32, 512],
-            "lambd": [0.9, 0.95],
-            "learning_rate": [1e-5, 1e-3],
-            "max_steps": [5e5, 1e7],
-            "memory_size": [64, 512],
-            "num_layers": [1, 3],
-            "num_epoch": [3, 10],
-            "time_horizon": [32, 2048],
-            "sequence_length": [4, 128],
+    'brain': {
+        'name': 'BRAIN_NAME',
+        'hyperparameters': {
+            'batch_size': [512, 5120],
+            'beta': [1e-4, 1e-2],
+            'buffer_size_multiple': [4, 10],
+            'curiosity_strength': [0.001, 0.1],
+            'curiosity_enc_size': [64, 256],
+            'epsilon': [0.1, 0.3],
+            'gamma': [0.8, 0.995],
+            'hidden_units': [32, 512],
+            'lambd': [0.9, 0.95],
+            'learning_rate': [1e-5, 1e-3],
+            'max_steps': [5e5, 1e7],
+            'memory_size': [64, 512],
+            'num_layers': [1, 3],
+            'num_epoch': [3, 10],
+            'time_horizon': [32, 2048],
+            'sequence_length': [4, 128],
         },
     }
 }
@@ -164,7 +164,7 @@ def get_default_search_config():
     return _DEFAULT_SEARCH_CONFIG.copy()
 
 
-def load_grim_config_file(file_path: Path):
+def load_grim_configuration_file(file_path: Path):
     """Loads a grimagents configuration dictionary from file.
 
     Raises:
@@ -218,7 +218,7 @@ def validate_grim_configuration(configuration):
     return is_valid_config
 
 
-def load_trainer_configuration(file_path: Path):
+def load_trainer_configuration_file(file_path: Path):
     """Loads a MLAgents trainer configuration from a yaml file.
     """
 

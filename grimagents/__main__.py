@@ -41,13 +41,15 @@ main_log = logging.getLogger('grimagents.main')
 def main():
 
     configure_logging()
-    args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
         main_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
         return
+
+    argv = get_argvs()
+    args = parse_args(argv)
 
     if args.list:
         ListTrainingOptions().execute(args)
@@ -65,6 +67,11 @@ def main():
         PerformTraining().execute(args)
 
     logging.shutdown()
+
+
+def get_argvs():
+
+    return sys.argv[1:]
 
 
 def parse_args(argv):
@@ -154,7 +161,7 @@ def parse_args(argv):
         help='Additional arguments applied to training (ex. --slow, --debug, --load)',
     )
 
-    args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = options_parser.parse_known_args(argv)
     args, unparsed_args = overrides_parser.parse_known_args(unparsed_args, args)
 
     if len(argv) == 0:
@@ -171,26 +178,26 @@ def configure_logging():
     """Configures logging for the grim-agents CLI."""
 
     log_config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "display": {"style": "{", "format": "{message}"},
-            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'display': {'style': '{', 'format': '{message}'},
+            'timestamp': {'style': '{', 'format': '[{asctime}][{levelname}] {message}'},
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "display",
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'display',
             },
-            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+            'file': {'class': 'logging.FileHandler', 'filename': '', 'formatter': 'timestamp'},
         },
-        "loggers": {
-            "grimagents.main": {"handlers": ["console", "file"]},
-            "grimagents.config": {"handlers": ["console", "file"]},
-            "grimagents.command_util": {"handlers": ["console", "file"]},
+        'loggers': {
+            'grimagents.main': {'handlers': ['console', 'file']},
+            'grimagents.config': {'handlers': ['console', 'file']},
+            'grimagents.command_util': {'handlers': ['console', 'file']},
         },
-        "root": {"level": "INFO"},
+        'root': {'level': 'INFO'},
     }
 
     log_file = settings.get_log_file_path()
