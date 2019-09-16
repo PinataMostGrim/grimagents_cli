@@ -1,5 +1,4 @@
-"""
-CLI application that performs hyperparameter searches using a grimagents configuration file.
+"""CLI application that performs hyperparameter searches using a grimagents configuration file.
 
 Features:
 - Grid Search for hyperparameters
@@ -35,13 +34,15 @@ search_log = logging.getLogger('grimagents.search')
 def main():
 
     configure_logging()
-    args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
         search_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
         return
+
+    argv = get_argvs()
+    args = parse_args(argv)
 
     if args.edit_config:
         EditGrimConfigFile(args).execute()
@@ -57,6 +58,11 @@ def main():
         PerformGridSearch(args).execute()
 
     logging.shutdown()
+
+
+def get_argvs():
+
+    return sys.argv[1:]
 
 
 def parse_args(argv):
@@ -128,7 +134,7 @@ def parse_args(argv):
         'configuration_file', type=str, help='grimagents configuration file with search parameters'
     )
 
-    args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = options_parser.parse_known_args(argv)
 
     if len(argv) == 0:
         parser.print_help()
