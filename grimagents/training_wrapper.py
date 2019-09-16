@@ -88,9 +88,10 @@ def main():
         )
         return
 
-    args = parse_args(sys.argv[1:])
-    run_id = args.run_id
+    argv = get_argvs()
+    args = parse_args(argv)
 
+    run_id = args.run_id
     training_info = TrainingRunInfo()
 
     command = [
@@ -148,6 +149,11 @@ def main():
         training_log.info(f'Final Mean Reward: {training_info.mean_reward}')
         training_log.info('-' * 63)
         logging.shutdown()
+
+
+def get_argvs():
+
+    return sys.argv[1:]
 
 
 def parse_args(argv):
