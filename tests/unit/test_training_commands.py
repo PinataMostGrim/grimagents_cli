@@ -8,6 +8,8 @@ import grimagents.config
 
 from grimagents.training_commands import (
     Command,
+    ListTrainingOptions,
+    StartTensorboard,
     PerformTraining,
     ResumeTraining,
     TrainingWrapperArguments,
@@ -72,6 +74,31 @@ def training_command_arguments():
         '3DBall',
         '--train',
     ]
+
+
+def test_list_training_options(namespace_args):
+    """
+    """
+
+    namespace_args.list = True
+    list_options = ListTrainingOptions(namespace_args)
+
+    assert list_options.create_command() == ['pipenv', 'run', 'mlagents-learn', '--help']
+
+
+def test_start_tensorboard(namespace_args):
+    """
+    """
+
+    namespace_args.tensorboard_start = True
+    start_tensorboard = StartTensorboard(namespace_args)
+
+    command = start_tensorboard.create_command()
+
+    # Summaries folder will differ based on the system running the test
+    command[3] = '--logdir=../../summaries'
+
+    assert command == ['pipenv', 'run', 'tensorboard', '--logdir=../../summaries']
 
 
 def test_perform_training_create_command(
