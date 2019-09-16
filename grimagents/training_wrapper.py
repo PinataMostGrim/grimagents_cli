@@ -70,6 +70,7 @@ class TrainingRunInfo:
 
         if self.max_steps != 0 and self.step != 0:
             self.time_remaining = (self.time_elapsed / self.step) * self.steps_remaining
+            self.time_remaining = max(self.time_remaining, 0.0)
 
     def line_has_time_elapsed(self, line):
 
