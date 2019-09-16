@@ -268,7 +268,7 @@ class PerformBayesianSearch(SearchCommand):
             log_files_list = self.get_load_log_paths()
             search_log.info(f'Loading Bayesian optimization observations from:')
             for log in log_files_list:
-                search_log.info(f'{str(log)}')
+                search_log.info(f'    {str(log)}')
 
             bayes_opt.util.load_logs(optimizer, logs=log_files_list)
 
