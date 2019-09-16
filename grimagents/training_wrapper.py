@@ -66,7 +66,7 @@ class TrainingRunInfo:
 
         match = self.exported_brain_regex.search(line)
         if match:
-            self.exported_brains.append(match.group(1))
+            self.exported_brains.append(Path(match.group(1)))
 
         if self.max_steps != 0 and self.step != 0:
             self.time_remaining = (self.time_elapsed / self.step) * self.steps_remaining
@@ -114,7 +114,7 @@ def main():
             start_time = time.perf_counter()
 
             for line in p.stderr:
-                # Print intercepted line so it is visible on the console
+                # Print intercepted line so it is visible in the console
                 line = line.rstrip()
                 print(line)
 
@@ -130,6 +130,7 @@ def main():
         raise
 
     finally:
+        training_log.info('-' * 63)
         if args.export_path:
             export_brains(training_info.exported_brains, Path(args.export_path))
 
@@ -222,21 +223,25 @@ def configure_logging():
     logging.config.dictConfig(log_config)
 
 
-def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained policies into a folder."""
+def export_brains(brain_paths: list, export_path: Path):
+    """Copies a list of brain files into a target folder.
+
+    Parameters:
+        brain_paths: list: A list of Path objects pointing each brain files that should be exported
+        export_path: Path: A folder to export brains files into
+    """
 
     training_log.info('Exporting brains:')
 
     if not export_path.exists():
         export_path.mkdir(parents=True, exist_ok=True)
 
-    for brain in brains:
-        source = Path(brain)
-        if not source.exists():
+    for brain in brain_paths:
+        if not brain.exists():
             continue
 
-        destination = export_path / source.name
-        destination.write_bytes(source.read_bytes())
+        destination = export_path / brain.name
+        destination.write_bytes(brain.read_bytes())
 
         training_log.info(f'\t{destination}')
 
