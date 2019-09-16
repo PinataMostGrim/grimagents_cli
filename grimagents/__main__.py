@@ -52,19 +52,19 @@ def main():
     args = parse_args(argv)
 
     if args.list:
-        ListTrainingOptions().execute(args)
+        ListTrainingOptions(args).execute()
     elif args.edit_config:
-        EditGrimConfigFile().execute(args)
+        EditGrimConfigFile(args).execute()
     elif args.edit_trainer_config:
-        EditTrainerConfigFile().execute(args)
+        EditTrainerConfigFile(args).execute()
     elif args.edit_curriculum:
-        EditCurriculumFile().execute(args)
+        EditCurriculumFile(args).execute()
     elif args.tensorboard_start:
-        StartTensorboard().execute(args)
+        StartTensorboard(args).execute()
     elif args.resume:
-        ResumeTraining().execute(args)
+        ResumeTraining(args).execute()
     else:
-        PerformTraining().execute(args)
+        PerformTraining(args).execute()
 
     logging.shutdown()
 
