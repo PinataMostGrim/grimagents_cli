@@ -25,8 +25,6 @@ import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
-exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
-mean_reward_regex = re.compile(r'(Mean Reward: )([^ ]+)\. ')
 
 
 class TrainingRunInfo:
@@ -62,11 +60,11 @@ class TrainingRunInfo:
         if match:
             self.time_elapsed = float(match.group(1))
 
-        match = mean_reward_regex.search(line)
+        match = self.mean_reward_regex.search(line)
         if match:
-            self.mean_reward = match.group(2)
+            self.mean_reward = float(match.group(2))
 
-        match = exported_brain_regex.search(line)
+        match = self.exported_brain_regex.search(line)
         if match:
             self.exported_brains.append(match.group(1))
 
