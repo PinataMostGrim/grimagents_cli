@@ -25,7 +25,7 @@ def arguments():
 @pytest.fixture
 def namespace_args():
     return Namespace(
-        args=[],
+        additional_args=[],
         base_port=None,
         configuration_file='config\\3DBall_grimagents.json',
         dry_run=False,

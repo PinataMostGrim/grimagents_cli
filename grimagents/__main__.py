@@ -156,7 +156,8 @@ def parse_args(argv):
         'configuration_file', type=str, help='Configuration file to extract training arguments from'
     )
     parser.add_argument(
-        'args',
+        'additional_args',
+        metavar='args',
         nargs=argparse.REMAINDER,
         help='Additional arguments applied to training (ex. --slow, --debug, --load)',
     )

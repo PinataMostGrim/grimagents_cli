@@ -52,7 +52,7 @@ def namespace_args():
         no_graphics=None,
         timestamp=None,
         no_timestamp=None,
-        args=[],
+        additional_args=[],
     )
 
 

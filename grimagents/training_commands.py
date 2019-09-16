@@ -107,7 +107,7 @@ class PerformTraining(Command):
 
         training_arguments = TrainingWrapperArguments(config)
         training_arguments.apply_argument_overrides(self.args)
-        training_arguments.set_additional_arguments(self.args.args)
+        training_arguments.set_additional_arguments(self.args.additional_args)
 
         return training_arguments.get_arguments()
 
