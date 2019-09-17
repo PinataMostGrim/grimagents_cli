@@ -19,11 +19,7 @@ class Command:
 
     def execute(self):
         command = self.create_command()
-        command_util.execute_command(
-            command,
-            show_command=self.show_command,
-            dry_run=self.dry_run,
-        )
+        command_util.execute_command(command, show_command=self.show_command, dry_run=self.dry_run)
 
     def create_command(self):
         return ['cmd', '/K', 'echo', self.__class__.__name__, repr(self.args)]
@@ -88,11 +84,7 @@ class PerformTraining(Command):
 
         command = self.create_command()
         command_util.save_to_history(command)
-        command_util.execute_command(
-            command,
-            show_command=self.show_command,
-            dry_run=self.dry_run,
-        )
+        command_util.execute_command(command, show_command=self.show_command, dry_run=self.dry_run)
 
     def create_command(self):
 

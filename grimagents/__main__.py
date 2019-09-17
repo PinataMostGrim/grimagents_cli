@@ -100,7 +100,9 @@ def parse_args(argv):
     options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
-    options_parser.add_argument('--resume', '-r', action='store_true', help='Resume the last training run')
+    options_parser.add_argument(
+        '--resume', '-r', action='store_true', help='Resume the last training run'
+    )
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
     )
