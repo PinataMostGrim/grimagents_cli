@@ -262,15 +262,17 @@ class PerformBayesianSearch(SearchCommand):
         # Perform Bayesian searches
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
 
-        search_log.info('-' * 63)
-        search_log.info(f'Best Configuration ({optimizer.max["target"]}):')
+        optimizer_max = self.get_optimizer_max(optimizer)
 
-        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer.max['params'])
+        search_log.info('-' * 63)
+        search_log.info(f'Best Configuration ({optimizer_max["target"]}):')
+
+        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer_max)
         for key, value in best_intersect.items():
             search_log.info(f'    {key}: {value}')
 
         search_log.info('-' * 63)
-        self.save_max_to_file(optimizer.max)
+        self.save_max_to_file(optimizer_max)
         search_log.info('-' * 63)
 
     def perform_bayes_search(self, **kwargs):
@@ -311,6 +313,10 @@ class PerformBayesianSearch(SearchCommand):
 
         self.search_counter += 1
         return self.get_last_mean_reward_from_log()
+
+    @staticmethod
+    def get_optimizer_max(optimizer):
+        return optimizer.max
 
     @staticmethod
     def get_last_mean_reward_from_log():
