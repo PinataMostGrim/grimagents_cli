@@ -81,11 +81,6 @@ def parse_args(argv):
         help='Output the total number of searches a grimagents configuration file will attempt',
     )
     options_parser.add_argument(
-        '--parallel',
-        action='store_true',
-        help='Perform all searches in parallel (be careful with this one!)',
-    )
-    options_parser.add_argument(
         '--resume',
         metavar='<search index>',
         type=int,
@@ -131,7 +126,7 @@ def parse_args(argv):
         parents=[options_parser],
     )
     parser.add_argument(
-        'configuration_file', type=str, help='grimagents configuration file with search parameters'
+        'configuration_file', type=str, help='A grimagents configuration file containing search parameters'
     )
 
     args, unparsed_args = options_parser.parse_known_args(argv)

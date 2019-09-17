@@ -68,11 +68,6 @@ class SearchCommand(Command):
         """
 
         # Write trainer configuration file for current intersect
-        if self.args.parallel:
-            self.search_config_path = self.search_config_path.with_name(
-                f'search_config{self.search_counter:02d}.yaml'
-            )
-
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
         # Execute training with the search_brain_config and run_id
@@ -90,16 +85,8 @@ class SearchCommand(Command):
             run_id,
         ]
 
-        if self.args.parallel:
-            command = ['cmd', '/K'] + command
-            base_port = self.grim_config.get('--base-port', 5005)
-            command = command + ['--base-port', base_port + self.search_counter]
-            command = [str(element) for element in command]
-            subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
-
-        else:
-            command = [str(element) for element in command]
-            subprocess.run(command)
+        command = [str(element) for element in command]
+        subprocess.run(command)
 
     def get_search_run_id(self):
         """Returns a run_id string for the current search."""
@@ -166,11 +153,10 @@ class PerformGridSearch(GridSearchCommand):
 
             self.perform_search_with_configuration(intersect_brain_config)
 
-        if not self.args.parallel and self.search_config_path.exists():
+        if self.search_config_path.exists():
             self.search_config_path.unlink()
 
-        if not self.args.parallel:
-            search_log.info('Grid search complete\n')
+        search_log.info('Grid search complete\n')
 
 
 class ExportGridSearchConfiguration(GridSearchCommand):
@@ -221,11 +207,10 @@ class PerformRandomSearch(SearchCommand):
 
             self.perform_search_with_configuration(intersect_brain_config)
 
-        if not self.args.parallel and self.search_config_path.exists():
+        if self.search_config_path.exists():
             self.search_config_path.unlink()
 
-        if not self.args.parallel:
-            search_log.info('Random search complete\n')
+        search_log.info('Random search complete\n')
 
 
 class PerformBayesianSearch(SearchCommand):
@@ -240,11 +225,6 @@ class PerformBayesianSearch(SearchCommand):
         self.output_config_path = self.trainer_config_path.with_name('bayes_config.yaml')
 
     def execute(self):
-
-        if self.args.parallel:
-            search_log.warning(
-                'The \'--parallel\' argument is not compatible with Bayesian Search and will be ignored.'
-            )
 
         search_log.info('-' * 63)
         search_log.info('Performing Bayesian search for hyperparameters:')

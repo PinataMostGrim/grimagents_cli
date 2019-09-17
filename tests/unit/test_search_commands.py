@@ -120,7 +120,6 @@ def namespace_args():
         configuration_file='config\\3DBall_grimagents.json',
         edit_config=None,
         export_index=None,
-        parallel=False,
         random=None,
         resume=None,
         search_count=False,
