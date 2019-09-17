@@ -12,9 +12,9 @@ from grimagents.training_wrapper import TrainingRunInfo
 @pytest.fixture
 def arguments():
     return [
-        'config\\3DBall_config.yaml',
+        'config/3DBall_config.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall',
         '--train',
@@ -24,10 +24,10 @@ def arguments():
 @pytest.fixture
 def namespace_args():
     return Namespace(
-        args=['--env', 'builds\\3DBall\\3DBall.exe', '--train'],
+        args=['--env', 'builds/3DBall/3DBall.exe', '--train'],
         export_path=None,
         run_id='3DBall',
-        trainer_config_path='config\\3DBall_config.yaml',
+        trainer_config_path='config/3DBall_config.yaml',
     )
 
 

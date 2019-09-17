@@ -19,9 +19,9 @@ from grimagents.training_commands import (
 @pytest.fixture
 def grim_config():
     return {
-        'trainer-config-path': 'config\\3DBall.yaml',
-        '--env': 'builds\\3DBall\\3DBall.exe',
-        '--export-path': 'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        'trainer-config-path': 'config/3DBall.yaml',
+        '--env': 'builds/3DBall/3DBall.exe',
+        '--export-path': 'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--curriculum': '',
         '--keep-checkpoints': '',
         '--lesson': '',
@@ -40,7 +40,7 @@ def grim_config():
 def namespace_args():
 
     return Namespace(
-        configuration_file='config\\3DBall_grimagents.json',
+        configuration_file='config/3DBall_grimagents.json',
         dry_run=False,
         trainer_config=None,
         env=None,
@@ -63,12 +63,12 @@ def training_command_arguments():
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--export-path',
-        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
         '--train',
@@ -112,7 +112,7 @@ def test_perform_training_create_command(
     result = perform_training.create_command()
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == training_command_arguments
 
@@ -198,10 +198,10 @@ def test_resume_training(monkeypatch):
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
         '--train',
@@ -220,10 +220,10 @@ def test_resume_training(monkeypatch):
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
         '--train',
@@ -238,10 +238,10 @@ def test_resume_training(monkeypatch):
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
         '--train',
@@ -258,18 +258,18 @@ def test_create_training_arguments(grim_config):
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = arguments.get_arguments()
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == [
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--export-path',
-        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
         '--train',
@@ -311,18 +311,18 @@ def test_training_arguments_add_additional_args(grim_config):
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = arguments.get_arguments()
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == [
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--export-path',
-        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
         '--slow',
@@ -345,9 +345,9 @@ def test_override_configuration_values(grim_config):
     """
 
     args = Namespace(
-        configuration_file='config\\3DBall_grimagents.json',
-        trainer_config='config\\PushBlock_grimagents.json',
-        env='builds\\PushBlock\\PushBlock.exe',
+        configuration_file='config/3DBall_grimagents.json',
+        trainer_config='config/PushBlock_grimagents.json',
+        env='builds/PushBlock/PushBlock.exe',
         lesson=2,
         run_id='PushBlock',
         base_port=5010,
@@ -369,18 +369,18 @@ def test_override_configuration_values(grim_config):
     result = arguments.get_arguments()
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == [
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\PushBlock_grimagents.json',
+        'grimagents/training_wrapper.py',
+        'config/PushBlock_grimagents.json',
         '--env',
-        'builds\\PushBlock\\PushBlock.exe',
+        'builds/PushBlock/PushBlock.exe',
         '--export-path',
-        'UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels',
+        'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--lesson',
         '2',
         '--run-id',
@@ -401,7 +401,7 @@ def test_training_arguments_set_methods(grim_config):
 
     arguments = TrainingWrapperArguments(grim_config)
 
-    arguments.set_env('builds\\3DBall\\3DBallHard.exe')
+    arguments.set_env('builds/3DBall/3DBallHard.exe')
     arguments.set_lesson('3')
     arguments.set_run_id('ball')
     arguments.set_num_envs('4')
@@ -409,7 +409,7 @@ def test_training_arguments_set_methods(grim_config):
     arguments.set_timestamp_enabled(True)
 
     arguments_string = arguments.get_arguments_as_string()
-    assert '--env builds\\3DBall\\3DBallHard.exe' in arguments_string
+    assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
     assert '--lesson 3' in arguments_string
     assert '--run-id ball' in arguments_string
     assert '--num-envs 4' in arguments_string
@@ -449,10 +449,10 @@ def test_training_arguments_inference(grim_config):
         'pipenv',
         'run',
         'python',
-        'grimagents\\training_wrapper.py',
-        'config\\3DBall.yaml',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
         '--env',
-        'builds\\3DBall\\3DBall.exe',
+        'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall',
         '--slow',
@@ -460,7 +460,7 @@ def test_training_arguments_inference(grim_config):
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result = arguments.get_arguments()
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == arguments_list
 
@@ -470,6 +470,6 @@ def test_training_arguments_inference(grim_config):
     arguments.set_additional_arguments(additional_args)
 
     result = arguments.get_arguments()
-    result[3] = 'grimagents\\training_wrapper.py'
+    result[3] = 'grimagents/training_wrapper.py'
 
     assert result == arguments_list

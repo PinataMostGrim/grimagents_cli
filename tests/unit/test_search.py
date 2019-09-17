@@ -17,7 +17,7 @@ from grimagents.search_commands import (
 
 @pytest.fixture
 def arguments():
-    return ['config\\3DBall_grimagents.json']
+    return ['config/3DBall_grimagents.json']
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def namespace_args():
         bayes_load=False,
         bayes_save=False,
         bayesian=None,
-        configuration_file='config\\3DBall_grimagents.json',
+        configuration_file='config/3DBall_grimagents.json',
         edit_config=None,
         export_index=None,
         random=None,

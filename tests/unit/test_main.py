@@ -19,7 +19,7 @@ from grimagents.training_commands import (
 
 @pytest.fixture
 def arguments():
-    return ['config\\3DBall_grimagents.json']
+    return ['config/3DBall_grimagents.json']
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def namespace_args():
     return Namespace(
         additional_args=[],
         base_port=None,
-        configuration_file='config\\3DBall_grimagents.json',
+        configuration_file='config/3DBall_grimagents.json',
         dry_run=False,
         edit_config=None,
         edit_curriculum=None,
