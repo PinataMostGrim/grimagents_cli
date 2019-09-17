@@ -304,6 +304,16 @@ def test_search_command_init(patch_search_command, namespace_args, grim_config, 
     assert search_command.search_counter == 0
 
 
+def test_search_command_get_run_id(patch_search_command, namespace_args):
+    """Tests for the correct construction of a search run_id."""
+
+    search_command = SearchCommand(namespace_args)
+    assert search_command.get_search_run_id() == '3DBall_00'
+
+    search_command.search_counter = 4
+    assert search_command.get_search_run_id() == '3DBall_04'
+
+
 def test_perform_search_with_configuration(
     monkeypatch, patch_search_command, namespace_args, grim_config, trainer_config, intersect
 ):
