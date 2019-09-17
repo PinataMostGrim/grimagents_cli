@@ -8,6 +8,8 @@ import grimagents.config
 
 from grimagents.training_commands import (
     Command,
+    ListTrainingOptions,
+    StartTensorboard,
     PerformTraining,
     ResumeTraining,
     TrainingWrapperArguments,
@@ -52,7 +54,7 @@ def namespace_args():
         no_graphics=None,
         timestamp=None,
         no_timestamp=None,
-        args=[],
+        additional_args=[],
     )
 
 
@@ -74,6 +76,31 @@ def training_command_arguments():
     ]
 
 
+def test_list_training_options(namespace_args):
+    """
+    """
+
+    namespace_args.list = True
+    list_options = ListTrainingOptions(namespace_args)
+
+    assert list_options.create_command() == ['pipenv', 'run', 'mlagents-learn', '--help']
+
+
+def test_start_tensorboard(namespace_args):
+    """
+    """
+
+    namespace_args.tensorboard_start = True
+    start_tensorboard = StartTensorboard(namespace_args)
+
+    command = start_tensorboard.create_command()
+
+    # Summaries folder will differ based on the system running the test
+    command[3] = '--logdir=../../summaries'
+
+    assert command == ['pipenv', 'run', 'tensorboard', '--logdir=../../summaries']
+
+
 def test_perform_training_create_command(
     monkeypatch, namespace_args, grim_config, training_command_arguments
 ):
@@ -84,8 +111,8 @@ def test_perform_training_create_command(
 
     monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_config)
 
-    perform_training = PerformTraining()
-    result = perform_training.create_command(namespace_args)
+    perform_training = PerformTraining(namespace_args)
+    result = perform_training.create_command()
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
     result[3] = 'grimagents\\training_wrapper.py'
@@ -101,7 +128,7 @@ def test_perform_training_execute(monkeypatch, namespace_args, training_command_
         - The training command is sent to command_util for execution
     """
 
-    def mock_create_command(self, args):
+    def mock_create_command(self):
         return training_command_arguments
 
     def mock_save_to_history(command):
@@ -114,8 +141,8 @@ def test_perform_training_execute(monkeypatch, namespace_args, training_command_
     monkeypatch.setattr(grimagents.command_util, 'save_to_history', mock_save_to_history)
     monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_execute_command)
 
-    perform_training = PerformTraining()
-    perform_training.execute(namespace_args)
+    perform_training = PerformTraining(namespace_args)
+    perform_training.execute()
 
 
 def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_config):
@@ -127,14 +154,14 @@ def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_conf
     def mock_load_config(config_path):
         return grim_config
 
-    def mock_override_execute_command(command, new_window, show_command, dry_run):
+    def mock_execute_command(command, new_window, show_command, dry_run):
         pass
 
     monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_config)
-    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_override_execute_command)
+    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_execute_command)
 
-    perform_training = PerformTraining()
-    perform_training.execute(namespace_args)
+    perform_training = PerformTraining(namespace_args)
+    perform_training.execute()
     assert perform_training.dry_run is True
 
 
@@ -150,17 +177,17 @@ def test_command_dry_run(monkeypatch):
 
     dry_run_args = Namespace(new_window=False, dry_run=True, args=[])
 
-    def mock_override_execute_command(command, new_window, show_command, dry_run):
+    def mock_execute_command(command, new_window, show_command, dry_run):
         pass
 
-    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_override_execute_command)
+    monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_execute_command)
 
-    command = Command()
-    command.execute(no_dry_run_args)
+    command = Command(no_dry_run_args)
+    command.execute()
     assert command.dry_run is False
 
-    command = Command()
-    command.execute(dry_run_args)
+    command = Command(dry_run_args)
+    command.execute()
     assert command.dry_run is True
 
 
@@ -189,11 +216,11 @@ def test_resume_training(monkeypatch):
 
     monkeypatch.setattr(grimagents.command_util, 'load_last_history', mock_load_history)
 
-    resume_training = ResumeTraining()
-
     # --load argument is appended and --lesson IS NOT present
     args = Namespace(new_window=False, dry_run=False, lesson=None, args=[])
-    assert resume_training.create_command(args) == [
+    resume_training = ResumeTraining(args)
+
+    assert resume_training.create_command() == [
         'pipenv',
         'run',
         'python',
@@ -209,7 +236,9 @@ def test_resume_training(monkeypatch):
 
     # --load argument is appended and --lesson IS present
     args = Namespace(new_window=False, dry_run=False, lesson=3, args=[])
-    assert resume_training.create_command(args) == [
+    resume_training = ResumeTraining(args)
+
+    assert resume_training.create_command() == [
         'pipenv',
         'run',
         'python',

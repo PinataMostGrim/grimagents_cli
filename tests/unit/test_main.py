@@ -25,7 +25,7 @@ def arguments():
 @pytest.fixture
 def namespace_args():
     return Namespace(
-        args=[],
+        additional_args=[],
         base_port=None,
         configuration_file='config\\3DBall_grimagents.json',
         dry_run=False,
@@ -73,26 +73,37 @@ def patch_main(monkeypatch, arguments, namespace_args):
 def patch_training_commands(monkeypatch):
     """Patches all training commands to assert False if their execute method is called. """
 
-    def mock_execute_list_options(self, args):
+    def mock_init(self, args):
+        pass
+
+    def mock_execute_list_options(self):
         assert False
 
-    def mock_execute_edit_grim_config(self, args):
+    def mock_execute_edit_grim_config(self):
         assert False
 
-    def mock_execute_edit_trainer_config(self, args):
+    def mock_execute_edit_trainer_config(self):
         assert False
 
-    def mock_execute_edit_curriculum(self, args):
+    def mock_execute_edit_curriculum(self):
         assert False
 
-    def mock_execute_start_tensorboard(self, args):
+    def mock_execute_start_tensorboard(self):
         assert False
 
-    def mock_execute_perform_training(self, args):
+    def mock_execute_perform_training(self):
         assert False
 
-    def mock_execute_resume_training(self, args):
+    def mock_execute_resume_training(self):
         assert False
+
+    monkeypatch.setattr(ListTrainingOptions, '__init__', mock_init)
+    monkeypatch.setattr(EditGrimConfigFile, '__init__', mock_init)
+    monkeypatch.setattr(EditTrainerConfigFile, '__init__', mock_init)
+    monkeypatch.setattr(EditCurriculumFile, '__init__', mock_init)
+    monkeypatch.setattr(StartTensorboard, '__init__', mock_init)
+    monkeypatch.setattr(PerformTraining, '__init__', mock_init)
+    monkeypatch.setattr(ResumeTraining, '__init__', mock_init)
 
     monkeypatch.setattr(ListTrainingOptions, 'execute', mock_execute_list_options)
     monkeypatch.setattr(EditGrimConfigFile, 'execute', mock_execute_edit_grim_config)
@@ -119,7 +130,7 @@ def test_list_training_options(monkeypatch, patch_main, namespace_args, patch_tr
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
@@ -136,7 +147,7 @@ def test_edit_grim_config_file(monkeypatch, patch_main, namespace_args, patch_tr
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
@@ -153,7 +164,7 @@ def test_edit_trainer_config(monkeypatch, patch_main, namespace_args, patch_trai
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
@@ -170,7 +181,7 @@ def test_edit_curriculum(monkeypatch, patch_main, namespace_args, patch_training
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
@@ -187,7 +198,7 @@ def test_start_tensorboard(monkeypatch, patch_main, namespace_args, patch_traini
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
@@ -201,7 +212,7 @@ def test_perform_training(monkeypatch, patch_main, patch_training_commands):
 
     # PerformTraining is the default behaviour so namespace_args does not need to be modified.
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(PerformTraining, 'execute', mock_execute)
@@ -217,7 +228,7 @@ def test_resume_training(monkeypatch, patch_main, namespace_args, patch_training
     def mock_parse_args(argvs):
         return namespace_args
 
-    def mock_execute(self, args):
+    def mock_execute(self):
         assert True
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
