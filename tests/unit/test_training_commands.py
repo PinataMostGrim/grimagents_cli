@@ -76,8 +76,7 @@ def training_command_arguments():
 
 
 def test_list_training_options(namespace_args):
-    """
-    """
+    """Tests ListTrainingOptions.create_command() for the creation of a valid command."""
 
     namespace_args.list = True
     list_options = ListTrainingOptions(namespace_args)
@@ -86,8 +85,7 @@ def test_list_training_options(namespace_args):
 
 
 def test_start_tensorboard(namespace_args):
-    """
-    """
+    """Tests StartTensorboard.create_command() for the creation of a valid command."""
 
     namespace_args.tensorboard_start = True
     start_tensorboard = StartTensorboard(namespace_args)
@@ -145,8 +143,7 @@ def test_perform_training_execute(monkeypatch, namespace_args, training_command_
 
 
 def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_config):
-    """Tests for the correct creation of a PerformTraining command with dry_run enabled.
-    """
+    """Tests for the correct creation of a PerformTraining command with dry_run enabled."""
 
     namespace_args.dry_run = True
 
