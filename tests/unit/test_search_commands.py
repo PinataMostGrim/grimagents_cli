@@ -147,9 +147,6 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
     def mock_load_trainer_configuration(file_path: Path):
         return trainer_config
 
-    def mock_perform_search_with_configuration(self, brain_config):
-        pass
-
     def mock_write_yaml_file(yaml_data, file_path):
         pass
 
@@ -159,13 +156,21 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
         grimagents.config, 'load_trainer_configuration_file', mock_load_trainer_configuration
     )
 
+    monkeypatch.setattr(grimagents.command_util, 'write_yaml_file', mock_write_yaml_file)
+
+
+@pytest.fixture
+def patch_perform_search_with_configuration(monkeypatch):
+    """Patches SearchCommand.perform_search_with_configuration()."""
+
+    def mock_perform_search_with_configuration(self, brain_config):
+        pass
+
     monkeypatch.setattr(
         grimagents.search_commands.SearchCommand,
         'perform_search_with_configuration',
         mock_perform_search_with_configuration,
     )
-
-    monkeypatch.setattr(grimagents.command_util, 'write_yaml_file', mock_write_yaml_file)
 
 
 @pytest.fixture
@@ -297,7 +302,6 @@ def test_perform_search_with_configuration(
         ]
 
     monkeypatch.setattr(grimagents.command_util, "write_yaml_file", mock_write_yaml_file)
-
     monkeypatch.setattr(subprocess, 'run', mock_run)
 
     search_command = SearchCommand(namespace_args)
@@ -307,6 +311,7 @@ def test_perform_search_with_configuration(
 def test_perform_grid_search(
     patch_search_command,
     patch_perform_grid_search,
+    patch_perform_search_with_configuration,
     namespace_args,
     test_file,
     fixture_cleanup_test_file,
@@ -331,7 +336,11 @@ def test_perform_grid_search(
 
 
 def test_resume_perform_grid_search(
-    monkeypatch, patch_search_command, patch_perform_grid_search, namespace_args
+    monkeypatch,
+    patch_search_command,
+    patch_perform_search_with_configuration,
+    patch_perform_grid_search,
+    namespace_args,
 ):
     """Tests for correct handling of the resume argument when executing a grid search.
 
@@ -364,7 +373,12 @@ def test_resume_perform_grid_search(
 
 
 def test_export_grid_search_configuration(
-    monkeypatch, patch_search_command, patch_perform_grid_search, namespace_args, trainer_config
+    monkeypatch,
+    patch_search_command,
+    patch_perform_search_with_configuration,
+    patch_perform_grid_search,
+    namespace_args,
+    trainer_config,
 ):
     """Tests exporting a grid search trainer configuration to file."""
 
@@ -381,6 +395,7 @@ def test_export_grid_search_configuration(
 def test_perform_random_search(
     monkeypatch,
     patch_search_command,
+    patch_perform_search_with_configuration,
     namespace_args,
     trainer_config,
     intersect,
