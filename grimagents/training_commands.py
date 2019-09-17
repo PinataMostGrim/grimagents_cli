@@ -15,14 +15,12 @@ class Command:
     def __init__(self, args: Namespace):
         self.args = args
         self.dry_run = args.dry_run
-        self.new_window = False
         self.show_command = True
 
     def execute(self):
         command = self.create_command()
         command_util.execute_command(
             command,
-            new_window=self.new_window,
             show_command=self.show_command,
             dry_run=self.dry_run,
         )
@@ -68,12 +66,10 @@ class EditCurriculumFile(Command):
 
 
 class StartTensorboard(Command):
-    """Starts a new instance of tensorboard server in a new terminal window."""
+    """Starts a new instance of tensorboard server."""
 
     def __init__(self, args):
         super().__init__(args)
-
-        self.new_window = True
 
     def create_command(self):
         log_dir = f'--logdir={settings.get_summaries_folder()}'
@@ -87,7 +83,6 @@ class PerformTraining(Command):
         super().__init__(args)
 
         self.show_command = False
-        self.new_window = self.args.new_window
 
     def execute(self):
 
@@ -95,7 +90,6 @@ class PerformTraining(Command):
         command_util.save_to_history(command)
         command_util.execute_command(
             command,
-            new_window=self.new_window,
             show_command=self.show_command,
             dry_run=self.dry_run,
         )
@@ -120,7 +114,6 @@ class ResumeTraining(Command):
         super().__init__(args)
 
         self.show_command = False
-        self.new_window = self.args.new_window
 
     def create_command(self):
 
