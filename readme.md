@@ -32,25 +32,25 @@ The main module's features include:
 ## Usage
 Once installed, `grimagents` can be executed from the `MLAgents` project root folder several ways:
 
-Using python directly:
-```
-pipenv run python -m grimagents -h
-pipenv run python -m grimagents.training_wrapper -h
-pipenv run python -m grimagents.search -h
-```
-
 Using console script entry points:
 ```
-grimagents -h
-grimwrapper -h
-grimsearch -h
+pipenv run grimagents -h
+pipenv run grimsearch -h
+pipenv run grimwrapper -h
+```
+
+Using the modules directly:
+```
+pipenv run python -m grimagents -h
+pipenv run python -m grimagents.search -h
+pipenv run python -m grimagents.training_wrapper -h
 ```
 
 Using the batch files in the `grim-agents` folder:
 ```
 grim-agents\grimagents.bat -h
-grim-agents\grimwrapper.bat -h
 grim-agents\grimsearch.bat -h
+grim-agents\grimwrapper.bat -h
 ```
 
 
