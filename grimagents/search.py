@@ -78,7 +78,7 @@ def parse_args(argv):
     options_parser.add_argument(
         '--search-count',
         action='store_true',
-        help='Output the total number of searches a grimagents configuration file will attempt',
+        help='Output the total number of grid searches a grimagents configuration file will attempt',
     )
     options_parser.add_argument(
         '--resume',
