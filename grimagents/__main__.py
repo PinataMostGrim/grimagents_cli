@@ -8,7 +8,6 @@ Features:
 - Override loaded configuration arguments with command line arguments
 - Quickly resume the last training run
 - Optionally time-stamp the training run-id
-- Optionally launch training in a new console window
 - Convenience command for listing mlagents-learn command line arguments
 - Convenience command for starting the tensorboard server
 - Convenience command for creating grimagents config, trainer config, and curriculum files
@@ -99,12 +98,11 @@ def parse_args(argv):
         '--edit-curriculum', metavar='<file>', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window', '-w', action='store_true', help='Run process in a new console window'
-    )
-    options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
-    options_parser.add_argument('--resume', '-r', action='store_true', help='Resume the last run')
+    options_parser.add_argument(
+        '--resume', '-r', action='store_true', help='Resume the last training run'
+    )
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
     )

@@ -6,14 +6,13 @@ The main module's features include:
 - Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
-- *(Optional)* Launch training session in a new console window
+
+**grimsearch** features include:
+- Grid search, Random search, and Bayesian search for hyperparameters
 
 **grimwrapper** features include:
 - Display estimated time remaining
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
-
-**grimsearch** features include:
-- Grid search, Random search, and Bayesian search for hyperparameters
 
 
 ## Requirements
@@ -47,7 +46,7 @@ grimwrapper -h
 grimsearch -h
 ```
 
-Using the convenience batch files in the `grim-agents` folder:
+Using the batch files in the `grim-agents` folder:
 ```
 grim-agents\grimagents.bat -h
 grim-agents\grimwrapper.bat -h
@@ -59,7 +58,7 @@ grim-agents\grimsearch.bat -h
 ```
 usage: grimagents [-h] [--list] [--edit-config <file>]
                   [--edit-trainer-config <file>] [--edit-curriculum <file>]
-                  [--new-window] [--tensorboard-start] [--resume] [--dry-run]
+                  [--tensorboard-start] [--resume] [--dry-run]
                   [--trainer-config TRAINER_CONFIG] [--env ENV]
                   [--lesson LESSON] [--run-id RUN_ID] [--base-port BASE_PORT]
                   [--num-envs NUM_ENVS] [--inference]
@@ -81,10 +80,9 @@ optional arguments:
                         Open a trainer configuration file for editing
   --edit-curriculum <file>
                         Open a curriculum file for editing
-  --new-window, -w      Run process in a new console window
   --tensorboard-start, -s
                         Start tensorboard server
-  --resume, -r          Resume the last run
+  --resume, -r          Resume the last training run
   --dry-run, -n         Print command without executing
   --trainer-config TRAINER_CONFIG
                         Overrides configuration setting
@@ -125,30 +123,9 @@ grimagents --resume
 ```
 
 
-### grimwrapper
-```
-usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
-                   trainer_config_path ...
-
-CLI application that wraps mlagents-learn with automatic exporting of trained
-policies.
-
-positional arguments:
-  trainer_config_path   Configuration file that holds brain hyperparameters
-  args                  Additional arguments passed on to mlagents-learn (ex.
-                        --slow, --debug, --load)
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --run-id <run-id>     Run id for the training session
-  --export-path EXPORT_PATH
-                        Export trained policies to this path
-```
-
-
 ### grimsearch
 ```
-usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
+usage: grimsearch [-h] [--edit-config <file>] [--search-count]
                   [--resume <search index>] [--export-index <search index>]
                   [--random <n>]
                   [--bayesian <exploration_steps> <optimization_steps>]
@@ -158,16 +135,15 @@ usage: grimsearch [-h] [--edit-config <file>] [--search-count] [--parallel]
 CLI application that performs a hyperparameter search
 
 positional arguments:
-  configuration_file    grimagents configuration file with search parameters
+  configuration_file    A grimagents configuration file containing search
+                        parameters
 
 optional arguments:
   -h, --help            show this help message and exit
   --edit-config <file>  Open a grimagents configuration file for editing. Adds
                         a default search entry if one is not present.
-  --search-count        Output the total number of searches a grimagents
+  --search-count        Output the total number of grid searches a grimagents
                         configuration file will attempt
-  --parallel            Perform all searches in parallel (be careful with this
-                        one!)
   --resume <search index>
                         Resume grid search from <search index> (counting from
                         zero)
@@ -204,6 +180,27 @@ grimsearch grim-agents\config\3DBall_grimagents.json --bayesian 5 10
 ```
 
 
+### grimwrapper
+```
+usage: grimwrapper [-h] [--run-id <run-id>] [--export-path EXPORT_PATH]
+                   trainer_config_path ...
+
+CLI application that wraps mlagents-learn with automatic exporting of trained
+policies and exposes more training information in the console.
+
+positional arguments:
+  trainer_config_path   Configuration file that holds brain hyperparameters
+  args                  Additional arguments passed on to mlagents-learn (ex.
+                        --slow, --debug, --load)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --run-id <run-id>     Run id for the training session
+  --export-path EXPORT_PATH
+                        Export trained policies to this path
+```
+
+
 ## Configuration
 #### grimagents Configuration
 Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
@@ -229,13 +226,13 @@ Example grimagents configuration:
 #### grimsearch Configuration
 Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-`grimsearch` only supports grid searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running a grid search and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
-When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum. The `--parallel` argument will not work in conjunction with Bayesian optimization as this implementation is a serial process.
+When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
 ```json
 {
@@ -259,10 +256,10 @@ When the `--bayesian` argument is present, [Bayesian optimization](https://githu
 
 
 ## Notes
-`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested while `grimagents` and `grimsearch` require Windows.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested, while `grimagents` and `grimsearch` require Windows.
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
 grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
 
-Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search.
+Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.

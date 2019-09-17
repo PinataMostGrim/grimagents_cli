@@ -8,7 +8,6 @@ import subprocess
 import yaml
 
 from pathlib import Path
-from subprocess import CREATE_NEW_CONSOLE
 
 import grimagents.settings as settings
 
@@ -23,9 +22,8 @@ class CommandUtilError(Exception):
     pass
 
 
-def execute_command(command: list, cwd=None, new_window=False, show_command=True, dry_run=False):
-    """Executes a command in terminal. Optionally opens a new window or
-    echos the provided command."""
+def execute_command(command: list, cwd=None, show_command=True, dry_run=False):
+    """Executes a command in terminal. Optionally echos the provided command."""
 
     # Subprocess requires all elements of the command list to be strings
     command = [str(element) for element in command]
@@ -36,11 +34,7 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     if dry_run:
         return
 
-    if new_window:
-        command = ['cmd', '/K'] + command
-        subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
-    else:
-        subprocess.run(command, cwd=cwd)
+    subprocess.run(command, cwd=cwd)
 
 
 def open_file(file_path: Path):

@@ -37,7 +37,6 @@ def namespace_args():
         inference=False,
         lesson=None,
         list=False,
-        new_window=False,
         no_graphics=False,
         no_timestamp=False,
         num_envs=None,

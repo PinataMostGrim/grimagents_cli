@@ -41,7 +41,6 @@ def namespace_args():
 
     return Namespace(
         configuration_file='config\\3DBall_grimagents.json',
-        new_window=False,
         dry_run=False,
         trainer_config=None,
         env=None,
@@ -134,7 +133,7 @@ def test_perform_training_execute(monkeypatch, namespace_args, training_command_
     def mock_save_to_history(command):
         assert command == training_command_arguments
 
-    def mock_execute_command(command, new_window, show_command, dry_run):
+    def mock_execute_command(command, show_command, dry_run):
         assert command == training_command_arguments
 
     monkeypatch.setattr(PerformTraining, 'create_command', mock_create_command)
@@ -154,7 +153,7 @@ def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_conf
     def mock_load_config(config_path):
         return grim_config
 
-    def mock_execute_command(command, new_window, show_command, dry_run):
+    def mock_execute_command(command, show_command, dry_run):
         pass
 
     monkeypatch.setattr(grimagents.config, 'load_grim_configuration_file', mock_load_config)
@@ -173,11 +172,11 @@ def test_command_dry_run(monkeypatch):
         - ResumeTraining
     """
 
-    no_dry_run_args = Namespace(new_window=False, dry_run=False, args=[])
+    no_dry_run_args = Namespace(dry_run=False, args=[])
 
-    dry_run_args = Namespace(new_window=False, dry_run=True, args=[])
+    dry_run_args = Namespace(dry_run=True, args=[])
 
-    def mock_execute_command(command, new_window, show_command, dry_run):
+    def mock_execute_command(command, show_command, dry_run):
         pass
 
     monkeypatch.setattr(grimagents.command_util, 'execute_command', mock_execute_command)
@@ -217,7 +216,7 @@ def test_resume_training(monkeypatch):
     monkeypatch.setattr(grimagents.command_util, 'load_last_history', mock_load_history)
 
     # --load argument is appended and --lesson IS NOT present
-    args = Namespace(new_window=False, dry_run=False, lesson=None, args=[])
+    args = Namespace(dry_run=False, lesson=None, args=[])
     resume_training = ResumeTraining(args)
 
     assert resume_training.create_command() == [
@@ -235,7 +234,7 @@ def test_resume_training(monkeypatch):
     ]
 
     # --load argument is appended and --lesson IS present
-    args = Namespace(new_window=False, dry_run=False, lesson=3, args=[])
+    args = Namespace(dry_run=False, lesson=3, args=[])
     resume_training = ResumeTraining(args)
 
     assert resume_training.create_command() == [
@@ -350,7 +349,6 @@ def test_override_configuration_values(grim_config):
 
     args = Namespace(
         configuration_file='config\\3DBall_grimagents.json',
-        new_window=False,
         trainer_config='config\\PushBlock_grimagents.json',
         env='builds\\PushBlock\\PushBlock.exe',
         lesson=2,
