@@ -43,3 +43,7 @@ jobs:
       run: |
         pipenv install --dev pytest pytest-cov --skip-lock
         pipenv run pytest --capture=no --cov grimagents
+    - name: Test with bandit
+      run: |
+        pipenv install --dev bandit --skip-lock
+        pipenv run bandit -r grim-agents -ll
