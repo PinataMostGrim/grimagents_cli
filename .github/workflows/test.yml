@@ -32,6 +32,10 @@ jobs:
         grimagents -h
         grimsearch -h
         grimwrapper -h
+    - name: Format with black
+      run: |
+        pip install black
+        black -l 100 -S grimagents tests --check
     - name: Lint with flake8
       run: |
         pipenv install --dev flake8 --skip-lock
