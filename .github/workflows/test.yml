@@ -42,7 +42,10 @@ jobs:
   test:
 
     needs: lint
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+          matrix:
+            os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -75,7 +78,7 @@ jobs:
   build:
 
     needs: test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
