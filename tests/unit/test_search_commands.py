@@ -488,15 +488,7 @@ def test_perform_bayesian_search_init(patch_search_command, namespace_args):
 
 
 def test_perform_bayesian_search_execute(
-    monkeypatch,
-    patch_search_command,
-    patch_perform_bayesian_search,
-    patch_get_optimizer_max,
-    patch_get_last_mean_reward_from_log,
-    patch_get_load_log_paths,
-    patch_get_save_log_path,
-    patch_save_max_to_file,
-    namespace_args,
+    monkeypatch, patch_search_command, patch_perform_bayesian_search, patch_get_optimizer_max, patch_get_last_mean_reward_from_log, patch_get_load_log_paths, patch_get_save_log_path, patch_save_max_to_file, namespace_args,
 ):
     """Tests for the correct execution of a Bayesian search.
 
