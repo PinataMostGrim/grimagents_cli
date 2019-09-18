@@ -9,7 +9,7 @@ on:
       - feature/SetupGithubActions
 
 jobs:
-  build:
+  test:
 
     runs-on: windows-latest
 
