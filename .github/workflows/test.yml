@@ -6,7 +6,6 @@ on:
       - master
       - develop
       - release/*
-      - feature/SetupGithubActions
   pull_request:
     types: [assigned]
   schedule:
