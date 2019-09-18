@@ -7,6 +7,8 @@ on:
       - develop
       - release/*
       - feature/SetupGithubActions
+  pull_request:
+    types: [assigned]
 
 jobs:
   test:
