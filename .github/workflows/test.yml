@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -13,16 +13,22 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.6
-    - name: Install grimagents and dependencies
+    - name: Set up Pipenv
       run: |
         python -m pip install --upgrade pip
         pip install pipenv
+        pipenv --python 3.6
+    - name: Install grimagents cli and dependencies
+      run: |
         pipenv install -e . --skip-lock
     - name: Lint with flake8
       run: |
         pipenv install --dev flake8 --skip-lock
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
+        pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pipenv install --dev pytest pytest-cov --skip-lock
+        pipenv run pytest --capture=no --cov grimagents
