@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - release/*
+      - feature/SetupGithubActions
 
 jobs:
   build:
@@ -26,6 +27,11 @@ jobs:
     - name: Install grimagents cli and dependencies
       run: |
         pipenv install -e . --skip-lock
+    - name: grimagents usage check
+      run: |
+        grimagents -h
+        grimsearch -h
+        grimwrapper -h
     - name: Lint with flake8
       run: |
         pipenv install --dev flake8 --skip-lock
