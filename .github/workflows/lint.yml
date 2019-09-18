@@ -1,0 +1,19 @@
+name: Lint and Format Workflow
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Install grimagents cli and dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
