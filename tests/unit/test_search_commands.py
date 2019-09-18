@@ -723,7 +723,8 @@ def test_get_load_log_paths(
     search.trainer_config_path = Path(__file__)
     retrieved_log_paths = search.get_load_log_paths()
 
-    for pair in zip(log_paths, retrieved_log_paths):
-        assert pair[0] == pair[1]
-
     assert len(retrieved_log_paths) == 3
+
+    for path in retrieved_log_paths:
+        assert path.suffix == '.json'
+        assert path in log_paths

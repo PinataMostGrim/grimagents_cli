@@ -85,7 +85,7 @@ def main():
         training_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
-        return
+        sys.exit(1)
 
     argv = get_argvs()
     args = parse_args(argv)
