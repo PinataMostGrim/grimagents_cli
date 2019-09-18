@@ -23,7 +23,7 @@ from grimagents.search_commands import (
 from grimagents.parameter_search import ParameterSearch, GridSearch, BayesianSearch
 
 
-class Counter:
+class Counter
     def __init__(self):
         self.count = 0
 
