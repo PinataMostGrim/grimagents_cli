@@ -9,6 +9,8 @@ on:
       - feature/SetupGithubActions
   pull_request:
     types: [assigned]
+  schedule:
+    - cron: '0 9 * * 1'
 
 jobs:
   test:
