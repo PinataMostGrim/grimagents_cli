@@ -60,9 +60,9 @@ jobs:
         pipenv install -e . --skip-lock
     - name: Usage check
       run: |
-        grimagents -h
-        grimsearch -h
-        grimwrapper -h
+        pipenv run grimagents -h
+        pipenv run grimsearch -h
+        pipenv run grimwrapper -h
     - name: Test with pytest
       run: |
         pipenv install --dev pytest pytest-cov --skip-lock
