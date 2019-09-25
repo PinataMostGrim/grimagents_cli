@@ -1,7 +1,7 @@
 # grimagents
 **grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
 
-The main module's features include:
+**grimagents** features include:
 - Initiate training using arguments loaded from a configuration file
 - Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
@@ -16,16 +16,14 @@ The main module's features include:
 
 
 ## Requirements
-- Windows
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the `MLAgents` project folder using Python 3.6
+- A virtual environment setup for the `MLAgents` project folder using Pipenv and Python 3.6
 - ml-agents 8.2.0 (untested with 0.9)
 
 
 ## Installation
 - Copy or clone this repository into the `MLAgents` project in a folder named `grim-agents`
-- Install `grimagents` in "editable" mode with `pipenv install -e grim-agents/`
-- Alternatively, build `grimagents` using `setup.py` and install normally
+- Install `grimagents` with `pipenv install grim-agents/` or in "editable" mode with `pipenv install -e grim-agents/`
 - *(Optional)* Give the `grim-agents` folder another name and update `settings.py` accordingly
 
 
@@ -224,9 +222,9 @@ Example grimagents configuration:
 ```
 
 #### grimsearch Configuration
-Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
+Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-`grimsearch` only supports searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
@@ -256,7 +254,7 @@ When the `--bayesian` argument is present, [Bayesian optimization](https://githu
 
 
 ## Notes
-`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested, while `grimagents` and `grimsearch` require Windows.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call.
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
