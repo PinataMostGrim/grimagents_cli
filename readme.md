@@ -8,7 +8,7 @@
 - *(Optional)* Override loaded configuration values with command line arguments
 
 **grimsearch** features include:
-- Grid search, Random search, and Bayesian search for hyperparameters
+- Search for optimal hyperparameter settings using Grid, Random, and Bayesian strategies
 
 **grimwrapper** features include:
 - Display estimated time remaining
@@ -222,15 +222,15 @@ Example grimagents configuration:
 ```
 
 #### grimsearch Configuration
-Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
-
-`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
-
-As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
+Grid Search is the default strategy used by `grimsearch`. Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
 When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
+
+`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
