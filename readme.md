@@ -213,9 +213,9 @@ An example configuration file is included at `config\3DBall_grimagents.json`.
 Example grimagents configuration:
 ```json
 {
-    "trainer-config-path": "config\\3DBall_config.yaml",
-    "--env": "builds\\3DBall\\3DBall.exe",
-    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+    "trainer-config-path": "config/3DBall_config.yaml",
+    "--env": "builds/3DBall/3DBall.exe",
+    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels",
     "--run-id": "3DBall",
     "--timestamp": true
 }
@@ -234,8 +234,8 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 ```json
 {
-    "trainer-config-path": "config\\3DBall_config.yaml",
-    "--env": "builds\\3DBall\\3DBall.exe",
+    "trainer-config-path": "config/3DBall_config.yaml",
+    "--env": "builds/3DBall/3DBall.exe",
     "--export-path": "",
     "--run-id": "3DBall",
     "--timestamp": true,
@@ -258,6 +258,6 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
-grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
+grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 
 Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.

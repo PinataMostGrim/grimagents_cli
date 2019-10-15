@@ -1,7 +1,7 @@
 {
-    "trainer-config-path": "config\\3DBall_config.yaml",
-    "--env": "builds\\3DBall\\3DBall.exe",
-    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+    "trainer-config-path": "config/3DBall_config.yaml",
+    "--env": "builds/3DBall/3DBall.exe",
+    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels",
     "--run-id": "3DBall",
     "--timestamp": true,
     "search": {
