@@ -1,14 +1,14 @@
 # grimagents
 **grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
 
-The main module's features include:
+**grimagents** features include:
 - Initiate training using arguments loaded from a configuration file
 - Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
 
 **grimsearch** features include:
-- Grid search, Random search, and Bayesian search for hyperparameters
+- Search for optimal hyperparameter settings using Grid, Random, and Bayesian strategies
 
 **grimwrapper** features include:
 - Display estimated time remaining
@@ -16,16 +16,14 @@ The main module's features include:
 
 
 ## Requirements
-- Windows
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the `MLAgents` project folder using Python 3.6
+- A virtual environment setup for the `MLAgents` project folder using Pipenv and Python 3.6
 - ml-agents 8.2.0 (untested with 0.9)
 
 
 ## Installation
 - Copy or clone this repository into the `MLAgents` project in a folder named `grim-agents`
-- Install `grimagents` in "editable" mode with `pipenv install -e grim-agents/`
-- Alternatively, build `grimagents` using `setup.py` and install normally
+- Install `grimagents` with `pipenv install grim-agents/` or in "editable" mode with `pipenv install -e grim-agents/`
 - *(Optional)* Give the `grim-agents` folder another name and update `settings.py` accordingly
 
 
@@ -215,29 +213,29 @@ An example configuration file is included at `config\3DBall_grimagents.json`.
 Example grimagents configuration:
 ```json
 {
-    "trainer-config-path": "config\\3DBall_config.yaml",
-    "--env": "builds\\3DBall\\3DBall.exe",
-    "--export-path": "UnitySDK\\Assets\\ML-Agents\\Examples\\3DBall\\ImportedModels",
+    "trainer-config-path": "config/3DBall_config.yaml",
+    "--env": "builds/3DBall/3DBall.exe",
+    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels",
     "--run-id": "3DBall",
     "--timestamp": true
 }
 ```
 
 #### grimsearch Configuration
-Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
-
-`grimsearch` only supports searching for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
-
-As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
+Grid Search is the default strategy used by `grimsearch`. Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
 When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
 
 When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
+`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
+
 ```json
 {
-    "trainer-config-path": "config\\3DBall_config.yaml",
-    "--env": "builds\\3DBall\\3DBall.exe",
+    "trainer-config-path": "config/3DBall_config.yaml",
+    "--env": "builds/3DBall/3DBall.exe",
     "--export-path": "",
     "--run-id": "3DBall",
     "--timestamp": true,
@@ -256,10 +254,10 @@ When the `--bayesian` argument is present, [Bayesian optimization](https://githu
 
 
 ## Notes
-`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call. `grimwrapper` potentially works with Linux but is untested, while `grimagents` and `grimsearch` require Windows.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call.
 
 The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
-grimagent's log file is written into `grim-agents\logs` by default, but this can be changed in `settings.py`.
+grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 
 Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
