@@ -18,7 +18,7 @@ from grimagents.parameter_search import GridSearch, RandomSearch, BayesianSearch
 
 
 search_log = logging.getLogger('grimagents.search')
-reward_regex = re.compile(r'Final Mean Reward: (\d*[.,]?\d*)')
+reward_regex = re.compile(r'Final Mean Reward: (-?\d*[.,]?\d*)')
 
 
 class Command:
