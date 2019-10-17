@@ -227,6 +227,7 @@ class BayesianSearch(ParameterSearch):
                 or key == 'buffer_size_multiple'
                 or key == 'hidden_units'
                 or key == 'num_epoch'
+                or key == 'max_steps'
                 or key == 'num_layers'
                 or key == 'time_horizon'
                 or key == 'sequence_length'
