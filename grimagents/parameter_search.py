@@ -1,4 +1,5 @@
 import itertools
+import numpy
 import random
 
 
@@ -217,7 +218,7 @@ class BayesianSearch(ParameterSearch):
     def sanitize_parameter_values(bounds: dict):
         """Enforces int type on parameters that should be int and ensures native value types are used.
 
-        BayesianOptimization objects return numpy floats, which cause problems with yaml serialization.
+        Converts values to standard Python value types. BayesianOptimization objects return numpy floats and numpy floats cause problems with yaml serialization.
         """
 
         for key, value in bounds.items():
@@ -234,6 +235,7 @@ class BayesianSearch(ParameterSearch):
                 bounds[key] = int(value)
                 continue
 
-            bounds[key] = value.item()
+            if isinstance(value, numpy.generic):
+                bounds[key] = value.item()
 
         return bounds
