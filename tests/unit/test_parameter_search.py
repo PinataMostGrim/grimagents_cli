@@ -294,5 +294,5 @@ def test_sanitize_parameter_values():
         'time_horizon': 64,
         'sequence_length': 144,
         'curiosity_enc_size': 184,
-        'curiosity_strength': 0.001
+        'curiosity_strength': 0.001,
     }
