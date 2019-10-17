@@ -595,7 +595,8 @@ def test_perform_bayes_search(
     search.perform_bayes_search(batch_size=84, beta=0.002, buffer_size_multiple=88)
 
 
-def test_get_last_mean_reward_from_log(monkeypatch):
+@pytest.mark.parametrize('reward', [0, 1, -1, 1.358, -1.358])
+def test_get_last_mean_reward_from_log(monkeypatch, reward):
     """Tests for retrieval of the final mean reward of the last training run."""
 
     def mock_get_log_file_path():
@@ -610,7 +611,7 @@ def test_get_last_mean_reward_from_log(monkeypatch):
             r'[2019-09-12 02:03:14,855][INFO] ',
             r'Training run \'3DBall_00-2019-09-12_02-02-34\' ended after 39 seconds',
             r'[2019-09-12 02:03:14,857][INFO] Training completed successfully',
-            r'[2019-09-12 02:03:14,858][INFO] Final Mean Reward: 1.358',
+            f'[2019-09-12 02:03:14,858][INFO] Final Mean Reward: {reward}',
             r'[2019-09-12 02:03:14,858][INFO] ---------------------------------------------------------------',
         ]
 
@@ -620,7 +621,7 @@ def test_get_last_mean_reward_from_log(monkeypatch):
         grimagents.command_util, 'load_last_lines_from_file', mock_load_last_lines_from_file
     )
 
-    assert PerformBayesianSearch.get_last_mean_reward_from_log() == float(1.358)
+    assert PerformBayesianSearch.get_last_mean_reward_from_log() == reward
 
 
 def test_save_max_to_file(
