@@ -263,7 +263,10 @@ def test_get_parameter_bounds():
 
 
 def test_sanitize_parameter_values():
-    """Tests that only native value types are returned and values that should be int are converted to int.
+    """Tests that
+        - Only standard Python value types are returned
+        - Values that should be int are converted to int
+        - The item() method is not called on non-numpy value types
     """
 
     bounds = {
@@ -272,10 +275,12 @@ def test_sanitize_parameter_values():
         'buffer_size_multiple': numpy.float64(50.017156222601734),
         'hidden_units': numpy.float64(121.0682249028942),
         'num_epoch': numpy.float64(5.028942),
+        'max_steps': numpy.float64(500000.1),
         'num_layers': numpy.float64(2.49028942),
         'time_horizon': numpy.float64(64.049292),
         'sequence_length': numpy.float64(144.9028),
         'curiosity_enc_size': numpy.float64(184.6824928),
+        'curiosity_strength': 0.001,
     }
 
     assert BayesianSearch.sanitize_parameter_values(bounds) == {
@@ -284,8 +289,10 @@ def test_sanitize_parameter_values():
         'buffer_size_multiple': 50,
         'hidden_units': 121,
         'num_epoch': 5,
+        'max_steps': 500000,
         'num_layers': 2,
         'time_horizon': 64,
         'sequence_length': 144,
         'curiosity_enc_size': 184,
+        'curiosity_strength': 0.001,
     }
