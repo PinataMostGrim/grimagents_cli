@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""CLI application that loads training arguments from a configuration file and sends
+"""
+CLI application that loads training arguments from a configuration file and sends
 them to the grimagents.training_wrapper. This script aims to automate several
 repetitive training tasks.
 
@@ -8,11 +8,8 @@ Features:
 - Override loaded configuration arguments with command line arguments
 - Quickly resume the last training run
 - Optionally time-stamp the training run-id
-- Convenience command for listing mlagents-learn command line arguments
-- Convenience command for starting the tensorboard server
-- Convenience command for creating grimagents config, trainer config, and curriculum files
 
-See training_wrapper.py for its feature list and readme.md for more documentation.
+See readme.md for more information.
 """
 
 import argparse

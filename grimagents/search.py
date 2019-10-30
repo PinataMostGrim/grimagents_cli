@@ -1,11 +1,12 @@
-"""CLI application that performs hyperparameter searches using a grimagents configuration file.
+"""
+CLI application that performs hyperparameter searches using a grimagents configuration file.
 
 Features:
 - Grid Search for hyperparameters
 - Random Search for hyperparameters
 - Bayesian Search for hyperparameters
 - Resume Grid Search
-- Export trainer configuration file for a given Grid Search index
+- Save and load Bayesian search progress
 
 See readme.md for more information.
 """
