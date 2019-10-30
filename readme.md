@@ -18,7 +18,7 @@
 ## Requirements
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using Pipenv and Python 3.6
-- ml-agents 8.2.0 (untested with 0.9)
+- ml-agents 0.8 (untested with 0.9 or higher)
 
 
 ## Installation
@@ -256,7 +256,7 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 ## Notes
 `grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call.
 
-The `grimagents' '--resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
+The `grimagents --resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
 grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 

@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-"""CLI application that wraps 'mlagents-learn' with more automation.
+"""
+CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
 - Displays estimated time remaining in training run
 - Optionally copies trained policies to another location after training finishes (for example, into a Unity project)
 
-Notes:
-- Potentially works with Linux (untested)
-- See readme.md for more documentation
+See readme.md for more information.
 """
 
 import argparse
