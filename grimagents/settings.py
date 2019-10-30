@@ -16,12 +16,12 @@ def get_log_file_path():
 
 
 def get_training_wrapper_path():
-    """Returns relative path to the training wrapper."""
+    """Returns path to the training wrapper."""
 
     return Path(__file__).parent / 'training_wrapper.py'
 
 
 def get_history_file_path():
-    """Returns relative path to the training command history file."""
+    """Returns path to the training command history file."""
 
     return Path(__file__).parent / 'history'

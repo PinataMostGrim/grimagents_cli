@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-"""CLI application that wraps 'mlagents-learn' with more automation.
+"""
+CLI application that wraps 'mlagents-learn' with more automation.
 
 Features:
 - Displays estimated time remaining in training run
 - Optionally copies trained policies to another location after training finishes (for example, into a Unity project)
 
-Notes:
-- Potentially works with Linux (untested)
-- See readme.md for more documentation
+See readme.md for more information.
 """
 
 import argparse
@@ -25,8 +23,6 @@ import grimagents.common as common
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
-exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
-mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
 
 
 class TrainingRunInfo:
@@ -43,7 +39,7 @@ class TrainingRunInfo:
         self.steps_regex = re.compile(r'Step: ([\d]+)\. ')
         self.time_regex = re.compile(r'Time Elapsed: ([\.\d]+) s')
         self.max_steps_regex = re.compile(r'max_steps:\t(.+)$')
-        self.mean_reward_regex = re.compile(r"(Mean Reward: )([^ ]+)\. ")
+        self.mean_reward_regex = re.compile(r'(Mean Reward: )([^ ]+)\. ')
         self.exported_brain_regex = re.compile(r'Exported (.*\.nn) file')
 
     def update_from_training_output(self, line):
@@ -62,16 +58,17 @@ class TrainingRunInfo:
         if match:
             self.time_elapsed = float(match.group(1))
 
-        match = mean_reward_regex.search(line)
+        match = self.mean_reward_regex.search(line)
         if match:
-            self.mean_reward = match.group(2)
+            self.mean_reward = float(match.group(2))
 
-        match = exported_brain_regex.search(line)
+        match = self.exported_brain_regex.search(line)
         if match:
-            self.exported_brains.append(match.group(1))
+            self.exported_brains.append(Path(match.group(1)))
 
         if self.max_steps != 0 and self.step != 0:
             self.time_remaining = (self.time_elapsed / self.step) * self.steps_remaining
+            self.time_remaining = max(self.time_remaining, 0.0)
 
     def line_has_time_elapsed(self, line):
 
@@ -86,11 +83,12 @@ def main():
         training_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
-        return
+        sys.exit(1)
 
-    args = parse_args(sys.argv[1:])
+    argv = get_argvs()
+    args = parse_args(argv)
+
     run_id = args.run_id
-
     training_info = TrainingRunInfo()
 
     command = [
@@ -114,7 +112,7 @@ def main():
             start_time = time.perf_counter()
 
             for line in p.stderr:
-                # Print intercepted line so it is visible on the console
+                # Print intercepted line so it is visible in the console
                 line = line.rstrip()
                 print(line)
 
@@ -130,6 +128,7 @@ def main():
         raise
 
     finally:
+        training_log.info('-' * 63)
         if args.export_path:
             export_brains(training_info.exported_brains, Path(args.export_path))
 
@@ -150,6 +149,11 @@ def main():
         logging.shutdown()
 
 
+def get_argvs():
+
+    return sys.argv[1:]
+
+
 def parse_args(argv):
     """Builds a Namespace object with parsed arguments."""
 
@@ -167,7 +171,7 @@ def parse_args(argv):
 
     parser = argparse.ArgumentParser(
         prog='grimwrapper',
-        description='CLI application that wraps mlagents-learn with automatic exporting of trained policies.',
+        description='CLI application that wraps mlagents-learn with automatic exporting of trained policies and exposes more training information in the console.',
         parents=[wrapper_parser],
     )
 
@@ -190,22 +194,22 @@ def configure_logging():
     """Configures logging for a training session."""
 
     log_config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "display": {"style": "{", "format": "{message}"},
-            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'display': {'style': '{', 'format': '{message}'},
+            'timestamp': {'style': '{', 'format': '[{asctime}][{levelname}] {message}'},
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "display",
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'display',
             },
-            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+            'file': {'class': 'logging.FileHandler', 'filename': '', 'formatter': 'timestamp'},
         },
-        "loggers": {"grimagents.training_wrapper": {"handlers": ["console", "file"]}},
-        "root": {"level": "INFO"},
+        'loggers': {'grimagents.training_wrapper': {'handlers': ['console', 'file']}},
+        'root': {'level': 'INFO'},
     }
 
     log_file = settings.get_log_file_path()
@@ -217,21 +221,25 @@ def configure_logging():
     logging.config.dictConfig(log_config)
 
 
-def export_brains(brains: list, export_path: Path):
-    """Exports a list of trained policies into a folder."""
+def export_brains(brain_paths: list, export_path: Path):
+    """Copies a list of brain files into a target folder.
+
+    Parameters:
+        brain_paths: list: A list of Path objects pointing each brain files that should be exported
+        export_path: Path: A folder to export brains files into
+    """
 
     training_log.info('Exporting brains:')
 
     if not export_path.exists():
         export_path.mkdir(parents=True, exist_ok=True)
 
-    for brain in brains:
-        source = Path(brain)
-        if not source.exists():
+    for brain in brain_paths:
+        if not brain.exists():
             continue
 
-        destination = export_path / source.name
-        destination.write_bytes(source.read_bytes())
+        destination = export_path / brain.name
+        destination.write_bytes(brain.read_bytes())
 
         training_log.info(f'\t{destination}')
 

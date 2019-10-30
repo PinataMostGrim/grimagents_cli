@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""CLI application that loads training arguments from a configuration file and sends
+"""
+CLI application that loads training arguments from a configuration file and sends
 them to the grimagents.training_wrapper. This script aims to automate several
 repetitive training tasks.
 
@@ -8,12 +8,8 @@ Features:
 - Override loaded configuration arguments with command line arguments
 - Quickly resume the last training run
 - Optionally time-stamp the training run-id
-- Optionally launch training in a new console window
-- Convenience command for listing mlagents-learn command line arguments
-- Convenience command for starting the tensorboard server
-- Convenience command for creating grimagents config, trainer config, and curriculum files
 
-See training_wrapper.py for its feature list and readme.md for more documentation.
+See readme.md for more information.
 """
 
 import argparse
@@ -41,30 +37,37 @@ main_log = logging.getLogger('grimagents.main')
 def main():
 
     configure_logging()
-    args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
         main_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
-        return
+        sys.exit(1)
+
+    argv = get_argvs()
+    args = parse_args(argv)
 
     if args.list:
-        ListTrainingOptions().execute(args)
+        ListTrainingOptions(args).execute()
     elif args.edit_config:
-        EditGrimConfigFile().execute(args)
+        EditGrimConfigFile(args).execute()
     elif args.edit_trainer_config:
-        EditTrainerConfigFile().execute(args)
+        EditTrainerConfigFile(args).execute()
     elif args.edit_curriculum:
-        EditCurriculumFile().execute(args)
+        EditCurriculumFile(args).execute()
     elif args.tensorboard_start:
-        StartTensorboard().execute(args)
+        StartTensorboard(args).execute()
     elif args.resume:
-        ResumeTraining().execute(args)
+        ResumeTraining(args).execute()
     else:
-        PerformTraining().execute(args)
+        PerformTraining(args).execute()
 
     logging.shutdown()
+
+
+def get_argvs():
+
+    return sys.argv[1:]
 
 
 def parse_args(argv):
@@ -92,12 +95,11 @@ def parse_args(argv):
         '--edit-curriculum', metavar='<file>', type=str, help='Open a curriculum file for editing'
     )
     options_parser.add_argument(
-        '--new-window', '-w', action='store_true', help='Run process in a new console window'
-    )
-    options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
-    options_parser.add_argument('--resume', '-r', action='store_true', help='Resume the last run')
+    options_parser.add_argument(
+        '--resume', '-r', action='store_true', help='Resume the last training run'
+    )
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
     )
@@ -149,12 +151,13 @@ def parse_args(argv):
         'configuration_file', type=str, help='Configuration file to extract training arguments from'
     )
     parser.add_argument(
-        'args',
+        'additional_args',
+        metavar='args',
         nargs=argparse.REMAINDER,
         help='Additional arguments applied to training (ex. --slow, --debug, --load)',
     )
 
-    args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = options_parser.parse_known_args(argv)
     args, unparsed_args = overrides_parser.parse_known_args(unparsed_args, args)
 
     if len(argv) == 0:
@@ -171,26 +174,26 @@ def configure_logging():
     """Configures logging for the grim-agents CLI."""
 
     log_config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "display": {"style": "{", "format": "{message}"},
-            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'display': {'style': '{', 'format': '{message}'},
+            'timestamp': {'style': '{', 'format': '[{asctime}][{levelname}] {message}'},
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "display",
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'display',
             },
-            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+            'file': {'class': 'logging.FileHandler', 'filename': '', 'formatter': 'timestamp'},
         },
-        "loggers": {
-            "grimagents.main": {"handlers": ["console", "file"]},
-            "grimagents.config": {"handlers": ["console", "file"]},
-            "grimagents.command_util": {"handlers": ["console", "file"]},
+        'loggers': {
+            'grimagents.main': {'handlers': ['console', 'file']},
+            'grimagents.config': {'handlers': ['console', 'file']},
+            'grimagents.command_util': {'handlers': ['console', 'file']},
         },
-        "root": {"level": "INFO"},
+        'root': {'level': 'INFO'},
     }
 
     log_file = settings.get_log_file_path()

@@ -1,14 +1,14 @@
 """
-CLI application that performs hyperparameter searches using grimagents and a grimagents configuration file.
+CLI application that performs hyperparameter searches using a grimagents configuration file.
 
 Features:
 - Grid Search for hyperparameters
 - Random Search for hyperparameters
 - Bayesian Search for hyperparameters
 - Resume Grid Search
-- Export trainer configuration file for a given Grid Search index
+- Save and load Bayesian search progress
 
-See readme.md for more documentation.
+See readme.md for more information.
 """
 
 import argparse
@@ -35,13 +35,15 @@ search_log = logging.getLogger('grimagents.search')
 def main():
 
     configure_logging()
-    args = parse_args(sys.argv[1:])
 
     if not common.is_pipenv_present():
         search_log.error(
             'No virtual environment is accessible by Pipenv from this directory, unable to run mlagents-learn'
         )
-        return
+        sys.exit(1)
+
+    argv = get_argvs()
+    args = parse_args(argv)
 
     if args.edit_config:
         EditGrimConfigFile(args).execute()
@@ -59,6 +61,11 @@ def main():
     logging.shutdown()
 
 
+def get_argvs():
+
+    return sys.argv[1:]
+
+
 def parse_args(argv):
     """Builds a Namespace object out of parsed arguments."""
 
@@ -72,12 +79,7 @@ def parse_args(argv):
     options_parser.add_argument(
         '--search-count',
         action='store_true',
-        help='Output the total number of searches a grimagents configuration file will attempt',
-    )
-    options_parser.add_argument(
-        '--parallel',
-        action='store_true',
-        help='Perform all searches in parallel (be careful with this one!)',
+        help='Output the total number of grid searches a grimagents configuration file will attempt',
     )
     options_parser.add_argument(
         '--resume',
@@ -125,10 +127,12 @@ def parse_args(argv):
         parents=[options_parser],
     )
     parser.add_argument(
-        'configuration_file', type=str, help='grimagents configuration file with search parameters'
+        'configuration_file',
+        type=str,
+        help='A grimagents configuration file containing search parameters',
     )
 
-    args, unparsed_args = options_parser.parse_known_args()
+    args, unparsed_args = options_parser.parse_known_args(argv)
 
     if len(argv) == 0:
         parser.print_help()
@@ -142,22 +146,22 @@ def parse_args(argv):
 
 def configure_logging():
     log_config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "display": {"style": "{", "format": "{message}"},
-            "timestamp": {"style": "{", "format": "[{asctime}][{levelname}] {message}"},
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'display': {'style': '{', 'format': '{message}'},
+            'timestamp': {'style': '{', 'format': '[{asctime}][{levelname}] {message}'},
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "display",
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'display',
             },
-            "file": {"class": "logging.FileHandler", "filename": "", "formatter": "timestamp"},
+            'file': {'class': 'logging.FileHandler', 'filename': '', 'formatter': 'timestamp'},
         },
-        "loggers": {"grimagents.search": {"handlers": ["console", "file"]}},
-        "root": {"level": "INFO"},
+        'loggers': {'grimagents.search': {'handlers': ['console', 'file']}},
+        'root': {'level': 'INFO'},
     }
 
     log_file = settings.get_log_file_path()

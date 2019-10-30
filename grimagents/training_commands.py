@@ -12,28 +12,23 @@ SLOW = '--slow'
 
 
 class Command:
-    def __init__(self):
-        self.new_window = False
+    def __init__(self, args: Namespace):
+        self.args = args
+        self.dry_run = args.dry_run
         self.show_command = True
 
-    def execute(self, args: Namespace):
-        self.dry_run = args.dry_run
-        self.command = self.create_command(args)
-        command_util.execute_command(
-            self.command,
-            new_window=self.new_window,
-            show_command=self.show_command,
-            dry_run=self.dry_run,
-        )
+    def execute(self):
+        command = self.create_command()
+        command_util.execute_command(command, show_command=self.show_command, dry_run=self.dry_run)
 
-    def create_command(self, args):
-        return ['cmd', '/K', 'echo', self.__class__.__name__, repr(args)]
+    def create_command(self):
+        return ['cmd', '/K', 'echo', self.__class__.__name__, repr(self.args)]
 
 
 class ListTrainingOptions(Command):
     """Outputs mlagents-learn usage options."""
 
-    def create_command(self, args):
+    def create_command(self):
         return ['pipenv', 'run', 'mlagents-learn', '--help']
 
 
@@ -41,8 +36,8 @@ class EditGrimConfigFile(Command):
     """Opens a grimagents configuration file for editing or creates one if
     a file does not already exist."""
 
-    def execute(self, args):
-        file_path = Path(args.edit_config)
+    def execute(self):
+        file_path = Path(self.args.edit_config)
         config_util.edit_grim_config_file(file_path)
 
 
@@ -51,8 +46,8 @@ class EditTrainerConfigFile(Command):
     a file does not already exist.
     """
 
-    def execute(self, args):
-        file_path = Path(args.edit_trainer_config)
+    def execute(self):
+        file_path = Path(self.args.edit_trainer_config)
         config_util.edit_trainer_configuration_file(file_path)
 
 
@@ -61,46 +56,44 @@ class EditCurriculumFile(Command):
     not already exist.
     """
 
-    def execute(self, args):
-        file_path = Path(args.edit_curriculum)
+    def execute(self):
+        file_path = Path(self.args.edit_curriculum)
         config_util.edit_curriculum_file(file_path)
 
 
 class StartTensorboard(Command):
-    """Starts a new instance of tensorboard server in a new terminal window."""
+    """Starts a new instance of tensorboard server."""
 
-    def create_command(self, args):
-        self.new_window = True
+    def __init__(self, args):
+        super().__init__(args)
+
+    def create_command(self):
         log_dir = f'--logdir={settings.get_summaries_folder()}'
         return ['pipenv', 'run', 'tensorboard', log_dir]
 
 
 class PerformTraining(Command):
-    """Launches the training wrapper script with arguments loaded from a configuration file."""
+    """Executes the training wrapper script with arguments loaded from a configuration file."""
 
-    def execute(self, args: Namespace):
+    def __init__(self, args):
+        super().__init__(args)
 
         self.show_command = False
-        self.dry_run = args.dry_run
-        self.new_window = args.new_window
-        self.command = self.create_command(args)
 
-        command_util.save_to_history(self.command)
-        command_util.execute_command(
-            self.command,
-            new_window=self.new_window,
-            show_command=self.show_command,
-            dry_run=self.dry_run,
-        )
+    def execute(self):
 
-    def create_command(self, args):
+        command = self.create_command()
+        command_util.save_to_history(command)
+        command_util.execute_command(command, show_command=self.show_command, dry_run=self.dry_run)
 
-        config_path = Path(args.configuration_file)
-        config = config_util.load_grim_config_file(config_path)
+    def create_command(self):
+
+        config_path = Path(self.args.configuration_file)
+        config = config_util.load_grim_configuration_file(config_path)
 
         training_arguments = TrainingWrapperArguments(config)
-        training_arguments.apply_argument_overrides(args)
-        training_arguments.set_additional_arguments(args.args)
+        training_arguments.apply_argument_overrides(self.args)
+        training_arguments.set_additional_arguments(self.args.additional_args)
 
         return training_arguments.get_arguments()
 
@@ -109,18 +102,20 @@ class ResumeTraining(Command):
     """Launches the training wrapper script with the arguments used
     by the last training command executed."""
 
-    def create_command(self, args):
+    def __init__(self, args):
+        super().__init__(args)
 
         self.show_command = False
-        self.new_window = args.new_window
+
+    def create_command(self):
 
         command = command_util.load_last_history()
 
         if '--load' not in command:
             command.append('--load')
-        if args.lesson:
+        if self.args.lesson:
             command.append('--lesson')
-            command.append(str(args.lesson))
+            command.append(str(self.args.lesson))
 
         return command
 

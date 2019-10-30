@@ -8,7 +8,6 @@ import subprocess
 import yaml
 
 from pathlib import Path
-from subprocess import CREATE_NEW_CONSOLE
 
 import grimagents.settings as settings
 
@@ -23,11 +22,10 @@ class CommandUtilError(Exception):
     pass
 
 
-def execute_command(command: list, cwd=None, new_window=False, show_command=True, dry_run=False):
-    """Executes a command in terminal. Optionally opens a new window or
-    echos the provided command."""
+def execute_command(command: list, cwd=None, show_command=True, dry_run=False):
+    """Executes a command in terminal. Optionally echos the provided command."""
 
-    # Subprocess requires all elements of command be strings
+    # Subprocess requires all elements of the command list to be strings
     command = [str(element) for element in command]
 
     if show_command or dry_run:
@@ -36,11 +34,7 @@ def execute_command(command: list, cwd=None, new_window=False, show_command=True
     if dry_run:
         return
 
-    if new_window:
-        command = ['cmd', '/K'] + command
-        subprocess.Popen(command, cwd=cwd, creationflags=CREATE_NEW_CONSOLE)
-    else:
-        subprocess.run(command, cwd=cwd)
+    subprocess.run(command, cwd=cwd)
 
 
 def open_file(file_path: Path):
@@ -69,7 +63,7 @@ def write_file(text, file_path: Path, overwrite=False):
 
 
 def write_json_file(json_data, file_path: Path):
-    """Write json data to a file."""
+    """Write JSON data to a file."""
 
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
@@ -80,11 +74,11 @@ def write_json_file(json_data, file_path: Path):
 
 
 def load_json_file(file_path: Path):
-    """Load json data from a file.
+    """Load JSON data from a file.
 
     Raises:
-      FileNotFoundError: When file can't be found
-      JSONDecodeError: When the json file can't be parsed
+      FileNotFoundError:
+      JSONDecodeError: When the JSON file can't be parsed
     """
 
     try:
@@ -101,7 +95,7 @@ def load_json_file(file_path: Path):
 
 
 def write_yaml_file(yaml_data, file_path: Path):
-    """Write yaml data to a file."""
+    """Write Yaml data to a file."""
 
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
@@ -112,10 +106,10 @@ def write_yaml_file(yaml_data, file_path: Path):
 
 
 def load_yaml_file(file_path: Path):
-    """Load yaml data from a file.
+    """Load Yaml data from a file.
 
     Raises:
-      FileNotFoundError
+      FileNotFoundError:
     """
 
     try:
