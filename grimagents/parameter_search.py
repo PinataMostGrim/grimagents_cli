@@ -144,12 +144,12 @@ class GridSearch(ParameterSearch):
             result = dict(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
             raise InvalidGridSearchIndex(
-                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
+                f'Unable to access intersection {index}, GridSearch only contains {self.get_grid_search_count()} intersections.'
             )
 
         return result
 
-    def get_intersect_count(self):
+    def get_grid_search_count(self):
         """Returns the total count of search permutations for this GridSearch."""
 
         return len(self.search_permutations)

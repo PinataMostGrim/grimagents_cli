@@ -179,7 +179,7 @@ def patch_perform_search_with_configuration(monkeypatch):
 def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
     """Patches external methods used by PerformGridSearch objects."""
 
-    def mock_get_intersect_count(self):
+    def mock_get_grid_search_count(self):
         return 10
 
     def mock_get_intersect(self, index):
@@ -188,7 +188,7 @@ def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
     def mock_get_brain_config_for_intersect(self, intersect):
         return trainer_config
 
-    monkeypatch.setattr(GridSearch, 'get_intersect_count', mock_get_intersect_count)
+    monkeypatch.setattr(GridSearch, 'get_grid_search_count', mock_get_grid_search_count)
     monkeypatch.setattr(GridSearch, 'get_intersect', mock_get_intersect)
 
     monkeypatch.setattr(

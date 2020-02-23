@@ -108,7 +108,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
+            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
         )
 
 
@@ -122,7 +122,7 @@ class PerformGridSearch(GridSearchCommand):
     def execute(self):
 
         if self.args.resume:
-            count = self.grid_search.get_intersect_count()
+            count = self.grid_search.get_grid_search_count()
             if self.args.resume > count:
                 error = f'\'{self.trainer_config_path}\' is configured for {count} training runs, unable to resume at index {self.args.resume}'
                 search_log.error(error)
@@ -139,7 +139,7 @@ class PerformGridSearch(GridSearchCommand):
             )
         search_log.info('-' * 63)
 
-        for i in range(start_index, self.grid_search.get_intersect_count()):
+        for i in range(start_index, self.grid_search.get_grid_search_count()):
 
             intersect = self.grid_search.get_intersect(i)
             intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)

@@ -132,11 +132,11 @@ def test_get_intersect(search_config, trainer_config):
     }
 
 
-def test_get_intersect_count(search_config, trainer_config):
+def test_get_grid_search_count(search_config, trainer_config):
     """Tests for the correct calculation of permutation count."""
 
     search = GridSearch(search_config, trainer_config)
-    assert search.get_intersect_count() == 32
+    assert search.get_grid_search_count() == 32
 
 
 def test_invalid_grid_search_index(search_config, trainer_config):
