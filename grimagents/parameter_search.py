@@ -3,18 +3,14 @@ import numpy
 import random
 
 
-class GridSearchError(Exception):
-    pass
-
-
-class InvalidTrainerConfig(GridSearchError):
+class InvalidTrainerConfig(Exception):
     """The trainer config yaml file is invalid."""
 
     pass
 
 
-class InvalidIntersectIndex(GridSearchError):
-    """An attempt to access an invalid intersection index was made."""
+class InvalidGridSearchIndex(Exception):
+    """An attempt to access an invalid GridSearch index was made."""
 
     pass
 
@@ -141,13 +137,13 @@ class GridSearch(ParameterSearch):
         """Returns a dictionary containing the search parameters to use for a given intersect (index) in the grid search.
 
         Raises:
-          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+          InvalidGridSearchIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
         """
 
         try:
             result = dict(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
-            raise InvalidIntersectIndex(
+            raise InvalidGridSearchIndex(
                 f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
             )
 
