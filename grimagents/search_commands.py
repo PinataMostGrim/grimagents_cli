@@ -61,13 +61,13 @@ class SearchCommand(Command):
         self.search_counter = 0
 
     def perform_search_with_configuration(self, search_brain_config):
-        """Executes a search using the provided intersect and matching brain_config.
+        """Executes a search using the provided search configuration.
 
         Parameters:
             search_brain_config: dict: A dictionary containing a set of default hyperparameters and brain specific hyperparameters that will be used in the search. This will be written into a trainer config file for the search.
         """
 
-        # Write trainer configuration file for current intersect
+        # Write trainer configuration file using the search configuration
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
         # Execute training with the search_brain_config and run_id
@@ -160,7 +160,7 @@ class PerformGridSearch(GridSearchCommand):
 
 
 class ExportGridSearchConfiguration(GridSearchCommand):
-    """Exports a trainer config file for a given GridSearch intersect."""
+    """Exports a trainer config file for a given GridSearch index."""
 
     def execute(self):
 
@@ -287,7 +287,7 @@ class PerformBayesianSearch(SearchCommand):
         bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
-        # Execute training with the intersect config and run_id
+        # Execute training with the search config and run_id
         run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
         command = [
             'pipenv',
