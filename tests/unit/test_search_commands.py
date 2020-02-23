@@ -182,14 +182,14 @@ def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
     def mock_get_grid_search_count(self):
         return 10
 
-    def mock_get_intersect(self, index):
+    def mock_get_search_configuration(self, index):
         return intersect
 
     def mock_get_brain_config_with_overrides(self, intersect):
         return trainer_config
 
     monkeypatch.setattr(GridSearch, 'get_grid_search_count', mock_get_grid_search_count)
-    monkeypatch.setattr(GridSearch, 'get_intersect', mock_get_intersect)
+    monkeypatch.setattr(GridSearch, 'get_search_configuration', mock_get_search_configuration)
 
     monkeypatch.setattr(
         ParameterSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides

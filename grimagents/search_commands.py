@@ -141,7 +141,7 @@ class PerformGridSearch(GridSearchCommand):
 
         for i in range(start_index, self.grid_search.get_grid_search_count()):
 
-            intersect = self.grid_search.get_intersect(i)
+            intersect = self.grid_search.get_search_configuration(i)
             intersect_brain_config = self.grid_search.get_brain_config_with_overrides(intersect)
             self.search_counter = i
 
@@ -168,7 +168,7 @@ class ExportGridSearchConfiguration(GridSearchCommand):
             f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_index}\' into \'{self.search_config_path}\''
         )
 
-        intersect = self.grid_search.get_intersect(self.args.export_index)
+        intersect = self.grid_search.get_search_configuration(self.args.export_index)
         intersect_brain_config = self.grid_search.get_brain_config_with_overrides(intersect)
         command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 

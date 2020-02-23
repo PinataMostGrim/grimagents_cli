@@ -133,8 +133,8 @@ class GridSearch(ParameterSearch):
 
         return list(itertools.product(*hyperparameter_sets))
 
-    def get_intersect(self, index):
-        """Returns a dictionary containing the search parameters to use for a given intersect (index) in the grid search.
+    def get_search_configuration(self, index):
+        """Returns a dictionary containing the search parameters to use for a GridSearch by search index.
 
         Raises:
           InvalidGridSearchIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
@@ -144,7 +144,7 @@ class GridSearch(ParameterSearch):
             result = dict(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
             raise InvalidGridSearchIndex(
-                f'Unable to access intersection {index}, GridSearch only contains {self.get_grid_search_count()} intersections.'
+                f'Unable to access GridSearch index \'{index}\', GridSearch only contains {self.get_grid_search_count()} elements.'
             )
 
         return result

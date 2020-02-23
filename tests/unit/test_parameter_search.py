@@ -102,12 +102,12 @@ def test_get_brain_configuration(trainer_config):
     }
 
 
-def test_get_intersect(search_config, trainer_config):
+def test_get_search_configuration(search_config, trainer_config):
     """Tests for the correct creation of GridSearch intersect configurations."""
 
     search = GridSearch(search_config, trainer_config)
 
-    assert search.get_intersect(0) == {
+    assert search.get_search_configuration(0) == {
         'beta': 0.0001,
         'hidden_units': 32,
         'learning_rate': 1e-05,
@@ -115,7 +115,7 @@ def test_get_intersect(search_config, trainer_config):
         'num_epoch': 3,
     }
 
-    assert search.get_intersect(15) == {
+    assert search.get_search_configuration(15) == {
         'beta': 0.0001,
         'hidden_units': 512,
         'learning_rate': 0.001,
@@ -123,7 +123,7 @@ def test_get_intersect(search_config, trainer_config):
         'num_epoch': 10,
     }
 
-    assert search.get_intersect(31) == {
+    assert search.get_search_configuration(31) == {
         'beta': 0.01,
         'hidden_units': 512,
         'learning_rate': 0.001,
@@ -145,7 +145,7 @@ def test_invalid_grid_search_index(search_config, trainer_config):
     search = GridSearch(search_config, trainer_config)
 
     with pytest.raises(InvalidGridSearchIndex):
-        search.get_intersect(32)
+        search.get_search_configuration(32)
 
 
 def test_invalid_trainer_config(trainer_config):
@@ -192,7 +192,7 @@ def test_buffer_size_multiple(search_config, trainer_config):
     search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
 
     search = GridSearch(search_config, trainer_config)
-    intersect = search.get_intersect(0)
+    intersect = search.get_search_configuration(0)
     intersect_config = search.get_brain_config_with_overrides(intersect)
 
     assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
