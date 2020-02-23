@@ -193,7 +193,7 @@ def test_buffer_size_multiple(search_config, trainer_config):
 
     search = GridSearch(search_config, trainer_config)
     intersect = search.get_intersect(0)
-    intersect_config = search.get_brain_config_for_intersect(intersect)
+    intersect_config = search.get_brain_config_with_overrides(intersect)
 
     assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
 

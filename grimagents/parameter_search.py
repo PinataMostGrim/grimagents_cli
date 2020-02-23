@@ -87,15 +87,15 @@ class ParameterSearch:
 
         return result
 
-    def get_brain_config_for_intersect(self, intersect):
-        """Returns a brain configuration dictionary with values overridden by the grid search intersect.
+    def get_brain_config_with_overrides(self, overrides):
+        """Returns a copy of the brain configuration with the specified values overriden.
 
         Parameters:
-            intersect: dict: A dictionary containing hyperparameter names paired with override values
+            overrides: dict: A dictionary containing hyperparameter names paired with override values
         """
 
         result = self.brain_config.copy()
-        for key, value in intersect.items():
+        for key, value in overrides.items():
             result[self.brain_name][key] = value
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present

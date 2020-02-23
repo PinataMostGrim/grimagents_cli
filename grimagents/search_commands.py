@@ -142,7 +142,7 @@ class PerformGridSearch(GridSearchCommand):
         for i in range(start_index, self.grid_search.get_grid_search_count()):
 
             intersect = self.grid_search.get_intersect(i)
-            intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
+            intersect_brain_config = self.grid_search.get_brain_config_with_overrides(intersect)
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -169,7 +169,7 @@ class ExportGridSearchConfiguration(GridSearchCommand):
         )
 
         intersect = self.grid_search.get_intersect(self.args.export_index)
-        intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
+        intersect_brain_config = self.grid_search.get_brain_config_with_overrides(intersect)
         command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
 
 
@@ -196,7 +196,7 @@ class PerformRandomSearch(SearchCommand):
         for i in range(self.args.random):
 
             intersect = self.random_search.get_randomized_intersect()
-            intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
+            intersect_brain_config = self.random_search.get_brain_config_with_overrides(intersect)
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -284,7 +284,7 @@ class PerformBayesianSearch(SearchCommand):
 
         # Construct search configuration using input from the BayesianSearch object.
         intersect = self.bayes_search.sanitize_parameter_values(kwargs)
-        bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
+        bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(intersect)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
         # Execute training with the intersect config and run_id
@@ -345,7 +345,7 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
         intersect = self.bayes_search.sanitize_parameter_values(max['params'])
-        best_config = self.bayes_search.get_brain_config_for_intersect(intersect)
+        best_config = self.bayes_search.get_brain_config_with_overrides(intersect)
         command_util.write_yaml_file(best_config, self.output_config_path)
 
     def get_save_log_path(self):
