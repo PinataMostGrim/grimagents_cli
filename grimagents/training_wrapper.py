@@ -185,9 +185,7 @@ def parse_args(argv):
     )
 
     wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
-    args = parser.parse_args(extra_args, wrapper_args)
-
-    return args
+    return parser.parse_args(extra_args, wrapper_args)
 
 
 def configure_logging():

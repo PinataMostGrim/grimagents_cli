@@ -61,13 +61,13 @@ class SearchCommand(Command):
         self.search_counter = 0
 
     def perform_search_with_configuration(self, search_brain_config):
-        """Executes a search using the provided intersect and matching brain_config.
+        """Executes a search using the provided search configuration.
 
         Parameters:
             search_brain_config: dict: A dictionary containing a set of default hyperparameters and brain specific hyperparameters that will be used in the search. This will be written into a trainer config file for the search.
         """
 
-        # Write trainer configuration file for current intersect
+        # Write trainer configuration file using the search configuration
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
         # Execute training with the search_brain_config and run_id
@@ -108,7 +108,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_intersect_count()} training runs'
+            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
         )
 
 
@@ -122,7 +122,7 @@ class PerformGridSearch(GridSearchCommand):
     def execute(self):
 
         if self.args.resume:
-            count = self.grid_search.get_intersect_count()
+            count = self.grid_search.get_grid_search_count()
             if self.args.resume > count:
                 error = f'\'{self.trainer_config_path}\' is configured for {count} training runs, unable to resume at index {self.args.resume}'
                 search_log.error(error)
@@ -139,19 +139,19 @@ class PerformGridSearch(GridSearchCommand):
             )
         search_log.info('-' * 63)
 
-        for i in range(start_index, self.grid_search.get_intersect_count()):
+        for i in range(start_index, self.grid_search.get_grid_search_count()):
 
-            intersect = self.grid_search.get_intersect(i)
-            intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
+            search_config = self.grid_search.get_search_configuration(i)
+            search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
             search_log.info(f'Search: {self.get_search_run_id()}')
-            for key, value in intersect.items():
+            for key, value in search_config.items():
                 search_log.info(f'    {key}: {value}')
             search_log.info('-' * 63)
 
-            self.perform_search_with_configuration(intersect_brain_config)
+            self.perform_search_with_configuration(search_brain_config)
 
         if self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -160,17 +160,17 @@ class PerformGridSearch(GridSearchCommand):
 
 
 class ExportGridSearchConfiguration(GridSearchCommand):
-    """Exports a trainer config file for a given GridSearch intersect."""
+    """Exports a trainer config file for a given GridSearch index."""
 
     def execute(self):
 
         search_log.info(
-            f'Exporting trainer configuration for GridSearch intersect \'{self.args.export_index}\' into \'{self.search_config_path}\''
+            f'Exporting trainer configuration for GridSearch index \'{self.args.export_index}\' into \'{self.search_config_path}\''
         )
 
-        intersect = self.grid_search.get_intersect(self.args.export_index)
-        intersect_brain_config = self.grid_search.get_brain_config_for_intersect(intersect)
-        command_util.write_yaml_file(intersect_brain_config, self.search_config_path)
+        search_config = self.grid_search.get_search_configuration(self.args.export_index)
+        search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
+        command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
 
 class PerformRandomSearch(SearchCommand):
@@ -195,17 +195,17 @@ class PerformRandomSearch(SearchCommand):
 
         for i in range(self.args.random):
 
-            intersect = self.random_search.get_randomized_intersect()
-            intersect_brain_config = self.random_search.get_brain_config_for_intersect(intersect)
+            search_config = self.random_search.get_randomized_search_configuration()
+            search_brain_config = self.random_search.get_brain_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
             search_log.info(f'Search: {self.get_search_run_id()}')
-            for key, value in intersect.items():
+            for key, value in search_config.items():
                 search_log.info(f'    {key}: {value}')
             search_log.info('-' * 63)
 
-            self.perform_search_with_configuration(intersect_brain_config)
+            self.perform_search_with_configuration(search_brain_config)
 
         if self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -267,8 +267,8 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
         search_log.info(f'Best Configuration ({optimizer_max["target"]}):')
 
-        best_intersect = self.bayes_search.sanitize_parameter_values(optimizer_max["params"])
-        for key, value in best_intersect.items():
+        best_configuration = self.bayes_search.sanitize_parameter_values(optimizer_max["params"])
+        for key, value in best_configuration.items():
             search_log.info(f'    {key}: {value}')
 
         search_log.info('-' * 63)
@@ -283,11 +283,11 @@ class PerformBayesianSearch(SearchCommand):
         """
 
         # Construct search configuration using input from the BayesianSearch object.
-        intersect = self.bayes_search.sanitize_parameter_values(kwargs)
-        bayes_brain_config = self.bayes_search.get_brain_config_for_intersect(intersect)
+        search_config = self.bayes_search.sanitize_parameter_values(kwargs)
+        bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
-        # Execute training with the intersect config and run_id
+        # Execute training with the search config and run_id
         run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
         command = [
             'pipenv',
@@ -304,7 +304,7 @@ class PerformBayesianSearch(SearchCommand):
 
         search_log.info('-' * 63)
         search_log.info(f'Search: {run_id}')
-        for key, value in intersect.items():
+        for key, value in search_config.items():
             search_log.info(f'    {key}: {value}')
         search_log.info('-' * 63)
 
@@ -344,9 +344,9 @@ class PerformBayesianSearch(SearchCommand):
 
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
-        intersect = self.bayes_search.sanitize_parameter_values(max['params'])
-        best_config = self.bayes_search.get_brain_config_for_intersect(intersect)
-        command_util.write_yaml_file(best_config, self.output_config_path)
+        search_config = self.bayes_search.sanitize_parameter_values(max['params'])
+        best_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
+        command_util.write_yaml_file(best_brain_config, self.output_config_path)
 
     def get_save_log_path(self):
         """Generates a timestamped log file path for Bayesian optimization observations."""

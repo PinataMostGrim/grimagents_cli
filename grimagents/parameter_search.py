@@ -3,18 +3,14 @@ import numpy
 import random
 
 
-class GridSearchError(Exception):
-    pass
-
-
-class InvalidTrainerConfig(GridSearchError):
+class InvalidTrainerConfig(Exception):
     """The trainer config yaml file is invalid."""
 
     pass
 
 
-class InvalidIntersectIndex(GridSearchError):
-    """An attempt to access an invalid intersection index was made."""
+class InvalidGridSearchIndex(Exception):
+    """An attempt to access an invalid GridSearch index was made."""
 
     pass
 
@@ -48,7 +44,7 @@ class ParameterSearch:
 
     @staticmethod
     def get_hyperparameter_sets(search_config):
-        """Returns a two dimensional array containing all hyperparameter values to use in the grid search."""
+        """Returns an array containing all sets of hyperparameter values to use in the search."""
 
         search_sets = []
         for _, values in search_config['brain']['hyperparameters'].items():
@@ -91,15 +87,15 @@ class ParameterSearch:
 
         return result
 
-    def get_brain_config_for_intersect(self, intersect):
-        """Returns a brain configuration dictionary with values overridden by the grid search intersect.
+    def get_brain_config_with_overrides(self, overrides):
+        """Returns a copy of the brain configuration with the specified values overriden.
 
         Parameters:
-            intersect: dict: A dictionary containing hyperparameter names paired with override values
+            overrides: dict: A dictionary containing hyperparameter names paired with override values
         """
 
         result = self.brain_config.copy()
-        for key, value in intersect.items():
+        for key, value in overrides.items():
             result[self.brain_name][key] = value
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
@@ -137,23 +133,23 @@ class GridSearch(ParameterSearch):
 
         return list(itertools.product(*hyperparameter_sets))
 
-    def get_intersect(self, index):
-        """Returns a dictionary containing the search parameters to use for a given intersect (index) in the grid search.
+    def get_search_configuration(self, index):
+        """Returns a dictionary containing the search parameters to use for a GridSearch by search index.
 
         Raises:
-          InvalidIntersectIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
+          InvalidGridSearchIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.
         """
 
         try:
             result = dict(zip(self.hyperparameters, self.search_permutations[index]))
         except IndexError:
-            raise InvalidIntersectIndex(
-                f'Unable to access intersection {index}, GridSearch only contains {self.get_intersect_count()} intersections.'
+            raise InvalidGridSearchIndex(
+                f'Unable to access GridSearch index \'{index}\', GridSearch only contains {self.get_grid_search_count()} elements.'
             )
 
         return result
 
-    def get_intersect_count(self):
+    def get_grid_search_count(self):
         """Returns the total count of search permutations for this GridSearch."""
 
         return len(self.search_permutations)
@@ -177,8 +173,8 @@ class RandomSearch(ParameterSearch):
 
         return random.randint(min(values), max(values))
 
-    def get_randomized_intersect(self, seed=None):
-        """Returns an intersect with randomized values. Values are chosen between the minimum and maximum values that exist for each hyperparameter."""
+    def get_randomized_search_configuration(self, seed=None):
+        """Returns a search configuration with randomized values. Values are chosen between the minimum and maximum values that exist for each hyperparameter."""
 
         randomized_hyperparameters = []
         for i in range(len(self.hyperparameters)):
