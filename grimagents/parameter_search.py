@@ -44,7 +44,7 @@ class ParameterSearch:
 
     @staticmethod
     def get_hyperparameter_sets(search_config):
-        """Returns a two dimensional array containing all hyperparameter values to use in the grid search."""
+        """Returns an array containing all sets of hyperparameter values to use in the search."""
 
         search_sets = []
         for _, values in search_config['brain']['hyperparameters'].items():
