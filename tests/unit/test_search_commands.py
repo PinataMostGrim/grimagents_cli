@@ -449,7 +449,7 @@ def test_perform_random_search(
         - The search trainer configuration file is removed after training
     """
 
-    def mock_get_randomized_intersect(self):
+    def mock_get_randomized_search_configuration(self):
         return intersect
 
     def mock_get_brain_config_with_overrides(self, intersect):
@@ -457,8 +457,8 @@ def test_perform_random_search(
 
     monkeypatch.setattr(
         grimagents.parameter_search.RandomSearch,
-        'get_randomized_intersect',
-        mock_get_randomized_intersect,
+        'get_randomized_search_configuration',
+        mock_get_randomized_search_configuration,
     )
 
     monkeypatch.setattr(

@@ -195,7 +195,7 @@ class PerformRandomSearch(SearchCommand):
 
         for i in range(self.args.random):
 
-            intersect = self.random_search.get_randomized_intersect()
+            intersect = self.random_search.get_randomized_search_configuration()
             intersect_brain_config = self.random_search.get_brain_config_with_overrides(intersect)
             self.search_counter = i
 

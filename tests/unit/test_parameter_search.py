@@ -231,7 +231,7 @@ def test_get_random_intersect(search_config, trainer_config):
     """Tests for the correct generation of a randomized intersect."""
 
     search = RandomSearch(search_config, trainer_config)
-    random_intersect = search.get_randomized_intersect(seed=9871237)
+    random_intersect = search.get_randomized_search_configuration(seed=9871237)
 
     assert random_intersect == {
         'beta': 0.008715030393329336,

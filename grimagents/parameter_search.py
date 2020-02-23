@@ -173,8 +173,8 @@ class RandomSearch(ParameterSearch):
 
         return random.randint(min(values), max(values))
 
-    def get_randomized_intersect(self, seed=None):
-        """Returns an intersect with randomized values. Values are chosen between the minimum and maximum values that exist for each hyperparameter."""
+    def get_randomized_search_configuration(self, seed=None):
+        """Returns a search configuration with randomized values. Values are chosen between the minimum and maximum values that exist for each hyperparameter."""
 
         randomized_hyperparameters = []
         for i in range(len(self.hyperparameters)):
