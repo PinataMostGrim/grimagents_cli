@@ -257,7 +257,7 @@ class PerformBayesianSearch(SearchCommand):
             bayes_log_path = self.get_save_log_path()
             search_log.info(f'Saving Bayesian optimization observations to \'{bayes_log_path}\'')
             bayes_logger = JSONLogger(path=str(bayes_log_path))
-            optimizer.subscribe(Events.OPTMIZATION_STEP, bayes_logger)
+            optimizer.subscribe(Events.OPTIMIZATION_STEP, bayes_logger)
 
         # Perform Bayesian searches
         optimizer.maximize(init_points=self.args.bayesian[0], n_iter=self.args.bayesian[1])
