@@ -24,7 +24,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "pyyaml",
-        "bayesian-optimization"
+        "bayesian-optimization>=1.0.3,<=1.1.0"
     ],
     python_requires=">=3.6,<3.7",
     entry_points={
