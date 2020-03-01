@@ -60,11 +60,6 @@ jobs:
     - name: Install grimagents cli and dependencies
       run: |
         pipenv install -e . --skip-lock
-    - name: Usage check
-      run: |
-        pipenv run grimagents -h
-        pipenv run grimsearch -h
-        pipenv run grimwrapper -h
     - name: Test with pytest
       run: |
         pipenv install --dev pytest pytest-cov --skip-lock
@@ -73,6 +68,11 @@ jobs:
       run: |
         pipenv install --dev bandit --skip-lock
         pipenv run bandit -r grim-agents -ll
+    - name: Usage check
+      run: |
+        pipenv run grimagents -h
+        pipenv run grimsearch -h
+        pipenv run grimwrapper -h
 
   build:
 
