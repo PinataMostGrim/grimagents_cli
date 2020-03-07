@@ -1,3 +1,7 @@
+### 2.0.1
+- Fixed exception caused by bayesian-optimization update
+- Fixed failing github action workflow
+
 ### 2.0.0
 - Added Linux support
 - Removed support for running commands in a new terminal window. This functionality complicated adding Linux support.
