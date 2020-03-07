@@ -50,6 +50,4 @@ def get_human_readable_duration(seconds):
         if locals_[magnitude]
     )
 
-    result = ", ".join(magnitudes_str)
-
-    return result
+    return ", ".join(magnitudes_str)

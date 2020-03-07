@@ -179,20 +179,20 @@ def patch_perform_search_with_configuration(monkeypatch):
 def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
     """Patches external methods used by PerformGridSearch objects."""
 
-    def mock_get_intersect_count(self):
+    def mock_get_grid_search_count(self):
         return 10
 
-    def mock_get_intersect(self, index):
+    def mock_get_search_configuration(self, index):
         return intersect
 
-    def mock_get_brain_config_for_intersect(self, intersect):
+    def mock_get_brain_config_with_overrides(self, intersect):
         return trainer_config
 
-    monkeypatch.setattr(GridSearch, 'get_intersect_count', mock_get_intersect_count)
-    monkeypatch.setattr(GridSearch, 'get_intersect', mock_get_intersect)
+    monkeypatch.setattr(GridSearch, 'get_grid_search_count', mock_get_grid_search_count)
+    monkeypatch.setattr(GridSearch, 'get_search_configuration', mock_get_search_configuration)
 
     monkeypatch.setattr(
-        ParameterSearch, 'get_brain_config_for_intersect', mock_get_brain_config_for_intersect
+        ParameterSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides
     )
 
 
@@ -206,7 +206,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_sanitize_parameter_values(self, dict):
         return {}
 
-    def mock_get_brain_config_for_intersect(self, intersect):
+    def mock_get_brain_config_with_overrides(self, intersect):
         return trainer_config
 
     def mock_bayes_opt_load_logs(optimizer, logs):
@@ -223,7 +223,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     monkeypatch.setattr(BayesianSearch, 'sanitize_parameter_values', mock_sanitize_parameter_values)
 
     monkeypatch.setattr(
-        BayesianSearch, 'get_brain_config_for_intersect', mock_get_brain_config_for_intersect
+        BayesianSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides
     )
 
     monkeypatch.setattr(bayes_opt.util, 'load_logs', mock_bayes_opt_load_logs)
@@ -449,22 +449,22 @@ def test_perform_random_search(
         - The search trainer configuration file is removed after training
     """
 
-    def mock_get_randomized_intersect(self):
+    def mock_get_randomized_search_configuration(self):
         return intersect
 
-    def mock_get_brain_config_for_intersect(self, intersect):
+    def mock_get_brain_config_with_overrides(self, intersect):
         return trainer_config
 
     monkeypatch.setattr(
         grimagents.parameter_search.RandomSearch,
-        'get_randomized_intersect',
-        mock_get_randomized_intersect,
+        'get_randomized_search_configuration',
+        mock_get_randomized_search_configuration,
     )
 
     monkeypatch.setattr(
         grimagents.parameter_search.ParameterSearch,
-        'get_brain_config_for_intersect',
-        mock_get_brain_config_for_intersect,
+        'get_brain_config_with_overrides',
+        mock_get_brain_config_with_overrides,
     )
 
     namespace_args.random = 4

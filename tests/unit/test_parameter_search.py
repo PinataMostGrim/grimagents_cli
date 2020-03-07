@@ -6,7 +6,7 @@ from grimagents.parameter_search import (
     RandomSearch,
     BayesianSearch,
     InvalidTrainerConfig,
-    InvalidIntersectIndex,
+    InvalidGridSearchIndex,
 )
 
 
@@ -102,12 +102,12 @@ def test_get_brain_configuration(trainer_config):
     }
 
 
-def test_get_intersect(search_config, trainer_config):
+def test_get_search_configuration(search_config, trainer_config):
     """Tests for the correct creation of GridSearch intersect configurations."""
 
     search = GridSearch(search_config, trainer_config)
 
-    assert search.get_intersect(0) == {
+    assert search.get_search_configuration(0) == {
         'beta': 0.0001,
         'hidden_units': 32,
         'learning_rate': 1e-05,
@@ -115,7 +115,7 @@ def test_get_intersect(search_config, trainer_config):
         'num_epoch': 3,
     }
 
-    assert search.get_intersect(15) == {
+    assert search.get_search_configuration(15) == {
         'beta': 0.0001,
         'hidden_units': 512,
         'learning_rate': 0.001,
@@ -123,7 +123,7 @@ def test_get_intersect(search_config, trainer_config):
         'num_epoch': 10,
     }
 
-    assert search.get_intersect(31) == {
+    assert search.get_search_configuration(31) == {
         'beta': 0.01,
         'hidden_units': 512,
         'learning_rate': 0.001,
@@ -132,20 +132,20 @@ def test_get_intersect(search_config, trainer_config):
     }
 
 
-def test_get_intersect_count(search_config, trainer_config):
+def test_get_grid_search_count(search_config, trainer_config):
     """Tests for the correct calculation of permutation count."""
 
     search = GridSearch(search_config, trainer_config)
-    assert search.get_intersect_count() == 32
+    assert search.get_grid_search_count() == 32
 
 
-def test_invalid_intersect_index(search_config, trainer_config):
-    """Tests for the correct creattion of GridSearch intersect configurations."""
+def test_invalid_grid_search_index(search_config, trainer_config):
+    """Tests that InvalidGridSearchIndex exceptions are raised."""
 
     search = GridSearch(search_config, trainer_config)
 
-    with pytest.raises(InvalidIntersectIndex):
-        search.get_intersect(32)
+    with pytest.raises(InvalidGridSearchIndex):
+        search.get_search_configuration(32)
 
 
 def test_invalid_trainer_config(trainer_config):
@@ -192,8 +192,8 @@ def test_buffer_size_multiple(search_config, trainer_config):
     search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
 
     search = GridSearch(search_config, trainer_config)
-    intersect = search.get_intersect(0)
-    intersect_config = search.get_brain_config_for_intersect(intersect)
+    intersect = search.get_search_configuration(0)
+    intersect_config = search.get_brain_config_with_overrides(intersect)
 
     assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
 
@@ -231,7 +231,7 @@ def test_get_random_intersect(search_config, trainer_config):
     """Tests for the correct generation of a randomized intersect."""
 
     search = RandomSearch(search_config, trainer_config)
-    random_intersect = search.get_randomized_intersect(seed=9871237)
+    random_intersect = search.get_randomized_search_configuration(seed=9871237)
 
     assert random_intersect == {
         'beta': 0.008715030393329336,

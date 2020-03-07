@@ -193,7 +193,7 @@ class TrainingWrapperArguments:
             if config_util.EXPORT_PATH in command_arguments:
                 del command_arguments[config_util.EXPORT_PATH]
 
-        result = list()
+        result = []
         for key, value in command_arguments.items():
             # mlagents-learn requires trainer config path be the first argument.
             if key == config_util.TRAINER_CONFIG_PATH and value:
@@ -203,7 +203,7 @@ class TrainingWrapperArguments:
             # The --no-graphics argument does not accept a value.
             if key == config_util.NO_GRAPHICS:
                 if value is True:
-                    result = result + [key]
+                    result += [key]
                 continue
 
             # The --timestamp argument is not sent to training_wrapper.
@@ -226,14 +226,14 @@ class TrainingWrapperArguments:
                 continue
 
             if value:
-                result = result + [key, value]
+                result += [key, value]
 
         trainer_path = settings.get_training_wrapper_path()
         result = ['pipenv', 'run', 'python', str(trainer_path)] + result
 
         # Exclude '--train' argument if inference was requested.
         if not use_inference:
-            result = result + ['--train']
+            result += ['--train']
 
         return result
 

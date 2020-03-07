@@ -17,3 +17,5 @@ build/
 # Misc files
 grimagents/history
 logs/*
+.idea/
+.coverage
