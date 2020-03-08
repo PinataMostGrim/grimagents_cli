@@ -2,6 +2,8 @@ import itertools
 import numpy
 import random
 
+import grimagents.common as common
+
 
 class InvalidTrainerConfig(Exception):
     """The trainer config yaml file is invalid."""
@@ -96,7 +98,7 @@ class ParameterSearch:
 
         result = self.brain_config.copy()
         for key, value in overrides.items():
-            result[self.brain_name][key] = value
+            common.add_nested_dict_value(result[self.brain_name], key, value)
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
         if 'buffer_size_multiple' in result[self.brain_name]:
