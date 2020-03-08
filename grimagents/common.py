@@ -51,3 +51,27 @@ def get_human_readable_duration(seconds):
     )
 
     return ", ".join(magnitudes_str)
+
+
+def add_nested_dict_value(dictionary: dict, key, value, sep: chr = '.'):
+    """Adds a value to a dictionary. If the key contains the separator character,
+    will nest the value inside a series of keys split by that separator.
+    """
+
+    keyList = key.split(sep=sep)
+
+    if len(keyList) > 1:
+        currentKey = key.split(sep=sep, maxsplit=1)[0]
+        nestedKey = key.split(sep=sep, maxsplit=1)[1]
+
+        if currentKey in dictionary:
+            newDict = dictionary[currentKey]
+        else:
+            newDict = {}
+
+        dictionary[currentKey] = add_nested_dict_value(newDict, nestedKey, value)
+
+    else:
+        dictionary[key] = value
+
+    return dictionary

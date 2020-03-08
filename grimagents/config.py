@@ -34,7 +34,7 @@ _DEFAULT_GRIM_CONFIG = {
     '--curriculum': '',
     '--keep-checkpoints': '',
     LESSON: '',
-    RUN_ID: 'ppo',
+    RUN_ID: 'TRAINING_RUN',
     '--num-runs': '',
     '--save-freq': '',
     '--seed': '',
@@ -51,10 +51,10 @@ _DEFAULT_TRAINER_CONFIG = """default:
     beta: 5.0e-3
     buffer_size: 10240
     epsilon: 0.2
-    gamma: 0.99
     hidden_units: 128
     lambd: 0.95
     learning_rate: 3.0e-4
+    learning_rate_schedule: linear
     max_steps: 5.0e4
     memory_size: 256
     normalize: false
@@ -64,9 +64,11 @@ _DEFAULT_TRAINER_CONFIG = """default:
     sequence_length: 64
     summary_freq: 1000
     use_recurrent: false
-    use_curiosity: false
-    curiosity_strength: 0.01
-    curiosity_enc_size: 128
+    vis_encode_type: simple
+    reward_signals:
+        extrinsic:
+            strength: 1.0
+            gamma: 0.99
 """
 
 _DEFAULT_CURRICULUM = {
@@ -85,10 +87,7 @@ _DEFAULT_SEARCH_CONFIG = {
             'batch_size': [512, 5120],
             'beta': [1e-4, 1e-2],
             'buffer_size_multiple': [4, 10],
-            'curiosity_strength': [0.001, 0.1],
-            'curiosity_enc_size': [64, 256],
             'epsilon': [0.1, 0.3],
-            'gamma': [0.8, 0.995],
             'hidden_units': [32, 512],
             'lambd': [0.9, 0.95],
             'learning_rate': [1e-5, 1e-3],
@@ -98,6 +97,7 @@ _DEFAULT_SEARCH_CONFIG = {
             'num_epoch': [3, 10],
             'time_horizon': [32, 2048],
             'sequence_length': [4, 128],
+            'reward_signals.extrinsic.gamma': [0.98, 0.99],
         },
     }
 }

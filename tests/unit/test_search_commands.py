@@ -203,7 +203,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_get_parameter_bounds(self, names, values):
         return bounds
 
-    def mock_sanitize_parameter_values(self, dict):
+    def mock_enforce_parameter_value_types(self, dict):
         return {}
 
     def mock_get_brain_config_with_overrides(self, intersect):
@@ -220,7 +220,9 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
 
     monkeypatch.setattr(BayesianSearch, 'get_parameter_bounds', mock_get_parameter_bounds)
 
-    monkeypatch.setattr(BayesianSearch, 'sanitize_parameter_values', mock_sanitize_parameter_values)
+    monkeypatch.setattr(
+        BayesianSearch, 'enforce_parameter_value_types', mock_enforce_parameter_value_types
+    )
 
     monkeypatch.setattr(
         BayesianSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides

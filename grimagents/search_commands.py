@@ -234,7 +234,7 @@ class PerformBayesianSearch(SearchCommand):
             )
         search_log.info('-' * 63)
 
-        # Load bounds from configuration and create an optimization object
+        # Create bayes-opt bounds from configuration and create an optimization object
         bounds = self.bayes_search.get_parameter_bounds(
             self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets
         )
@@ -267,7 +267,9 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
         search_log.info(f'Best Configuration ({optimizer_max["target"]}):')
 
-        best_configuration = self.bayes_search.sanitize_parameter_values(optimizer_max["params"])
+        best_configuration = self.bayes_search.enforce_parameter_value_types(
+            optimizer_max["params"]
+        )
         for key, value in best_configuration.items():
             search_log.info(f'    {key}: {value}')
 
@@ -283,7 +285,7 @@ class PerformBayesianSearch(SearchCommand):
         """
 
         # Construct search configuration using input from the BayesianSearch object.
-        search_config = self.bayes_search.sanitize_parameter_values(kwargs)
+        search_config = self.bayes_search.enforce_parameter_value_types(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
@@ -344,7 +346,7 @@ class PerformBayesianSearch(SearchCommand):
 
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
-        search_config = self.bayes_search.sanitize_parameter_values(max['params'])
+        search_config = self.bayes_search.enforce_parameter_value_types(max['params'])
         best_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(best_brain_config, self.output_config_path)
 

@@ -84,10 +84,10 @@ def test_get_search_permutations(search_config):
     ]
 
 
-def test_get_brain_configuration(trainer_config):
+def test_extract_brain_config(trainer_config):
     """Tests for the correct creation of the GridSearch brain configuration from a trainer configuration."""
 
-    assert GridSearch.get_brain_configuration(trainer_config, 'BRAIN_NAME') == {
+    assert GridSearch.extract_brain_config(trainer_config, 'BRAIN_NAME') == {
         'default': {
             'trainer': 'ppo',
             'batch_size': 1024,
@@ -153,7 +153,7 @@ def test_invalid_trainer_config(trainer_config):
 
     # Test for configuration missing 'brain_name'
     with pytest.raises(InvalidTrainerConfig):
-        assert GridSearch.get_brain_configuration(trainer_config, 'DOES_NOT_EXIST') == {
+        assert GridSearch.extract_brain_config(trainer_config, 'DOES_NOT_EXIST') == {
             'default': {
                 'trainer': 'ppo',
                 'batch_size': 1024,
@@ -170,7 +170,7 @@ def test_invalid_trainer_config(trainer_config):
     # Test for configuration missing 'default'
     del trainer_config['default']
     with pytest.raises(InvalidTrainerConfig):
-        assert GridSearch.get_brain_configuration(trainer_config, 'BRAIN_NAME') == {
+        assert GridSearch.extract_brain_config(trainer_config, 'BRAIN_NAME') == {
             'default': {
                 'trainer': 'ppo',
                 'batch_size': 1024,
@@ -185,6 +185,44 @@ def test_invalid_trainer_config(trainer_config):
         }
 
 
+def test_get_brain_config_with_overrides(search_config, trainer_config):
+    """Tests that flattened reward_signal keys are correctly expanded for the brain configuration. Additionally tests to ensure nested sibling keys do not get overwritten.
+    """
+
+    # Insert am unrelated reward signal to ensure it does not get overwritten by
+    # the overrides.
+    trainer_config['BRAIN_NAME']['reward_signal'] = {'extrinsic': {'strength': 1.0}}
+
+    search = GridSearch(search_config, trainer_config)
+    overrides = {
+        'reward_signal.extrinsic.gamma': 0.99,
+        'reward_signal.curiosity.curiosity_enc_size': 256,
+    }
+
+    brain_config = search.get_brain_config_with_overrides(overrides)
+
+    assert brain_config == {
+        'BRAIN_NAME': {
+            'beta': 0.005,
+            'epsilon': 0.2,
+            'reward_signal': {
+                'curiosity': {'curiosity_enc_size': 256},
+                'extrinsic': {'gamma': 0.99, 'strength': 1.0},
+            },
+        },
+        'default': {
+            'batch_size': 1024,
+            'beta': 0.005,
+            'buffer_size': 10240,
+            'epsilon': 0.2,
+            'gamma': 0.99,
+            'hidden_units': 128,
+            'lambd': 0.95,
+            'trainer': 'ppo',
+        },
+    }
+
+
 def test_buffer_size_multiple(search_config, trainer_config):
     """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config.
     """
@@ -192,12 +230,12 @@ def test_buffer_size_multiple(search_config, trainer_config):
     search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
 
     search = GridSearch(search_config, trainer_config)
-    intersect = search.get_search_configuration(0)
-    intersect_config = search.get_brain_config_with_overrides(intersect)
+    overrides = search.get_search_configuration(0)
+    brain_config = search.get_brain_config_with_overrides(overrides)
 
-    assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
+    assert 'buffer_size_multiple' not in brain_config['BRAIN_NAME']
 
-    assert intersect_config == {
+    assert brain_config == {
         'default': {
             'trainer': 'ppo',
             'batch_size': 1024,
@@ -262,7 +300,7 @@ def test_get_parameter_bounds():
     }
 
 
-def test_sanitize_parameter_values():
+def test_enforce_parameter_value_types():
     """Tests that
         - Only standard Python value types are returned
         - Values that should be int are converted to int
@@ -283,7 +321,7 @@ def test_sanitize_parameter_values():
         'curiosity_strength': 0.001,
     }
 
-    assert BayesianSearch.sanitize_parameter_values(bounds) == {
+    assert BayesianSearch.enforce_parameter_value_types(bounds) == {
         'batch_size': 144,
         'beta': 0.0028687875149226343,
         'buffer_size_multiple': 50,
