@@ -226,7 +226,7 @@ class BayesianSearch(ParameterSearch):
         return bounds
 
     @staticmethod
-    def sanitize_parameter_values(bounds: dict):
+    def enforce_parameter_value_types(bounds: dict):
         """Enforces int type on parameters that should be int and ensures native value types are used.
 
         Converts values to standard Python value types. BayesianOptimization objects return numpy floats and numpy floats cause problems with yaml serialization.

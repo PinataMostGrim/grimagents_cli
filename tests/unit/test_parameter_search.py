@@ -300,7 +300,7 @@ def test_get_parameter_bounds():
     }
 
 
-def test_sanitize_parameter_values():
+def test_enforce_parameter_value_types():
     """Tests that
         - Only standard Python value types are returned
         - Values that should be int are converted to int
@@ -321,7 +321,7 @@ def test_sanitize_parameter_values():
         'curiosity_strength': 0.001,
     }
 
-    assert BayesianSearch.sanitize_parameter_values(bounds) == {
+    assert BayesianSearch.enforce_parameter_value_types(bounds) == {
         'batch_size': 144,
         'beta': 0.0028687875149226343,
         'buffer_size_multiple': 50,
