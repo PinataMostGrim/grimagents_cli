@@ -185,6 +185,44 @@ def test_invalid_trainer_config(trainer_config):
         }
 
 
+def test_get_brain_config_with_overrides(search_config, trainer_config):
+    """Tests that flattened reward_signal keys are correctly expanded for the brain configuration. Additionally tests to ensure nested sibling keys do not get overwritten.
+    """
+
+    # Insert am unrelated reward signal to ensure it does not get overwritten by
+    # the overrides.
+    trainer_config['BRAIN_NAME']['reward_signal'] = {'extrinsic': {'strength': 1.0}}
+
+    search = GridSearch(search_config, trainer_config)
+    overrides = {
+        'reward_signal.extrinsic.gamma': 0.99,
+        'reward_signal.curiosity.curiosity_enc_size': 256,
+    }
+
+    brain_config = search.get_brain_config_with_overrides(overrides)
+
+    assert brain_config == {
+        'BRAIN_NAME': {
+            'beta': 0.005,
+            'epsilon': 0.2,
+            'reward_signal': {
+                'curiosity': {'curiosity_enc_size': 256},
+                'extrinsic': {'gamma': 0.99, 'strength': 1.0},
+            },
+        },
+        'default': {
+            'batch_size': 1024,
+            'beta': 0.005,
+            'buffer_size': 10240,
+            'epsilon': 0.2,
+            'gamma': 0.99,
+            'hidden_units': 128,
+            'lambd': 0.95,
+            'trainer': 'ppo',
+        },
+    }
+
+
 def test_buffer_size_multiple(search_config, trainer_config):
     """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config.
     """
