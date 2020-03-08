@@ -234,7 +234,7 @@ class PerformBayesianSearch(SearchCommand):
             )
         search_log.info('-' * 63)
 
-        # Load bounds from configuration and create an optimization object
+        # Create bayes-opt bounds from configuration and create an optimization object
         bounds = self.bayes_search.get_parameter_bounds(
             self.bayes_search.hyperparameters, self.bayes_search.hyperparameter_sets
         )

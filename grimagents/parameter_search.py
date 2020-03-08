@@ -22,13 +22,22 @@ class ParameterSearch:
 
     def __init__(self, search_config, trainer_config):
         self.search_config = None
+
+        # trainer_config potentially contains many embedded brain configurations and defaults.
         self.trainer_config = None
+
+        # brain_name contains the specific brain this parameter search is concerned with
         self.brain_name = ''
+
         self.hyperparameters = []
         self.hyperparameter_sets = []
+
+        # brain_config contains only the brain configuration and defaults
         self.brain_config = {}
 
+        # search_config contains hyperparameters to search, as well as a range of values to search through for each
         self.set_search_config(search_config)
+
         self.set_trainer_config(trainer_config)
 
     def set_search_config(self, search_config):
@@ -55,6 +64,10 @@ class ParameterSearch:
         return search_sets
 
     def set_trainer_config(self, trainer_config):
+        """Assigns the trainer configuration for this parameter search and isolates
+        a copy of the brain configuration we are concerned with, paired with default
+        values.
+        """
 
         self.trainer_config = trainer_config.copy()
         self.brain_config = self.get_brain_configuration(self.trainer_config, self.brain_name)
@@ -63,7 +76,7 @@ class ParameterSearch:
     def get_brain_configuration(trainer_config, brain_name):
         """Returns a complete trainer configuration for a brain, including default parameters.
 
-        This method essentially strips all configuration values except 'default' and 'brain_name' from 'trainer_config'.
+        This method strips all configuration values except 'default' and 'brain_name' from 'trainer_config'.
 
         Raises:
           InvalidTrainerConfig: Raised if 'default' or 'brain_name' parameters aren't found as keys in the trainer_config
