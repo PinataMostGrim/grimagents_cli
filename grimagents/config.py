@@ -51,10 +51,10 @@ _DEFAULT_TRAINER_CONFIG = """default:
     beta: 5.0e-3
     buffer_size: 10240
     epsilon: 0.2
-    gamma: 0.99
     hidden_units: 128
     lambd: 0.95
     learning_rate: 3.0e-4
+    learning_rate_schedule: linear
     max_steps: 5.0e4
     memory_size: 256
     normalize: false
@@ -64,9 +64,11 @@ _DEFAULT_TRAINER_CONFIG = """default:
     sequence_length: 64
     summary_freq: 1000
     use_recurrent: false
-    use_curiosity: false
-    curiosity_strength: 0.01
-    curiosity_enc_size: 128
+    vis_encode_type: simple
+    reward_signals:
+        extrinsic:
+            strength: 1.0
+            gamma: 0.99
 """
 
 _DEFAULT_CURRICULUM = {
