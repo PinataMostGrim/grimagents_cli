@@ -84,10 +84,10 @@ def test_get_search_permutations(search_config):
     ]
 
 
-def test_get_brain_configuration(trainer_config):
+def test_extract_brain_config(trainer_config):
     """Tests for the correct creation of the GridSearch brain configuration from a trainer configuration."""
 
-    assert GridSearch.get_brain_configuration(trainer_config, 'BRAIN_NAME') == {
+    assert GridSearch.extract_brain_config(trainer_config, 'BRAIN_NAME') == {
         'default': {
             'trainer': 'ppo',
             'batch_size': 1024,
@@ -153,7 +153,7 @@ def test_invalid_trainer_config(trainer_config):
 
     # Test for configuration missing 'brain_name'
     with pytest.raises(InvalidTrainerConfig):
-        assert GridSearch.get_brain_configuration(trainer_config, 'DOES_NOT_EXIST') == {
+        assert GridSearch.extract_brain_config(trainer_config, 'DOES_NOT_EXIST') == {
             'default': {
                 'trainer': 'ppo',
                 'batch_size': 1024,
@@ -170,7 +170,7 @@ def test_invalid_trainer_config(trainer_config):
     # Test for configuration missing 'default'
     del trainer_config['default']
     with pytest.raises(InvalidTrainerConfig):
-        assert GridSearch.get_brain_configuration(trainer_config, 'BRAIN_NAME') == {
+        assert GridSearch.extract_brain_config(trainer_config, 'BRAIN_NAME') == {
             'default': {
                 'trainer': 'ppo',
                 'batch_size': 1024,

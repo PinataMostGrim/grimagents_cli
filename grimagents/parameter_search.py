@@ -70,10 +70,10 @@ class ParameterSearch:
         """
 
         self.trainer_config = trainer_config.copy()
-        self.brain_config = self.get_brain_configuration(self.trainer_config, self.brain_name)
+        self.brain_config = self.extract_brain_config(self.trainer_config, self.brain_name)
 
     @staticmethod
-    def get_brain_configuration(trainer_config, brain_name):
+    def extract_brain_config(trainer_config, brain_name):
         """Returns a complete trainer configuration for a brain, including default parameters.
 
         This method strips all configuration values except 'default' and 'brain_name' from 'trainer_config'.
