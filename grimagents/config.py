@@ -34,7 +34,7 @@ _DEFAULT_GRIM_CONFIG = {
     '--curriculum': '',
     '--keep-checkpoints': '',
     LESSON: '',
-    RUN_ID: 'ppo',
+    RUN_ID: 'TRAINING_RUN',
     '--num-runs': '',
     '--save-freq': '',
     '--seed': '',
