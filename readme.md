@@ -230,26 +230,37 @@ When the `--bayesian` argument is present, [Bayesian optimization](https://githu
 
 `grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
+Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
+
+```json
+{
+  "search": {
+      "brain": {
+          "name": "3DBallLearning",
+          "hyperparameters":
+          {
+            "reward_signals.extrinsic.gamma" : [0.98 , 0.99],
+            "reward_signals.curiosity.strength" : [0.001, 0.1],
+            "reward_signals.curiosity.encoding_size" : [64, 256]
+          }
+      }
+  }
+```
+
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
-    "trainer-config-path": "config/3DBall_config.yaml",
-    "--env": "builds/3DBall/3DBall.exe",
-    "--export-path": "",
-    "--run-id": "3DBall",
-    "--timestamp": true,
-    "search": {
-        "brain": {
-            "name": "3DBallLearning",
-            "hyperparameters":
-            {
-                "beta": [1e-4, 1e-2],
-                "buffer_size_multiple": [4, 10]
-            }
-        }
-    }
-}
+  "search": {
+      "brain": {
+          "name": "3DBallLearning",
+          "hyperparameters":
+          {
+              "beta": [1e-4, 1e-2],
+              "buffer_size_multiple": [4, 10]
+          }
+      }
+  }
 ```
 
 
