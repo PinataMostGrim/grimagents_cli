@@ -192,12 +192,12 @@ def test_buffer_size_multiple(search_config, trainer_config):
     search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
 
     search = GridSearch(search_config, trainer_config)
-    intersect = search.get_search_configuration(0)
-    intersect_config = search.get_brain_config_with_overrides(intersect)
+    overrides = search.get_search_configuration(0)
+    brain_config = search.get_brain_config_with_overrides(overrides)
 
-    assert 'buffer_size_multiple' not in intersect_config['BRAIN_NAME']
+    assert 'buffer_size_multiple' not in brain_config['BRAIN_NAME']
 
-    assert intersect_config == {
+    assert brain_config == {
         'default': {
             'trainer': 'ppo',
             'batch_size': 1024,
