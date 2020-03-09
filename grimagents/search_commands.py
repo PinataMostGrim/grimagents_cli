@@ -222,7 +222,9 @@ class PerformBayesianSearch(SearchCommand):
 
         super().__init__(args)
         self.bayes_search = BayesianSearch(self.search_config, self.trainer_config)
-        self.output_config_path = self.trainer_config_path.with_name('bayes_config.yaml')
+        self.output_config_path = self.trainer_config_path.with_name(
+            f'{self.grim_config["--run-id"]}_bayes.yaml'
+        )
 
     def execute(self):
 
