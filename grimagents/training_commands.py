@@ -166,6 +166,11 @@ class TrainingWrapperArguments:
         if args.no_timestamp:
             self.set_timestamp_enabled(False)
 
+        if args.multi_gpu:
+            self.set_multi_gpu_enabled(True)
+        if args.no_multi_gpu:
+            self.set_multi_gpu_enabled(False)
+
     def set_additional_arguments(self, args):
         self.arguments[ADDITIONAL_ARGS] = args
 
@@ -211,6 +216,12 @@ class TrainingWrapperArguments:
 
             # The --no-graphics argument does not accept a value.
             if key == config_util.NO_GRAPHICS:
+                if value is True:
+                    result += [key]
+                continue
+
+            # The --multi-gpu argument does not accept a value.
+            if key == config_util.MULTI_GPU:
                 if value is True:
                     result += [key]
                 continue
@@ -281,3 +292,6 @@ class TrainingWrapperArguments:
 
     def set_base_port(self, value):
         self.arguments[config_util.BASE_PORT] = value
+
+    def set_multi_gpu_enabled(self, value):
+        self.arguments[config_util.MULTI_GPU] = value

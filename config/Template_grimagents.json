@@ -15,6 +15,7 @@
     "--inference": false,
     "--no-graphics": false,
     "--timestamp": false,
+    "--multi-gpu": false,
     "search": {
         "brain": {
             "name": "BRAIN_NAME",
