@@ -58,9 +58,10 @@ usage: grimagents [-h] [--list] [--edit-config <file>]
                   [--edit-trainer-config <file>] [--edit-curriculum <file>]
                   [--tensorboard-start] [--resume] [--dry-run]
                   [--trainer-config TRAINER_CONFIG] [--env ENV]
-                  [--lesson LESSON] [--run-id RUN_ID] [--base-port BASE_PORT]
-                  [--num-envs NUM_ENVS] [--inference]
+                  [--sampler SAMPLER] [--lesson LESSON] [--run-id RUN_ID]
+                  [--base-port BASE_PORT] [--num-envs NUM_ENVS] [--inference]
                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
+                  [--multi-gpu | --no-multi-gpu]
                   configuration_file ...
 
 CLI application that wraps Unity ML-Agents with more automation.
@@ -85,6 +86,7 @@ optional arguments:
   --trainer-config TRAINER_CONFIG
                         Overrides configuration setting
   --env ENV             Overrides configuration setting
+  --sampler SAMPLER     Overrides configuration setting
   --lesson LESSON       Overrides configuration setting
   --run-id RUN_ID       Overrides configuration setting
   --base-port BASE_PORT
@@ -96,6 +98,10 @@ optional arguments:
   --timestamp           Append timestamp to run-id. Overrides configuration
                         setting.
   --no-timestamp        Do not append timestamp to run-id. Overrides
+                        configuration setting.
+  --multi-gpu           Use multi-gpu if supported. Overrides configuration
+                        setting.
+  --no-multi-gpu        Do not use multi-gpu. Overrides
                         configuration setting.
 ```
 
