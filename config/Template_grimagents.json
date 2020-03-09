@@ -3,6 +3,7 @@
     "--env": "",
     "--export-path": "",
     "--curriculum": "",
+    "--sampler": "",
     "--keep-checkpoints": "",
     "--lesson": "",
     "--run-id": "TRAINING_RUN",

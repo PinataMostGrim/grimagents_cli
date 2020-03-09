@@ -33,6 +33,7 @@ def namespace_args():
         edit_curriculum=None,
         edit_trainer_config=None,
         env=None,
+        sampler=None,
         graphics=False,
         inference=False,
         lesson=None,
