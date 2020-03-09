@@ -34,6 +34,7 @@ def grim_config():
         '--num-envs': '',
         '--no-graphics': False,
         '--timestamp': False,
+        '--multi-gpu': False,
     }
 
 
@@ -55,6 +56,8 @@ def namespace_args():
         no_graphics=None,
         timestamp=None,
         no_timestamp=None,
+        multi_gpu=None,
+        no_multi_gpu=None,
         additional_args=[],
     )
 
@@ -292,6 +295,19 @@ def test_training_arguments_handles_no_graphics(grim_config):
     assert '--no-graphics' not in arguments.get_arguments()
 
 
+def test_training_arguments_handles_multi_gpu(grim_config):
+
+    # '--multi-gpu' should be present
+    grim_config['--multi-gpu'] = True
+    arguments = TrainingWrapperArguments(grim_config)
+    assert '--multi-gpu' in arguments.get_arguments()
+
+    # '--multi-gpu' should not be present
+    grim_config['--multi-gpu'] = False
+    arguments = TrainingWrapperArguments(grim_config)
+    assert '--multi-gpu' not in arguments.get_arguments()
+
+
 def test_training_arguments_excludes_timestamp(grim_config):
     """Test for ensuring TrainingWrapperArguments excludes the '--timestamp' argument."""
 
@@ -345,7 +361,12 @@ def test_override_configuration_values(grim_config):
         --num-envs
         --no-graphics
         --timestamp
+        --multi-gpu
     """
+
+    grim_config['--sampler'] = 'config/3DBall_generalize.yaml'
+    grim_config['--timestamp'] = True
+    grim_config['--multi-gpu'] = True
 
     override_args = Namespace(
         configuration_file='config/3DBall_grimagents.json',
@@ -361,11 +382,10 @@ def test_override_configuration_values(grim_config):
         no_graphics=True,
         timestamp=None,
         no_timestamp=True,
+        multi_gpu=None,
+        no_multi_gpu=True,
         args=['--load', '--slow'],
     )
-
-    grim_config['--sampler'] = 'config/3DBall_generalize.yaml'
-    grim_config['--timestamp'] = True
 
     arguments = TrainingWrapperArguments(grim_config)
     arguments.set_additional_arguments(override_args.args)
@@ -415,6 +435,7 @@ def test_training_arguments_set_methods(grim_config):
     arguments.set_num_envs('4')
     arguments.set_no_graphics_enabled(True)
     arguments.set_timestamp_enabled(True)
+    arguments.set_multi_gpu_enabled(True)
 
     arguments_string = arguments.get_arguments_as_string()
     assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
@@ -424,6 +445,7 @@ def test_training_arguments_set_methods(grim_config):
     assert '--num-envs 4' in arguments_string
     assert '--no-graphics' in arguments_string
     assert '--run-id ball-' in arguments_string
+    assert '--multi-gpu' in arguments_string
 
 
 def test_training_arguments_timestamp(monkeypatch, grim_config):
