@@ -21,6 +21,7 @@ def grim_config():
     return {
         'trainer-config-path': 'config/3DBall.yaml',
         '--env': 'builds/3DBall/3DBall.exe',
+        '--sampler': '',
         '--export-path': 'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--curriculum': '',
         '--keep-checkpoints': '',
@@ -44,6 +45,7 @@ def namespace_args():
         dry_run=False,
         trainer_config=None,
         env=None,
+        sampler=None,
         lesson=None,
         run_id='3DBall',
         base_port=None,
@@ -337,6 +339,7 @@ def test_override_configuration_values(grim_config):
     Ensures the following arguments are overridden:
         --trainer-config
         --env
+        --sampler
         --lesson
         --run-id
         --num-envs
@@ -344,10 +347,11 @@ def test_override_configuration_values(grim_config):
         --timestamp
     """
 
-    args = Namespace(
+    override_args = Namespace(
         configuration_file='config/3DBall_grimagents.json',
         trainer_config='config/PushBlock_grimagents.json',
         env='builds/PushBlock/PushBlock.exe',
+        sampler='config/PushBlock_generalize.yaml',
         lesson=2,
         run_id='PushBlock',
         base_port=5010,
@@ -360,11 +364,12 @@ def test_override_configuration_values(grim_config):
         args=['--load', '--slow'],
     )
 
+    grim_config['--sampler'] = 'config/3DBall_generalize.yaml'
     grim_config['--timestamp'] = True
 
     arguments = TrainingWrapperArguments(grim_config)
-    arguments.set_additional_arguments(args.args)
-    arguments.apply_argument_overrides(args)
+    arguments.set_additional_arguments(override_args.args)
+    arguments.apply_argument_overrides(override_args)
 
     result = arguments.get_arguments()
 
@@ -379,6 +384,8 @@ def test_override_configuration_values(grim_config):
         'config/PushBlock_grimagents.json',
         '--env',
         'builds/PushBlock/PushBlock.exe',
+        '--sampler',
+        'config/PushBlock_generalize.yaml',
         '--export-path',
         'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--lesson',
@@ -402,6 +409,7 @@ def test_training_arguments_set_methods(grim_config):
     arguments = TrainingWrapperArguments(grim_config)
 
     arguments.set_env('builds/3DBall/3DBallHard.exe')
+    arguments.set_sampler('config/3DBall_generalize.yaml')
     arguments.set_lesson('3')
     arguments.set_run_id('ball')
     arguments.set_num_envs('4')
@@ -410,6 +418,7 @@ def test_training_arguments_set_methods(grim_config):
 
     arguments_string = arguments.get_arguments_as_string()
     assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
+    assert '--sampler config/3DBall_generalize.yaml' in arguments_string
     assert '--lesson 3' in arguments_string
     assert '--run-id ball' in arguments_string
     assert '--num-envs 4' in arguments_string
