@@ -132,16 +132,25 @@ class TrainingWrapperArguments:
 
         if args.trainer_config is not None:
             self.set_trainer_config(args.trainer_config)
+
         if args.env is not None:
             self.set_env(args.env)
+
+        if args.sampler is not None:
+            self.set_sampler(args.sampler)
+
         if args.lesson is not None:
             self.set_lesson(str(args.lesson))
+
         if args.run_id is not None:
             self.set_run_id(args.run_id)
+
         if args.base_port is not None:
             self.set_base_port(args.base_port)
+
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
+
         if args.inference is not None:
             self.set_inference(args.inference)
 
@@ -245,6 +254,9 @@ class TrainingWrapperArguments:
 
     def set_env(self, value):
         self.arguments[config_util.ENV] = value
+
+    def set_sampler(self, value):
+        self.arguments[config_util.SAMPLER] = value
 
     def set_lesson(self, value):
         self.arguments[config_util.LESSON] = value

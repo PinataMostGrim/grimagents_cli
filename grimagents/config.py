@@ -16,6 +16,7 @@ import grimagents.command_util as command_util
 # Configuration keys
 TRAINER_CONFIG_PATH = 'trainer-config-path'
 ENV = '--env'
+SAMPLER = '--sampler'
 LESSON = '--lesson'
 RUN_ID = '--run-id'
 EXPORT_PATH = '--export-path'
@@ -32,6 +33,7 @@ _DEFAULT_GRIM_CONFIG = {
     ENV: '',
     EXPORT_PATH: '',
     '--curriculum': '',
+    '--sampler': '',
     '--keep-checkpoints': '',
     LESSON: '',
     RUN_ID: 'TRAINING_RUN',
