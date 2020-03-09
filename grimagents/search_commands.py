@@ -265,6 +265,7 @@ class PerformBayesianSearch(SearchCommand):
         optimizer_max = self.get_optimizer_max(optimizer)
 
         search_log.info('-' * 63)
+        search_log.info('Bayesian search complete')
         search_log.info(f'Best Configuration ({optimizer_max["target"]}):')
 
         best_configuration = self.bayes_search.enforce_parameter_value_types(
@@ -276,6 +277,9 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('-' * 63)
         self.save_max_to_file(optimizer_max)
         search_log.info('-' * 63)
+
+        if self.search_config_path.exists():
+            self.search_config_path.unlink()
 
     def perform_bayes_search(self, **kwargs):
         """Executes a training run using the provided arguments and returns the final mean reward.
