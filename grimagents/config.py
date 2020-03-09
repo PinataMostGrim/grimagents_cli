@@ -25,6 +25,7 @@ NUM_ENVS = '--num-envs'
 INFERENCE = '--inference'
 NO_GRAPHICS = '--no-graphics'
 TIMESTAMP = '--timestamp'
+MULTI_GPU = '--multi-gpu'
 SEARCH = 'search'
 
 
@@ -45,6 +46,7 @@ _DEFAULT_GRIM_CONFIG = {
     INFERENCE: False,
     NO_GRAPHICS: False,
     TIMESTAMP: False,
+    MULTI_GPU: False,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
