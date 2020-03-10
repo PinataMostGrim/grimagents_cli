@@ -486,7 +486,7 @@ def test_perform_bayesian_search_init(patch_search_command, namespace_args):
     """Tests for the correct construction of a bayesian search trainer config output path."""
 
     search = PerformBayesianSearch(namespace_args)
-    assert search.output_config_path == Path('config/bayes_config.yaml')
+    assert search.output_config_path == Path('config/3DBall_bayes.yaml')
 
 
 def test_perform_bayesian_search_execute(
