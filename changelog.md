@@ -1,3 +1,11 @@
+### 2.1.0
+- Added support for ML-Agents 0.9.3
+- Added support for performing hyperparameter searches on reward signals
+- Added support for sampler files (generalized agents)
+- Added support for the '--multi-gpu' argument
+- Bayes search cleans up search configuration files when finished
+- The best configuration found using Bayes search is now saved to `<run-id_bayes>.yaml`
+
 ### 2.0.1
 - Fixed exception caused by bayesian-optimization update
 - Fixed failing github action workflow
