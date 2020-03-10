@@ -1,3 +1,6 @@
+### 2.1.1
+- Update readme.md and configuration files
+
 ### 2.1.0
 - Added support for ML-Agents 0.9.3
 - Added support for performing hyperparameter searches on reward signals

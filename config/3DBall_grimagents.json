@@ -2,7 +2,7 @@
     "trainer-config-path": "config/3DBall_config.yaml",
     "--env": "builds/3DBall/3DBall.exe",
     "--sampler": "config/3dball_generalize.yaml",
-    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels",
+    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true,
     "search": {
