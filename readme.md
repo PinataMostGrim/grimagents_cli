@@ -1,24 +1,24 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap [Unity Machine Learning Agents toolkit](https://github.com/Unity-Technologies/ml-agents) with more automation.
+**grimagents** is collection of command line applications that wrap [Unity's Machine Learning Agents](https://github.com/Unity-Technologies/ml-agents) toolkit with more automation.
 
-**grimagents** features include:
+**grimagents** CLI features include:
 - Initiate training using arguments loaded from a configuration file
 - Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
 
-**grimsearch** features include:
+**grimsearch** CLI features include:
 - Search for optimal hyperparameter settings using Grid, Random, and Bayesian strategies
 
-**grimwrapper** features include:
+**grimwrapper** CLI features include:
 - Display estimated time remaining
 - *(Optional)* Automatically copy trained models to another location after training finishes (for example, into a Unity project)
 
 
 ## Requirements
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the `MLAgents` project folder using Pipenv and Python 3.6
-- ml-agents 0.8 (untested with 0.9 or higher)
+- A virtual environment setup for the `MLAgents` project folder using pipenv and Python 3.6
+- ML-Agents 0.9.3
 
 
 ## Installation
@@ -105,8 +105,8 @@ optional arguments:
                         configuration setting.
 ```
 
-#### Example usages
-Create and edit a new grimagents configuration file or edit an existing one:
+#### Example usage
+Create and edit a new `grimagents` configuration file or edit an existing one:
 ```
 grimagents --edit-config grim-agents\config\3DBall_grimagents.json
 ```
@@ -162,8 +162,8 @@ optional arguments:
   --bayes-load, -l      Loads Bayesian optimization progress logs from folder
 ```
 
-#### Example usages
-Create or edit a grimagents training configuration file (default search parameters are added automatically):
+#### Example usage
+Create or edit a `grimagents` training configuration file (default search parameters are added automatically):
 ```
 grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
 ```
@@ -207,21 +207,22 @@ optional arguments:
 
 ## Configuration
 #### grimagents Configuration
-Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `trainer-config-path` and `run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `--trainer-config-path` and `--run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
-All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run grimagents modules from the `MLAgents` project root folder and configure paths accordingly.
+All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run `grimagents` modules from the `MLAgents` project root folder and configure paths accordingly.
 
-`--timestamp` and `--inference` configuration values are consumed by the main module and not passed on to `grimwrapper` or `mlagents-learn`.
+`--timestamp` and `--inference` configuration values are consumed by the `grimagents` module and not passed on to `grimwrapper` or `mlagents-learn`.
 
 An example configuration file is included at `config\3DBall_grimagents.json`.
 
 
-Example grimagents configuration:
+Example `grimagents` configuration:
 ```json
 {
     "trainer-config-path": "config/3DBall_config.yaml",
     "--env": "builds/3DBall/3DBall.exe",
-    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels",
+    "--sampler": "config/3dball_generalize.yaml",
+    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true
 }
@@ -230,7 +231,7 @@ Example grimagents configuration:
 #### grimsearch Configuration
 Grid Search is the default strategy used by `grimsearch`. Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-When the `--random` argument is used, a random value is chosen between the minimum and maximum values defined for each hyperparameter. If only one value is defined, that hyperparameter value will not be randomized.
+Random Search can be applied using the `--random` argument. When used, a random value is chosen between the minimum and maximum values defined for each hyperparameter in the search configuration. A hyperparameter with only one value defined will not be randomized.
 
 When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
@@ -253,7 +254,7 @@ Reward Signals can be included in hyperparameter searches by using a period-sepa
   }
 ```
 
-As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform a grid search on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
+As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform searches on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
@@ -271,10 +272,10 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 
 ## Notes
-`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a pipenv subprocess call.
 
 The `grimagents --resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 
 grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 
-Bayesian search will write the best configuration discovered into a yaml file named `bayes_config.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
+Bayesian search will write the best configuration discovered into a yaml file named `<run-id>_bayes.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
