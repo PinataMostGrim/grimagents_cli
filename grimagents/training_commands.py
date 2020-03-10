@@ -132,16 +132,25 @@ class TrainingWrapperArguments:
 
         if args.trainer_config is not None:
             self.set_trainer_config(args.trainer_config)
+
         if args.env is not None:
             self.set_env(args.env)
+
+        if args.sampler is not None:
+            self.set_sampler(args.sampler)
+
         if args.lesson is not None:
             self.set_lesson(str(args.lesson))
+
         if args.run_id is not None:
             self.set_run_id(args.run_id)
+
         if args.base_port is not None:
             self.set_base_port(args.base_port)
+
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
+
         if args.inference is not None:
             self.set_inference(args.inference)
 
@@ -156,6 +165,11 @@ class TrainingWrapperArguments:
             self.set_timestamp_enabled(True)
         if args.no_timestamp:
             self.set_timestamp_enabled(False)
+
+        if args.multi_gpu:
+            self.set_multi_gpu_enabled(True)
+        if args.no_multi_gpu:
+            self.set_multi_gpu_enabled(False)
 
     def set_additional_arguments(self, args):
         self.arguments[ADDITIONAL_ARGS] = args
@@ -206,6 +220,12 @@ class TrainingWrapperArguments:
                     result += [key]
                 continue
 
+            # The --multi-gpu argument does not accept a value.
+            if key == config_util.MULTI_GPU:
+                if value is True:
+                    result += [key]
+                continue
+
             # The --timestamp argument is not sent to training_wrapper.
             if key == config_util.TIMESTAMP:
                 continue
@@ -246,6 +266,9 @@ class TrainingWrapperArguments:
     def set_env(self, value):
         self.arguments[config_util.ENV] = value
 
+    def set_sampler(self, value):
+        self.arguments[config_util.SAMPLER] = value
+
     def set_lesson(self, value):
         self.arguments[config_util.LESSON] = value
 
@@ -269,3 +292,6 @@ class TrainingWrapperArguments:
 
     def set_base_port(self, value):
         self.arguments[config_util.BASE_PORT] = value
+
+    def set_multi_gpu_enabled(self, value):
+        self.arguments[config_util.MULTI_GPU] = value

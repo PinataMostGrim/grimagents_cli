@@ -203,7 +203,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_get_parameter_bounds(self, names, values):
         return bounds
 
-    def mock_sanitize_parameter_values(self, dict):
+    def mock_enforce_parameter_value_types(self, dict):
         return {}
 
     def mock_get_brain_config_with_overrides(self, intersect):
@@ -220,7 +220,9 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
 
     monkeypatch.setattr(BayesianSearch, 'get_parameter_bounds', mock_get_parameter_bounds)
 
-    monkeypatch.setattr(BayesianSearch, 'sanitize_parameter_values', mock_sanitize_parameter_values)
+    monkeypatch.setattr(
+        BayesianSearch, 'enforce_parameter_value_types', mock_enforce_parameter_value_types
+    )
 
     monkeypatch.setattr(
         BayesianSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides
@@ -484,7 +486,7 @@ def test_perform_bayesian_search_init(patch_search_command, namespace_args):
     """Tests for the correct construction of a bayesian search trainer config output path."""
 
     search = PerformBayesianSearch(namespace_args)
-    assert search.output_config_path == Path('config/bayes_config.yaml')
+    assert search.output_config_path == Path('config/3DBall_bayes.yaml')
 
 
 def test_perform_bayesian_search_execute(

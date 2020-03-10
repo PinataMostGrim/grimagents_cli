@@ -110,6 +110,7 @@ def parse_args(argv):
         '--trainer-config', type=str, help='Overrides configuration setting'
     )
     overrides_parser.add_argument('--env', type=str, help='Overrides configuration setting')
+    overrides_parser.add_argument('--sampler', type=str, help='Overrides configuration setting')
     overrides_parser.add_argument('--lesson', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--run-id', type=str, help='Overrides configuration setting')
     overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
@@ -138,6 +139,18 @@ def parse_args(argv):
         '--no-timestamp',
         action='store_true',
         help='Do not append timestamp to run-id. Overrides configuration setting.',
+    )
+
+    multi_gpu_group = overrides_parser.add_mutually_exclusive_group()
+    multi_gpu_group.add_argument(
+        '--multi-gpu',
+        action='store_true',
+        help='Use multi-gpu if supported. Overrides configuration setting.',
+    )
+    multi_gpu_group.add_argument(
+        '--no-multi-gpu',
+        action='store_true',
+        help='Do not use multi-gpu. Overrides configuration setting.',
     )
 
     # Parser for arguments that are passed on to the training wrapper

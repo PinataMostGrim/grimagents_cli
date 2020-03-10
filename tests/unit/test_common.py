@@ -68,3 +68,44 @@ def test_get_human_readable_duration():
 
     human_readable = common.get_human_readable_duration(10000)
     assert human_readable == '2 hours, 46 minutes, 40 seconds'
+
+
+def test_add_nested_dict_value():
+    """Tests that values are correctly nested in a dictionary under multiple keys
+    and that existing, sibling key value pairs in the dictionary not destroyed.
+    """
+
+    recursiveKeys = [
+        "reward_signals.extrinsic.strength",
+        "reward_signals.extrinsic.gamma",
+        "reward_signals.curiosity.strength",
+        "reward_signals.curiosity.gamma",
+    ]
+
+    expectedDict = {
+        'reward_signals': {
+            'curiosity': {'gamma': 1.0, 'strength': 1.0},
+            'extrinsic': {'gamma': 1.0, 'strength': 1.0},
+        }
+    }
+
+    dictionary = {}
+
+    for key in recursiveKeys:
+        common.add_nested_dict_value(dictionary, key, 1.0)
+
+    assert dictionary == expectedDict
+
+    dictionary = {'reward_signals': {'extrinsic': {}}}
+
+    for key in recursiveKeys:
+        common.add_nested_dict_value(dictionary, key, 1.0)
+
+    assert dictionary == expectedDict
+
+    dictionary = {'reward_signals': {'extrinsic': {'gamma': 0.99}}}
+
+    for key in recursiveKeys:
+        common.add_nested_dict_value(dictionary, key, 1.0)
+
+    assert dictionary == expectedDict

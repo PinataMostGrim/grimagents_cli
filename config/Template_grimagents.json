@@ -3,9 +3,10 @@
     "--env": "",
     "--export-path": "",
     "--curriculum": "",
+    "--sampler": "",
     "--keep-checkpoints": "",
     "--lesson": "",
-    "--run-id": "ppo",
+    "--run-id": "TRAINING_RUN",
     "--num-runs": "",
     "--save-freq": "",
     "--seed": "",
@@ -13,5 +14,27 @@
     "--num-envs": "",
     "--inference": false,
     "--no-graphics": false,
-    "--timestamp": false
+    "--timestamp": false,
+    "--multi-gpu": false,
+    "search": {
+        "brain": {
+            "name": "BRAIN_NAME",
+            "hyperparameters": {
+                "batch_size": [512, 5120],
+                "beta": [0.0001, 0.01],
+                "buffer_size_multiple": [4, 10],
+                "epsilon": [0.1, 0.3],
+                "hidden_units": [32, 512],
+                "lambd": [0.9, 0.95],
+                "learning_rate": [1e-05, 0.001],
+                "max_steps": [500000.0, 10000000.0],
+                "memory_size": [64, 512],
+                "num_layers": [1, 3],
+                "num_epoch": [3, 10],
+                "time_horizon": [32, 2048],
+                "sequence_length": [4, 128],
+                "reward_signals.extrinsic.gamma": [0.98, 0.99],
+            },
+        }
+    },
 }
