@@ -10,8 +10,9 @@ from bayes_opt.event import Events
 from pathlib import Path
 
 import grimagents.command_util as command_util
-import grimagents.config as config_util
 import grimagents.common as common
+import grimagents.config as config_util
+import grimagents.constants as const
 import grimagents.settings as settings
 
 from grimagents.parameter_search import GridSearch, RandomSearch, BayesianSearch
@@ -51,9 +52,9 @@ class SearchCommand(Command):
         self.grim_config_path = Path(args.configuration_file)
         self.grim_config = config_util.load_grim_configuration_file(self.grim_config_path)
 
-        self.search_config = self.grim_config[config_util.SEARCH]
+        self.search_config = self.grim_config[const.GS_SEARCH]
 
-        self.trainer_config_path = Path(self.grim_config['trainer-config-path'])
+        self.trainer_config_path = Path(self.grim_config[const.ML_TRAINER_CONFIG_PATH])
         self.trainer_config = config_util.load_trainer_configuration_file(self.trainer_config_path)
 
         self.search_config_path = self.trainer_config_path.with_name('search_config.yaml')
@@ -91,7 +92,7 @@ class SearchCommand(Command):
     def get_search_run_id(self):
         """Returns a run_id string for the current search."""
 
-        return self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
+        return self.grim_config[const.ML_RUN_ID] + f'_{self.search_counter:02d}'
 
 
 class GridSearchCommand(SearchCommand):
@@ -223,7 +224,7 @@ class PerformBayesianSearch(SearchCommand):
         super().__init__(args)
         self.bayes_search = BayesianSearch(self.search_config, self.trainer_config)
         self.output_config_path = self.trainer_config_path.with_name(
-            f'{self.grim_config["--run-id"]}_bayes.yaml'
+            f'{self.grim_config[const.ML_RUN_ID]}_bayes.yaml'
         )
 
     def execute(self):
@@ -296,7 +297,7 @@ class PerformBayesianSearch(SearchCommand):
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
         # Execute training with the search config and run_id
-        run_id = self.grim_config[config_util.RUN_ID] + f'_{self.search_counter:02d}'
+        run_id = self.grim_config[const.ML_RUN_ID] + f'_{self.search_counter:02d}'
         command = [
             'pipenv',
             'run',
@@ -362,8 +363,7 @@ class PerformBayesianSearch(SearchCommand):
         log_folder_path = self.get_log_folder_path()
 
         log_file_path = (
-            log_folder_path
-            / f'{self.grim_config[config_util.RUN_ID]}_{common.get_timestamp()}.json'
+            log_folder_path / f'{self.grim_config[const.ML_RUN_ID]}_{common.get_timestamp()}.json'
         )
 
         return log_file_path
@@ -382,7 +382,7 @@ class PerformBayesianSearch(SearchCommand):
         """
 
         log_folder_path = (
-            self.trainer_config_path.parent / f'{self.grim_config[config_util.RUN_ID]}_bayes'
+            self.trainer_config_path.parent / f'{self.grim_config[const.ML_RUN_ID]}_bayes'
         )
 
         # We create the log folder if it doesn't exist as the BayesionOptimization JSONLogger will throw an exception instead of doing this.
