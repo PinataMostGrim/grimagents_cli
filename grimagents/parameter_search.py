@@ -248,6 +248,12 @@ class BayesianSearch(ParameterSearch):
                 bounds[key] = int(value)
                 continue
 
+            # Process reward signal hyperparameters
+            splitKey = key.rsplit('.', maxsplit=1)
+            if (len(splitKey) > 1) and (splitKey[1] == const.HP_ENCODING_SIZE):
+                bounds[key] = int(value)
+                continue
+
             if isinstance(value, numpy.generic):
                 bounds[key] = value.item()
 
