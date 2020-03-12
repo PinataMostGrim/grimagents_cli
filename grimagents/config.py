@@ -11,42 +11,29 @@ from pathlib import Path
 import yaml
 
 import grimagents.command_util as command_util
-
-
-# Configuration keys
-TRAINER_CONFIG_PATH = 'trainer-config-path'
-ENV = '--env'
-SAMPLER = '--sampler'
-LESSON = '--lesson'
-RUN_ID = '--run-id'
-EXPORT_PATH = '--export-path'
-BASE_PORT = '--base-port'
-NUM_ENVS = '--num-envs'
-INFERENCE = '--inference'
-NO_GRAPHICS = '--no-graphics'
-TIMESTAMP = '--timestamp'
-MULTI_GPU = '--multi-gpu'
-SEARCH = 'search'
+import grimagents.constants as const
 
 
 _DEFAULT_GRIM_CONFIG = {
-    TRAINER_CONFIG_PATH: '',
-    ENV: '',
-    EXPORT_PATH: '',
-    '--curriculum': '',
-    '--sampler': '',
-    '--keep-checkpoints': '',
-    LESSON: '',
-    RUN_ID: 'TRAINING_RUN',
-    '--num-runs': '',
-    '--save-freq': '',
-    '--seed': '',
-    BASE_PORT: '',
-    NUM_ENVS: '',
-    INFERENCE: False,
-    NO_GRAPHICS: False,
-    TIMESTAMP: False,
-    MULTI_GPU: False,
+    const.ML_TRAINER_CONFIG_PATH: '',
+    const.ML_ENV: '',
+    const.GA_EXPORT_PATH: '',
+    const.ML_CURRICULUM: '',
+    const.ML_SAMPLER: '',
+    const.ML_KEEP_CHECKPOINTS: '',
+    const.ML_LESSON: '',
+    const.ML_RUN_ID: 'TRAINING_RUN',
+    const.ML_NUM_RUNS: '',
+    const.ML_SAVE_FREQUENCY: '',
+    const.ML_SEED: '',
+    const.ML_BASE_PORT: '',
+    const.ML_NUM_ENVS: '',
+    const.ML_DOCKER_TARGET: '',
+    const.ML_NO_GRAPHICS: False,
+    const.ML_DEBUG: False,
+    const.ML_MULTI_GPU: False,
+    const.GA_INFERENCE: False,
+    const.GA_TIMESTAMP: False,
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
@@ -76,31 +63,31 @@ _DEFAULT_TRAINER_CONFIG = """default:
 """
 
 _DEFAULT_CURRICULUM = {
-    'measure': 'progress',
-    'thresholds': [0.1],
-    'min_lesson_length': 100,
-    'signal_smoothing': True,
-    'parameters': {'example_reset_parameter': [1.5, 2.0]},
+    const.CU_MEASURE: const.CU_PROGRESS,
+    const.CU_THRESHOLDS: [0.1],
+    const.CU_MIN_LESSON_LENGTH: 100,
+    const.CU_SIGNAL_SMOOTHING: True,
+    const.CU_PARAMETERS: {'example_reset_parameter': [1.5, 2.0]},
 }
 
 
 _DEFAULT_SEARCH_CONFIG = {
-    'brain': {
-        'name': 'BRAIN_NAME',
-        'hyperparameters': {
-            'batch_size': [512, 5120],
-            'beta': [1e-4, 1e-2],
-            'buffer_size_multiple': [4, 10],
-            'epsilon': [0.1, 0.3],
-            'hidden_units': [32, 512],
-            'lambd': [0.9, 0.95],
-            'learning_rate': [1e-5, 1e-3],
-            'max_steps': [5e5, 1e7],
-            'memory_size': [64, 512],
-            'num_layers': [1, 3],
-            'num_epoch': [3, 10],
-            'time_horizon': [32, 2048],
-            'sequence_length': [4, 128],
+    const.GS_BRAIN: {
+        const.GS_NAME: 'BRAIN_NAME',
+        const.GS_HYPERPARAMS: {
+            const.HP_BATCH_SIZE: [512, 5120],
+            const.HP_BETA: [1e-4, 1e-2],
+            const.GS_BUFFER_SIZE_MULTIPLE: [4, 10],
+            const.HP_EPSILON: [0.1, 0.3],
+            const.HP_HIDDEN_UNITS: [32, 512],
+            const.HP_LAMBD: [0.9, 0.95],
+            const.HP_LEARNING_RATE: [1e-5, 1e-3],
+            const.HP_MAX_STEPS: [5e5, 1e7],
+            const.HP_MEMORY_SIZE: [64, 512],
+            const.HP_NUM_LAYERS: [1, 3],
+            const.HP_NUM_EPOCH: [3, 10],
+            const.HP_TIME_HORIZON: [32, 2048],
+            const.HP_SEQUENCE_LENGTH: [4, 128],
             'reward_signals.extrinsic.gamma': [0.98, 0.99],
         },
     }
@@ -131,8 +118,8 @@ def edit_grim_config_file(file_path: Path, add_search=False):
 
     if add_search:
         config = command_util.load_json_file(file_path)
-        if SEARCH not in config:
-            config[SEARCH] = get_default_search_config()
+        if const.GS_SEARCH not in config:
+            config[const.GS_SEARCH] = get_default_search_config()
             command_util.write_json_file(config, file_path)
 
     command_util.open_file(file_path)
@@ -200,7 +187,7 @@ def validate_grim_configuration(configuration):
     # in the full configuration.
     for key, value in configuration.items():
         # 'search' is not defined in the default configuration but is still a valid key.
-        if key == SEARCH:
+        if key == const.GS_SEARCH:
             continue
 
         try:
@@ -210,7 +197,7 @@ def validate_grim_configuration(configuration):
             is_valid_config = False
 
     # The only required keys are 'trainer-config-path' and '--run-id'
-    for key in {TRAINER_CONFIG_PATH, RUN_ID}:
+    for key in {const.ML_TRAINER_CONFIG_PATH, const.ML_RUN_ID}:
         try:
             if not configuration[key]:
                 raise KeyError
