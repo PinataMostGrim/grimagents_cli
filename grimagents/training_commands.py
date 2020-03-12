@@ -221,6 +221,12 @@ class TrainingWrapperArguments:
                     result += [key]
                 continue
 
+            # The --debug argument does not accept a value.
+            if key == const.ML_DEBUG:
+                if value is True:
+                    result += [key]
+                continue
+
             # The timestamp argument is not sent to training_wrapper.
             if key == const.GA_TIMESTAMP:
                 continue
