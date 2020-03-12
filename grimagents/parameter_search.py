@@ -3,6 +3,7 @@ import numpy
 import random
 
 import grimagents.common as common
+import grimagents.constants as const
 
 
 class InvalidTrainerConfig(Exception):
@@ -43,7 +44,7 @@ class ParameterSearch:
     def set_search_config(self, search_config):
 
         self.search_config = search_config.copy()
-        self.brain_name = self.search_config['brain']['name']
+        self.brain_name = self.search_config[const.GS_BRAIN][const.GS_NAME]
         self.hyperparameters = self.get_search_hyperparameters(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
 
@@ -51,14 +52,14 @@ class ParameterSearch:
     def get_search_hyperparameters(search_config):
         """Returns the list of hyperparameter names defined in search configuration."""
 
-        return [name for name in search_config['brain']['hyperparameters']]
+        return [name for name in search_config[const.GS_BRAIN][const.GS_HYPERPARAMS]]
 
     @staticmethod
     def get_hyperparameter_sets(search_config):
         """Returns an array containing all sets of hyperparameter values to use in the search."""
 
         search_sets = []
-        for _, values in search_config['brain']['hyperparameters'].items():
+        for _, values in search_config[const.GS_BRAIN][const.GS_HYPERPARAMS].items():
             search_sets.append(values)
 
         return search_sets
@@ -83,7 +84,7 @@ class ParameterSearch:
         """
 
         try:
-            result = {'default': trainer_config['default']}
+            result = {const.TC_DEFAULT: trainer_config[const.TC_DEFAULT]}
         except KeyError:
             raise InvalidTrainerConfig(
                 f'Unable to find \'default\' configuration values in trainer configuration:\n{trainer_config}'
@@ -114,12 +115,12 @@ class ParameterSearch:
             common.add_nested_dict_value(result[self.brain_name], key, value)
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
-        if 'buffer_size_multiple' in result[self.brain_name]:
+        if const.GS_BUFFER_SIZE_MULTIPLE in result[self.brain_name]:
             batch_size = self.get_batch_size_value(result, self.brain_name)
-            result[self.brain_name]['buffer_size'] = (
-                batch_size * result[self.brain_name]['buffer_size_multiple']
+            result[self.brain_name][const.HP_BUFFER_SIZE] = (
+                batch_size * result[self.brain_name][const.GS_BUFFER_SIZE_MULTIPLE]
             )
-            del result[self.brain_name]['buffer_size_multiple']
+            del result[self.brain_name][const.GS_BUFFER_SIZE_MULTIPLE]
 
         return result
 
@@ -128,10 +129,10 @@ class ParameterSearch:
         """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead.
         """
 
-        if 'batch_size' in brain_config[brain_name]:
-            return brain_config[brain_name]['batch_size']
+        if const.HP_BATCH_SIZE in brain_config[brain_name]:
+            return brain_config[brain_name][const.HP_BATCH_SIZE]
 
-        return brain_config['default']['batch_size']
+        return brain_config[const.TC_DEFAULT][const.HP_BATCH_SIZE]
 
 
 class GridSearch(ParameterSearch):
@@ -227,23 +228,29 @@ class BayesianSearch(ParameterSearch):
 
     @staticmethod
     def enforce_parameter_value_types(bounds: dict):
-        """Enforces int type on parameters that should be int and ensures native value types are used.
+        """Enforces int type on parameters that should be int and ensures native value types are used for the rest.
 
         Converts values to standard Python value types. BayesianOptimization objects return numpy floats and numpy floats cause problems with yaml serialization.
         """
 
         for key, value in bounds.items():
             if (
-                key == 'batch_size'
-                or key == 'buffer_size_multiple'
-                or key == 'hidden_units'
-                or key == 'num_epoch'
-                or key == 'max_steps'
-                or key == 'num_layers'
-                or key == 'time_horizon'
-                or key == 'sequence_length'
-                or key == 'curiosity_enc_size'
+                key == const.HP_BATCH_SIZE
+                # 'const.GS_BUFFER_SIZE' should never be used for searches. Use 'const.GS_BUFFER_SIZE_MULTIPLE' instead.
+                or key == const.GS_BUFFER_SIZE_MULTIPLE
+                or key == const.HP_HIDDEN_UNITS
+                or key == const.HP_MAX_STEPS
+                or key == const.HP_NUM_EPOCH
+                or key == const.HP_NUM_LAYERS
+                or key == const.HP_TIME_HORIZON
+                or key == const.HP_SEQUENCE_LENGTH
             ):
+                bounds[key] = int(value)
+                continue
+
+            # Process reward signal hyperparameters
+            splitKey = key.rsplit('.', maxsplit=1)
+            if (len(splitKey) > 1) and (splitKey[1] == const.HP_ENCODING_SIZE):
                 bounds[key] = int(value)
                 continue
 

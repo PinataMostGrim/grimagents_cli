@@ -108,17 +108,17 @@ optional arguments:
 #### Example usage
 Create and edit a new `grimagents` configuration file or edit an existing one:
 ```
-grimagents --edit-config grim-agents\config\3DBall_grimagents.json
+grimagents --edit-config grim-agents\etc\3DBall_grimagents.json
 ```
 
 Initiate training with the `3DBall_grimagents.json` configuration file:
 ```
-grimagents grim-agents\config\3DBall.json
+grimagents grim-agents\etc\3DBall.json
 ```
 
 Initiate training with the `3DBall_grimagents.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
 ```
-grimagents grim-agents\config\3DBall_grimagents.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
+grimagents grim-agents\etc\3DBall_grimagents.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
 ```
 
 Resume the last training run:
@@ -165,22 +165,22 @@ optional arguments:
 #### Example usage
 Create or edit a `grimagents` training configuration file (default search parameters are added automatically):
 ```
-grimsearch --edit-config grim-agents\config\3DBall_grimagents.json
+grimsearch --edit-config grim-agents\etc\3DBall_grimagents.json
 ```
 
 Initiate grid search with the `3DBall_grimagents.json` configuration file:
 ```
-grimsearch grim-agents\config\3DBall_grimagents.json
+grimsearch grim-agents\etc\3DBall_grimagents.json
 ```
 
 Initiate 5 random searches with the `3DBall_grimagents.json` configuration file:
 ```
-grimsearch grim-agents\config\3DBall_grimagents.json --random 5
+grimsearch grim-agents\etc\3DBall_grimagents.json --random 5
 ```
 
 Initiate a Bayesian search with the `3DBall_grimagents.json` configuration file using 5 exploration steps and 10 optimization steps:
 ```
-grimsearch grim-agents\config\3DBall_grimagents.json --bayesian 5 10
+grimsearch grim-agents\etc\3DBall_grimagents.json --bayesian 5 10
 ```
 
 
@@ -213,15 +213,15 @@ All paths stored in configuration files should be relative paths from the curren
 
 `--timestamp` and `--inference` configuration values are consumed by the `grimagents` module and not passed on to `grimwrapper` or `mlagents-learn`.
 
-An example configuration file is included at `config\3DBall_grimagents.json`.
+Example configuration files can be found in the `etc` folder.
 
 
 Example `grimagents` configuration:
 ```json
 {
-    "trainer-config-path": "config/3DBall_config.yaml",
+    "trainer-config-path": "grim-agents/etc/3DBall_config.yaml",
     "--env": "builds/3DBall/3DBall.exe",
-    "--sampler": "config/3dball_generalize.yaml",
+    "--sampler": "grim-agents/etc/3dball_generalize.yaml",
     "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true
@@ -241,6 +241,9 @@ Reward Signals can be included in hyperparameter searches by using a period-sepa
 
 ```json
 {
+
+  ...
+
   "search": {
       "brain": {
           "name": "3DBallLearning",
@@ -258,6 +261,9 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 ```json
 {
+
+  ...
+
   "search": {
       "brain": {
           "name": "3DBallLearning",
