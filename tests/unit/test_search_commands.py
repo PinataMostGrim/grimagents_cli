@@ -102,7 +102,7 @@ def trainer_config():
 
 
 @pytest.fixture
-def intersect():
+def search_overrides():
     return {'batch_size': 84, 'beta': 0.002, 'buffer_size_multiple': 88}
 
 
@@ -176,16 +176,16 @@ def patch_perform_search_with_configuration(monkeypatch):
 
 
 @pytest.fixture
-def patch_perform_grid_search(monkeypatch, trainer_config, intersect):
+def patch_perform_grid_search(monkeypatch, trainer_config, search_overrides):
     """Patches external methods used by PerformGridSearch objects."""
 
     def mock_get_grid_search_count(self):
         return 10
 
     def mock_get_search_configuration(self, index):
-        return intersect
+        return search_overrides
 
-    def mock_get_brain_config_with_overrides(self, intersect):
+    def mock_get_brain_config_with_overrides(self, search_overrides):
         return trainer_config
 
     monkeypatch.setattr(GridSearch, 'get_grid_search_count', mock_get_grid_search_count)
@@ -206,7 +206,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_enforce_parameter_value_types(self, dict):
         return {}
 
-    def mock_get_brain_config_with_overrides(self, intersect):
+    def mock_get_brain_config_with_overrides(self, search_overrides):
         return trainer_config
 
     def mock_bayes_opt_load_logs(optimizer, logs):
@@ -317,7 +317,7 @@ def test_search_command_get_run_id(patch_search_command, namespace_args):
 
 
 def test_perform_search_with_configuration(
-    monkeypatch, patch_search_command, namespace_args, grim_config, trainer_config, intersect
+    monkeypatch, patch_search_command, namespace_args, grim_config, trainer_config, search_overrides
 ):
     """Tests that SearchCommand objects correctly perform searches with the specified trainer configurations.
 
@@ -440,7 +440,7 @@ def test_perform_random_search(
     patch_perform_search_with_configuration,
     namespace_args,
     trainer_config,
-    intersect,
+    search_overrides,
     test_file,
     fixture_cleanup_test_file,
 ):
@@ -452,9 +452,9 @@ def test_perform_random_search(
     """
 
     def mock_get_randomized_search_configuration(self):
-        return intersect
+        return search_overrides
 
-    def mock_get_brain_config_with_overrides(self, intersect):
+    def mock_get_brain_config_with_overrides(self, search_overrides):
         return trainer_config
 
     monkeypatch.setattr(
