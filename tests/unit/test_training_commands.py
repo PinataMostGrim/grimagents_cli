@@ -4,7 +4,6 @@ from argparse import Namespace
 
 import grimagents.command_util
 import grimagents.common
-import grimagents.config
 
 from grimagents.training_commands import (
     Command,

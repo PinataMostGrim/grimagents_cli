@@ -12,10 +12,12 @@
     "--seed": "",
     "--base-port": "",
     "--num-envs": "",
-    "--inference": false,
+    "--docker-target-name": "",
     "--no-graphics": false,
-    "--timestamp": false,
+    "--debug": false,
     "--multi-gpu": false,
+    "--inference": false,
+    "--timestamp": false,
     "search": {
         "brain": {
             "name": "BRAIN_NAME",

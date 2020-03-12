@@ -4,11 +4,8 @@ from pathlib import Path
 import grimagents.common as common
 import grimagents.command_util as command_util
 import grimagents.config as config_util
+import grimagents.constants as const
 import grimagents.settings as settings
-
-
-ADDITIONAL_ARGS = 'additional-args'
-SLOW = '--slow'
 
 
 class Command:
@@ -111,10 +108,10 @@ class ResumeTraining(Command):
 
         command = command_util.load_last_history()
 
-        if '--load' not in command:
-            command.append('--load')
+        if const.ML_LOAD not in command:
+            command.append(const.ML_LOAD)
         if self.args.lesson:
-            command.append('--lesson')
+            command.append(const.ML_LESSON)
             command.append(str(self.args.lesson))
 
         return command
@@ -172,7 +169,7 @@ class TrainingWrapperArguments:
             self.set_multi_gpu_enabled(False)
 
     def set_additional_arguments(self, args):
-        self.arguments[ADDITIONAL_ARGS] = args
+        self.arguments[const.GA_ADDITIONAL_ARGS] = args
 
     def get_arguments(self):
         """Converts a configuration dictionary into command line arguments
@@ -184,63 +181,67 @@ class TrainingWrapperArguments:
         command_arguments = self.arguments.copy()
 
         # Process --timestamp argument
-        if config_util.TIMESTAMP in command_arguments and command_arguments[config_util.TIMESTAMP]:
+        if const.GA_TIMESTAMP in command_arguments and command_arguments[const.GA_TIMESTAMP]:
 
             timestamp = common.get_timestamp()
-            command_arguments[
-                config_util.RUN_ID
-            ] = f'{command_arguments[config_util.RUN_ID]}-{timestamp}'
+            command_arguments[const.ML_RUN_ID] = f'{command_arguments[const.ML_RUN_ID]}-{timestamp}'
 
         # Process --inference argument
         use_inference = (
-            config_util.INFERENCE in command_arguments and command_arguments[config_util.INFERENCE]
+            const.GA_INFERENCE in command_arguments and command_arguments[const.GA_INFERENCE]
         )
         if use_inference:
-            if ADDITIONAL_ARGS not in command_arguments:
-                command_arguments[ADDITIONAL_ARGS] = []
+            if const.GA_ADDITIONAL_ARGS not in command_arguments:
+                command_arguments[const.GA_ADDITIONAL_ARGS] = []
 
             # Add the --slow flag if inference was requested, but it isn't present.
-            if SLOW not in command_arguments[ADDITIONAL_ARGS]:
-                command_arguments[ADDITIONAL_ARGS].append(SLOW)
+            if const.ML_SLOW not in command_arguments[const.GA_ADDITIONAL_ARGS]:
+                command_arguments[const.GA_ADDITIONAL_ARGS].append(const.ML_SLOW)
 
             # Remove the export path, if it is present.
-            if config_util.EXPORT_PATH in command_arguments:
-                del command_arguments[config_util.EXPORT_PATH]
+            if const.GA_EXPORT_PATH in command_arguments:
+                del command_arguments[const.GA_EXPORT_PATH]
 
         result = []
         for key, value in command_arguments.items():
             # mlagents-learn requires trainer config path be the first argument.
-            if key == config_util.TRAINER_CONFIG_PATH and value:
+            if key == const.ML_TRAINER_CONFIG_PATH and value:
                 result.insert(0, value)
                 continue
 
             # The --no-graphics argument does not accept a value.
-            if key == config_util.NO_GRAPHICS:
+            if key == const.ML_NO_GRAPHICS:
                 if value is True:
                     result += [key]
                 continue
 
             # The --multi-gpu argument does not accept a value.
-            if key == config_util.MULTI_GPU:
+            if key == const.ML_MULTI_GPU:
                 if value is True:
                     result += [key]
                 continue
 
-            # The --timestamp argument is not sent to training_wrapper.
-            if key == config_util.TIMESTAMP:
+            # The --debug argument does not accept a value.
+            if key == const.ML_DEBUG:
+                if value is True:
+                    result += [key]
                 continue
 
-            # The --inference argument is not sent to training_wrapper.
-            if key == config_util.INFERENCE:
+            # The timestamp argument is not sent to training_wrapper.
+            if key == const.GA_TIMESTAMP:
+                continue
+
+            # The inference argument is not sent to training_wrapper.
+            if key == const.GA_INFERENCE:
                 continue
 
             # The 'search' dictionary is not sent to training_wrapper.
-            if key == config_util.SEARCH:
+            if key == const.GS_SEARCH:
                 continue
 
             # Additional arguments are serialized as a list and the key should
             # not be included.
-            if key == ADDITIONAL_ARGS:
+            if key == const.GA_ADDITIONAL_ARGS:
                 for argument in value:
                     result.append(argument)
                 continue
@@ -253,7 +254,7 @@ class TrainingWrapperArguments:
 
         # Exclude '--train' argument if inference was requested.
         if not use_inference:
-            result += ['--train']
+            result += [const.ML_TRAIN]
 
         return result
 
@@ -261,37 +262,37 @@ class TrainingWrapperArguments:
         return ' '.join([str(element) for element in self.get_arguments()])
 
     def set_trainer_config(self, value):
-        self.arguments[config_util.TRAINER_CONFIG_PATH] = value
+        self.arguments[const.ML_TRAINER_CONFIG_PATH] = value
 
     def set_env(self, value):
-        self.arguments[config_util.ENV] = value
+        self.arguments[const.ML_ENV] = value
 
     def set_sampler(self, value):
-        self.arguments[config_util.SAMPLER] = value
+        self.arguments[const.ML_SAMPLER] = value
 
     def set_lesson(self, value):
-        self.arguments[config_util.LESSON] = value
+        self.arguments[const.ML_LESSON] = value
 
     def set_run_id(self, value):
-        self.arguments[config_util.RUN_ID] = value
+        self.arguments[const.ML_RUN_ID] = value
 
     def get_run_id(self):
-        return self.arguments[config_util.RUN_ID]
+        return self.arguments[const.ML_RUN_ID]
 
     def set_num_envs(self, value):
-        self.arguments[config_util.NUM_ENVS] = value
+        self.arguments[const.ML_NUM_ENVS] = value
 
     def set_inference(self, value):
-        self.arguments[config_util.INFERENCE] = value
+        self.arguments[const.GA_INFERENCE] = value
 
     def set_no_graphics_enabled(self, value):
-        self.arguments[config_util.NO_GRAPHICS] = value
+        self.arguments[const.ML_NO_GRAPHICS] = value
 
     def set_timestamp_enabled(self, value):
-        self.arguments[config_util.TIMESTAMP] = value
+        self.arguments[const.GA_TIMESTAMP] = value
 
     def set_base_port(self, value):
-        self.arguments[config_util.BASE_PORT] = value
+        self.arguments[const.ML_BASE_PORT] = value
 
     def set_multi_gpu_enabled(self, value):
-        self.arguments[config_util.MULTI_GPU] = value
+        self.arguments[const.ML_MULTI_GPU] = value
