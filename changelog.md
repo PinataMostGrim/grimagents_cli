@@ -1,3 +1,9 @@
+### 2.1.2
+- Added configuration support for '--docker-target-name' and '--debug'
+- Fixed exception caused by performing searches using the 'encoding_size' reward signal
+- Improved clarity of readme and example configuration files
+- Moved tests inside the 'grimagents' package
+
 ### 2.1.1
 - Update readme.md and configuration files
 
