@@ -1,5 +1,6 @@
 # Python files
 __pycache__/
+.coverage
 
 # Sublime Text files
 *.sublime-project
@@ -18,4 +19,3 @@ build/
 grimagents/history
 logs/*
 .idea/
-.coverage
