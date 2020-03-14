@@ -1,3 +1,7 @@
+### 2.2.0
+- Added support for ML-Agents 0.10.1
+- Added configuration support for '--env-args'
+
 ### 2.1.2
 - Added configuration support for '--docker-target-name' and '--debug'
 - Fixed exception caused by performing searches using the 'encoding_size' reward signal
