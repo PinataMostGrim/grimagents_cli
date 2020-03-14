@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - release/*
+      - hotfix/*
   pull_request:
     types: [assigned]
   schedule:

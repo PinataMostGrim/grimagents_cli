@@ -1,3 +1,6 @@
+### 2.2.1
+- Updated readme with the version of ML-Agents supported
+
 ### 2.2.0
 - Added support for ML-Agents 0.10.1
 - Added configuration support for '--env-args'
