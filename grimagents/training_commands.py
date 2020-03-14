@@ -180,13 +180,13 @@ class TrainingWrapperArguments:
         # We copy arguments in order to mutate it in the event a time-stamp is present.
         command_arguments = self.arguments.copy()
 
-        # Process --timestamp argument
+        # Process --timestamp argument.
         if const.GA_TIMESTAMP in command_arguments and command_arguments[const.GA_TIMESTAMP]:
 
             timestamp = common.get_timestamp()
             command_arguments[const.ML_RUN_ID] = f'{command_arguments[const.ML_RUN_ID]}-{timestamp}'
 
-        # Process --inference argument
+        # Process --inference argument.
         use_inference = (
             const.GA_INFERENCE in command_arguments and command_arguments[const.GA_INFERENCE]
         )
