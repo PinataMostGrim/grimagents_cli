@@ -34,6 +34,7 @@ def grim_config():
         '--no-graphics': False,
         '--timestamp': False,
         '--multi-gpu': False,
+        '--env-args': '',
     }
 
 
@@ -57,6 +58,7 @@ def namespace_args():
         no_timestamp=None,
         multi_gpu=None,
         no_multi_gpu=None,
+        env_args=None,
         additional_args=[],
     )
 
@@ -435,6 +437,7 @@ def test_training_arguments_set_methods(grim_config):
     arguments.set_no_graphics_enabled(True)
     arguments.set_timestamp_enabled(True)
     arguments.set_multi_gpu_enabled(True)
+    arguments.set_env_args(["--num-orcs", 42])
 
     arguments_string = arguments.get_arguments_as_string()
     assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
@@ -445,6 +448,7 @@ def test_training_arguments_set_methods(grim_config):
     assert '--no-graphics' in arguments_string
     assert '--run-id ball-' in arguments_string
     assert '--multi-gpu' in arguments_string
+    assert '--num-orcs 42' in arguments_string
 
 
 def test_training_arguments_timestamp(monkeypatch, grim_config):
@@ -503,3 +507,20 @@ def test_training_arguments_inference(grim_config):
     result[3] = 'grimagents/training_wrapper.py'
 
     assert result == arguments_list
+
+
+def test_env_args_placed_last():
+    """Tests that '--env-args' are placed at the end of the training command arguments."""
+
+    config = {
+        'trainer-config-path': 'config/3DBall.yaml',
+        '--env-args': ["--num-orcs", 42],
+        '--env': 'builds/3DBall/3DBall.exe',
+        '--export-path': 'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
+        '--run-id': '3DBall',
+    }
+
+    arguments = TrainingWrapperArguments(config)
+    result = arguments.get_arguments_as_string()
+
+    assert result.endswith('--env-args --num-orcs 42')
