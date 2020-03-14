@@ -18,6 +18,7 @@
     "--multi-gpu": false,
     "--inference": false,
     "--timestamp": false,
+    "--env-args": [],
     "search": {
         "brain": {
             "name": "BRAIN_NAME",
