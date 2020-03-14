@@ -304,3 +304,6 @@ class TrainingWrapperArguments:
 
     def set_multi_gpu_enabled(self, value):
         self.arguments[const.ML_MULTI_GPU] = value
+
+    def set_env_args(self, value: list):
+        self.arguments[const.ML_ENV_ARGS] = value
