@@ -18,7 +18,7 @@
 ## Requirements
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using pipenv and Python 3.6
-- ML-Agents 0.9.3
+- ML-Agents 0.10.1
 
 
 ## Installation
