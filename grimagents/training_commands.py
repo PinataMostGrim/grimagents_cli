@@ -180,13 +180,13 @@ class TrainingWrapperArguments:
         # We copy arguments in order to mutate it in the event a time-stamp is present.
         command_arguments = self.arguments.copy()
 
-        # Process --timestamp argument
+        # Process --timestamp argument.
         if const.GA_TIMESTAMP in command_arguments and command_arguments[const.GA_TIMESTAMP]:
 
             timestamp = common.get_timestamp()
             command_arguments[const.ML_RUN_ID] = f'{command_arguments[const.ML_RUN_ID]}-{timestamp}'
 
-        # Process --inference argument
+        # Process --inference argument.
         use_inference = (
             const.GA_INFERENCE in command_arguments and command_arguments[const.GA_INFERENCE]
         )
@@ -239,6 +239,10 @@ class TrainingWrapperArguments:
             if key == const.GS_SEARCH:
                 continue
 
+            # # Env-args must be added to the end of the command arguments.
+            if key == const.ML_ENV_ARGS:
+                continue
+
             # Additional arguments are serialized as a list and the key should
             # not be included.
             if key == const.GA_ADDITIONAL_ARGS:
@@ -249,12 +253,16 @@ class TrainingWrapperArguments:
             if value:
                 result += [key, value]
 
-        trainer_path = settings.get_training_wrapper_path()
-        result = ['pipenv', 'run', 'python', str(trainer_path)] + result
-
         # Exclude '--train' argument if inference was requested.
         if not use_inference:
             result += [const.ML_TRAIN]
+
+        # Env-args need to be appended to the end of the training arguments.
+        if const.ML_ENV_ARGS in command_arguments and command_arguments[const.ML_ENV_ARGS]:
+            result += [const.ML_ENV_ARGS] + command_arguments[const.ML_ENV_ARGS]
+
+        trainer_path = settings.get_training_wrapper_path()
+        result = ['pipenv', 'run', 'python', str(trainer_path)] + result
 
         return result
 
@@ -296,3 +304,6 @@ class TrainingWrapperArguments:
 
     def set_multi_gpu_enabled(self, value):
         self.arguments[const.ML_MULTI_GPU] = value
+
+    def set_env_args(self, value: list):
+        self.arguments[const.ML_ENV_ARGS] = value

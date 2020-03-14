@@ -34,6 +34,7 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_MULTI_GPU: False,
     const.GA_INFERENCE: False,
     const.GA_TIMESTAMP: False,
+    const.ML_ENV_ARGS: [],
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:
@@ -205,6 +206,15 @@ def validate_grim_configuration(configuration):
         except KeyError:
             config_log.error(f'Configuration is missing required key \'{key}\'')
             is_valid_config = False
+
+    # If --env-args entry is present, ensure it is a list.
+    if (
+        const.ML_ENV_ARGS in configuration
+        and configuration[const.ML_ENV_ARGS]
+        and not isinstance(configuration[const.ML_ENV_ARGS], list)
+    ):
+        config_log.error(f'Configuration value for \'--env-args\' must be a list.')
+        is_valid_config = False
 
     return is_valid_config
 
