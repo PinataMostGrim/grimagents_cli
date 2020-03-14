@@ -34,6 +34,7 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_MULTI_GPU: False,
     const.GA_INFERENCE: False,
     const.GA_TIMESTAMP: False,
+    const.ML_ENV_ARGS: [],
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:

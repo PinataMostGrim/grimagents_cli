@@ -20,6 +20,7 @@ ML_DOCKER_TARGET = '--docker-target-name'
 ML_NO_GRAPHICS = '--no-graphics'
 ML_DEBUG = '--debug'
 ML_MULTI_GPU = '--multi-gpu'
+ML_ENV_ARGS = '--env-args'
 
 # Hyperparameters
 HP_TRAINER = 'trainer'
