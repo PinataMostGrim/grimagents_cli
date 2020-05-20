@@ -241,9 +241,6 @@ Reward Signals can be included in hyperparameter searches by using a period-sepa
 
 ```json
 {
-
-  ...
-
   "search": {
       "brain": {
           "name": "3DBallLearning",
@@ -261,9 +258,6 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 ```json
 {
-
-  ...
-
   "search": {
       "brain": {
           "name": "3DBallLearning",
@@ -284,4 +278,4 @@ The `grimagents --resume` argument will not remember how far through a curriculu
 
 grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 
-Bayesian search will write the best configuration discovered into a yaml file named `<run-id>_bayes.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files form the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
+Bayesian search will write the best configuration discovered into a yaml file named `<run-id>_bayes.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files from the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
