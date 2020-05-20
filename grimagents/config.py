@@ -16,6 +16,11 @@ import grimagents.constants as const
 
 _DEFAULT_GRIM_CONFIG = {
     const.ML_TRAINER_CONFIG_PATH: '',
+    const.ML_WIDTH: 320,
+    const.ML_HEIGHT: 240,
+    const.ML_TIMESCALE: "",
+    const.ML_QUALITY_LEVEL: "",
+    const.ML_TARGET_FRAME_RATE: "",
     const.ML_ENV: '',
     const.GA_EXPORT_PATH: '',
     const.ML_CURRICULUM: '',
@@ -213,7 +218,7 @@ def validate_grim_configuration(configuration):
         and configuration[const.ML_ENV_ARGS]
         and not isinstance(configuration[const.ML_ENV_ARGS], list)
     ):
-        config_log.error(f'Configuration value for \'--env-args\' must be a list.')
+        config_log.error('Configuration value for \'--env-args\' must be a list.')
         is_valid_config = False
 
     return is_valid_config

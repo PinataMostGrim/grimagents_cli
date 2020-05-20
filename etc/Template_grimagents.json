@@ -1,5 +1,10 @@
 {
     "trainer-config-path": "",
+    "--width": 320,
+    "--height": 240,
+    "--time-scale": "",
+    "--quality-level": "",
+    "--target-frame-rate": "",
     "--env": "",
     "--export-path": "",
     "--curriculum": "",
