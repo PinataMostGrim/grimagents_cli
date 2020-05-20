@@ -218,7 +218,7 @@ def validate_grim_configuration(configuration):
         and configuration[const.ML_ENV_ARGS]
         and not isinstance(configuration[const.ML_ENV_ARGS], list)
     ):
-        config_log.error(f'Configuration value for \'--env-args\' must be a list.')
+        config_log.error('Configuration value for \'--env-args\' must be a list.')
         is_valid_config = False
 
     return is_valid_config
