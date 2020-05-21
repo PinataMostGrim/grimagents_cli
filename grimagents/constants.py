@@ -26,6 +26,7 @@ ML_NO_GRAPHICS = '--no-graphics'
 ML_DEBUG = '--debug'
 ML_MULTI_GPU = '--multi-gpu'
 ML_ENV_ARGS = '--env-args'
+ML_CPU = '--cpu'
 
 # Hyperparameters
 HP_TRAINER = 'trainer'
