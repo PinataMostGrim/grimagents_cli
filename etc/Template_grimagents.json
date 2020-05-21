@@ -24,6 +24,7 @@
     "--inference": false,
     "--timestamp": false,
     "--env-args": [],
+    "--cpu": "",
     "search": {
         "brain": {
             "name": "BRAIN_NAME",
