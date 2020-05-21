@@ -1,10 +1,5 @@
 {
     "trainer-config-path": "",
-    "--width": 320,
-    "--height": 240,
-    "--time-scale": "",
-    "--quality-level": "",
-    "--target-frame-rate": "",
     "--env": "",
     "--export-path": "",
     "--curriculum": "",
@@ -24,7 +19,12 @@
     "--inference": false,
     "--timestamp": false,
     "--env-args": [],
-    "--cpu": "",
+    "--cpu": false,
+    "--width": 320,
+    "--height": 240,
+    "--time-scale": "",
+    "--quality-level": "",
+    "--target-frame-rate": "",
     "search": {
         "brain": {
             "name": "BRAIN_NAME",
