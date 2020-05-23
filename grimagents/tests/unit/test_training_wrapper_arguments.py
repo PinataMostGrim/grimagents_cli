@@ -27,6 +27,7 @@ def grim_config():
         '--timestamp': False,
         '--multi-gpu': False,
         '--env-args': '',
+        '--cpu': '',
     }
 
 
@@ -56,7 +57,7 @@ def test_create_training_arguments(grim_config):
 
 
 def test_training_arguments_handles_no_graphics(grim_config):
-    """Test for correct handling of the --no-graphics argument."""
+    """Test for correct handling of the '--no-graphics' argument."""
 
     # '--no-graphics' should be present
     grim_config['--no-graphics'] = True
@@ -70,6 +71,7 @@ def test_training_arguments_handles_no_graphics(grim_config):
 
 
 def test_training_arguments_handles_multi_gpu(grim_config):
+    """Test for correct handling of the '--multi-gpu' argument."""
 
     # '--multi-gpu' should be present
     grim_config['--multi-gpu'] = True
@@ -80,6 +82,20 @@ def test_training_arguments_handles_multi_gpu(grim_config):
     grim_config['--multi-gpu'] = False
     arguments = TrainingWrapperArguments(grim_config)
     assert '--multi-gpu' not in arguments.get_arguments()
+
+
+def test_training_arguments_handles_cpu(grim_config):
+    """Test for correct handling of the '--cpu' argument."""
+
+    # '--cpu' should be present
+    grim_config['--cpu'] = True
+    arguments = TrainingWrapperArguments(grim_config)
+    assert '--cpu' in arguments.get_arguments()
+
+    # '--cpu' should not be present
+    grim_config['--cpu'] = False
+    arguments = TrainingWrapperArguments(grim_config)
+    assert '--cpu' not in arguments.get_arguments()
 
 
 def test_training_arguments_excludes_timestamp(grim_config):
