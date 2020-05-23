@@ -121,7 +121,7 @@ def test_training_arguments_add_additional_args(grim_config):
     """Test for TrainingWrapperArguments correctly setting additional arguments."""
 
     arguments = TrainingWrapperArguments(grim_config)
-    additional_args = ['--slow', '--load']
+    additional_args = ['--load']
     arguments.set_additional_arguments(additional_args)
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
@@ -140,7 +140,6 @@ def test_training_arguments_add_additional_args(grim_config):
         'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
-        '--slow',
         '--load',
         '--train',
     ]
@@ -193,7 +192,7 @@ def test_override_configuration_values(grim_config):
         no_timestamp=True,
         multi_gpu=None,
         no_multi_gpu=True,
-        args=['--load', '--slow'],
+        args=['--load'],
     )
 
     arguments = TrainingWrapperArguments(grim_config)
@@ -238,7 +237,6 @@ def test_override_configuration_values(grim_config):
         '--quality-leve',
         1,
         '--load',
-        '--slow',
         '--train',
     ]
 
@@ -291,12 +289,11 @@ def test_training_arguments_inference(grim_config):
     - Ensures get_arguments() can handle no additional args being set
     - Ensures the '--train' argument is removed
     - Ensures the '--export-path' argument is removed
-    - Ensures the '--slow' argument is appended and not duplicated
     """
 
     grim_config['--inference'] = True
 
-    # --train is removed, --slow is added, and no exceptions are caused by additional args not being set
+    # --train is removed and no exceptions are caused by additional args not being set
     arguments = TrainingWrapperArguments(grim_config)
     arguments_list = [
         'pipenv',
@@ -308,20 +305,9 @@ def test_training_arguments_inference(grim_config):
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall',
-        '--slow',
     ]
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
-    result = arguments.get_arguments()
-    result[3] = 'grimagents/training_wrapper.py'
-
-    assert result == arguments_list
-
-    # '--slow' isn't duplicated
-    arguments = TrainingWrapperArguments(grim_config)
-    additional_args = ['--slow']
-    arguments.set_additional_arguments(additional_args)
-
     result = arguments.get_arguments()
     result[3] = 'grimagents/training_wrapper.py'
 
