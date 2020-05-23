@@ -18,7 +18,7 @@
 ## Requirements
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using pipenv and Python 3.6
-- ML-Agents 0.12.1
+- ML-Agents 0.14.1
 
 
 ## Installation
@@ -68,8 +68,8 @@ CLI application that wraps Unity ML-Agents with more automation.
 
 positional arguments:
   configuration_file    Configuration file to extract training arguments from
-  args                  Additional arguments applied to training (ex. --slow,
-                        --debug, --load)
+  args                  Additional arguments applied to training (ex. --debug,
+                        --load)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,8 +101,7 @@ optional arguments:
                         configuration setting.
   --multi-gpu           Use multi-gpu if supported. Overrides configuration
                         setting.
-  --no-multi-gpu        Do not use multi-gpu. Overrides
-                        configuration setting.
+  --no-multi-gpu        Do not use multi-gpu. Overrides configuration setting.
 ```
 
 #### Example usage
@@ -195,7 +194,7 @@ policies and exposes more training information in the console.
 positional arguments:
   trainer_config_path   Configuration file that holds brain hyperparameters
   args                  Additional arguments passed on to mlagents-learn (ex.
-                        --slow, --debug, --load)
+                        --debug, --load)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -235,7 +234,7 @@ Random Search can be applied using the `--random` argument. When used, a random 
 
 When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
-`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
 Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
 

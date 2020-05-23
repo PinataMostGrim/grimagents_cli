@@ -1,3 +1,9 @@
+### 2.4.0
+- Added support for ML-Agents 0.14.1
+- Removed '--num-runs' configuration argument
+- 'grimagents --edit-curriculum' will now output a default curriculum formatted with yaml
+- Fixed a minor training summary log formatting issue
+
 ### 2.3.0
 - Added support for ML-Agents 0.13.1
 - Added configuration support for several new training arguments (--cpu, --width, --height, --time-scale, --quality-level and --target-frame-rate)

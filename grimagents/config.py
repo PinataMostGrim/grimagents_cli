@@ -23,7 +23,6 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_KEEP_CHECKPOINTS: '',
     const.ML_LESSON: '',
     const.ML_RUN_ID: 'TRAINING_RUN',
-    const.ML_NUM_RUNS: '',
     const.ML_SAVE_FREQUENCY: '',
     const.ML_SEED: '',
     const.ML_BASE_PORT: '',
@@ -70,17 +69,19 @@ _DEFAULT_TRAINER_CONFIG = """default:
 """
 
 _DEFAULT_CURRICULUM = {
-    const.CU_MEASURE: const.CU_PROGRESS,
-    const.CU_THRESHOLDS: [0.1],
-    const.CU_MIN_LESSON_LENGTH: 100,
-    const.CU_SIGNAL_SMOOTHING: True,
-    const.CU_PARAMETERS: {'example_reset_parameter': [1.5, 2.0]},
+    'BEHAVIOUR_NAME': {
+        const.CU_MEASURE: const.CU_PROGRESS,
+        const.CU_THRESHOLDS: [0.1],
+        const.CU_MIN_LESSON_LENGTH: 100,
+        const.CU_SIGNAL_SMOOTHING: True,
+        const.CU_PARAMETERS: {'example_parameter': [1.5, 2.0]},
+    }
 }
 
 
 _DEFAULT_SEARCH_CONFIG = {
     const.GS_BRAIN: {
-        const.GS_NAME: 'BRAIN_NAME',
+        const.GS_NAME: 'BEHAVIOUR_NAME',
         const.GS_HYPERPARAMS: {
             const.HP_BATCH_SIZE: [512, 5120],
             const.HP_BETA: [1e-4, 1e-2],
@@ -258,8 +259,8 @@ def edit_curriculum_file(file_path: Path):
     default values if file does not already exit.
     """
 
-    if not file_path.suffix == '.json':
-        file_path = file_path.with_suffix('.json')
+    if not file_path.suffix == '.yaml':
+        file_path = file_path.with_suffix('.yaml')
 
     if not file_path.exists():
         create_curriculum_file(file_path)
@@ -270,4 +271,4 @@ def edit_curriculum_file(file_path: Path):
 def create_curriculum_file(file_path: Path):
     """Creates a curriculum file with default values at the specified path."""
 
-    command_util.write_json_file(get_default_curriculum(), file_path)
+    command_util.write_yaml_file(get_default_curriculum(), file_path)
