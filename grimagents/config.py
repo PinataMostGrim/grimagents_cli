@@ -16,11 +16,6 @@ import grimagents.constants as const
 
 _DEFAULT_GRIM_CONFIG = {
     const.ML_TRAINER_CONFIG_PATH: '',
-    const.ML_WIDTH: 320,
-    const.ML_HEIGHT: 240,
-    const.ML_TIMESCALE: "",
-    const.ML_QUALITY_LEVEL: "",
-    const.ML_TARGET_FRAME_RATE: "",
     const.ML_ENV: '',
     const.GA_EXPORT_PATH: '',
     const.ML_CURRICULUM: '',
@@ -40,6 +35,12 @@ _DEFAULT_GRIM_CONFIG = {
     const.GA_INFERENCE: False,
     const.GA_TIMESTAMP: False,
     const.ML_ENV_ARGS: [],
+    const.ML_CPU: False,
+    const.ML_WIDTH: 320,
+    const.ML_HEIGHT: 240,
+    const.ML_TIMESCALE: "",
+    const.ML_QUALITY_LEVEL: "",
+    const.ML_TARGET_FRAME_RATE: "",
 }
 
 _DEFAULT_TRAINER_CONFIG = """default:

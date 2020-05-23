@@ -2,11 +2,6 @@
 
 # ML-Agents
 ML_TRAINER_CONFIG_PATH = 'trainer-config-path'
-ML_WIDTH = '--width'
-ML_HEIGHT = '--height'
-ML_TIMESCALE = '--time-scale'
-ML_QUALITY_LEVEL = '--quality-level'
-ML_TARGET_FRAME_RATE = '--target-frame-rate'
 ML_ENV = '--env'
 ML_CURRICULUM = '--curriculum'
 ML_SAMPLER = '--sampler'
@@ -26,6 +21,12 @@ ML_NO_GRAPHICS = '--no-graphics'
 ML_DEBUG = '--debug'
 ML_MULTI_GPU = '--multi-gpu'
 ML_ENV_ARGS = '--env-args'
+ML_CPU = '--cpu'
+ML_WIDTH = '--width'
+ML_HEIGHT = '--height'
+ML_TIMESCALE = '--time-scale'
+ML_QUALITY_LEVEL = '--quality-level'
+ML_TARGET_FRAME_RATE = '--target-frame-rate'
 
 # Hyperparameters
 HP_TRAINER = 'trainer'
