@@ -167,7 +167,7 @@ def parse_args(argv):
         'additional_args',
         metavar='args',
         nargs=argparse.REMAINDER,
-        help='Additional arguments applied to training (ex. --slow, --debug, --load)',
+        help='Additional arguments applied to training (ex. --debug, --load)',
     )
 
     args, unparsed_args = options_parser.parse_known_args(argv)
