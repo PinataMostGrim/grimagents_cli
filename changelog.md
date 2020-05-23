@@ -1,3 +1,8 @@
+### 2.3.0
+- Added support for ML-Agents 0.13.1
+- Added configuration support for several new training arguments (--cpu, --width, --height, --time-scale, --quality-level and --target-frame-rate)
+- Removed support for '--slow' argument
+
 ### 2.2.1
 - Updated readme with the version of ML-Agents supported
 
