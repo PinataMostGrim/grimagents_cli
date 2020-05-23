@@ -68,8 +68,8 @@ CLI application that wraps Unity ML-Agents with more automation.
 
 positional arguments:
   configuration_file    Configuration file to extract training arguments from
-  args                  Additional arguments applied to training (ex. --slow,
-                        --debug, --load)
+  args                  Additional arguments applied to training (ex. --debug,
+                        --load)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,8 +101,7 @@ optional arguments:
                         configuration setting.
   --multi-gpu           Use multi-gpu if supported. Overrides configuration
                         setting.
-  --no-multi-gpu        Do not use multi-gpu. Overrides
-                        configuration setting.
+  --no-multi-gpu        Do not use multi-gpu. Overrides configuration setting.
 ```
 
 #### Example usage
@@ -195,7 +194,7 @@ policies and exposes more training information in the console.
 positional arguments:
   trainer_config_path   Configuration file that holds brain hyperparameters
   args                  Additional arguments passed on to mlagents-learn (ex.
-                        --slow, --debug, --load)
+                        --debug, --load)
 
 optional arguments:
   -h, --help            show this help message and exit
