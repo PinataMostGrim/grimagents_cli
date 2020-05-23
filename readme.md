@@ -18,7 +18,7 @@
 ## Requirements
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using pipenv and Python 3.6
-- ML-Agents 0.12.1
+- ML-Agents 0.14.1
 
 
 ## Installation
@@ -234,7 +234,7 @@ Random Search can be applied using the `--random` argument. When used, a random 
 
 When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
-`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` and `--num-runs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
 Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
 
