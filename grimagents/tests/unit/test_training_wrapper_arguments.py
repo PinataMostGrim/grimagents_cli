@@ -28,6 +28,11 @@ def grim_config():
         '--multi-gpu': False,
         '--env-args': '',
         '--cpu': '',
+        '--width': '',
+        '--height': '',
+        '--time-scale': '',
+        '--quality-level': '',
+        '--target-frame-rate': '',
     }
 
 
@@ -154,11 +159,23 @@ def test_override_configuration_values(grim_config):
         --no-graphics
         --timestamp
         --multi-gpu
+        '--cpu'
+        '--width'
+        '--height'
+        '--time-scale'
+        '--quality-leve'
+        '--target-frame-rate'
     """
 
     grim_config['--sampler'] = 'config/3DBall_generalize.yaml'
     grim_config['--timestamp'] = True
     grim_config['--multi-gpu'] = True
+    grim_config['--cpu'] = True
+    grim_config['--width'] = 320
+    grim_config['--height'] = 240
+    grim_config['--time-scale'] = 20
+    grim_config['--quality-leve'] = 1
+    grim_config['--target-frame-rate'] = 60
 
     override_args = Namespace(
         configuration_file='config/3DBall_grimagents.json',
@@ -209,6 +226,17 @@ def test_override_configuration_values(grim_config):
         '--num-envs',
         '2',
         '--no-graphics',
+        '--cpu',
+        '--width',
+        320,
+        '--height',
+        240,
+        '--time-scale',
+        20,
+        '--target-frame-rate',
+        60,
+        '--quality-leve',
+        1,
         '--load',
         '--slow',
         '--train',
