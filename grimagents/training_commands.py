@@ -194,10 +194,6 @@ class TrainingWrapperArguments:
             if const.GA_ADDITIONAL_ARGS not in command_arguments:
                 command_arguments[const.GA_ADDITIONAL_ARGS] = []
 
-            # Add the --slow flag if inference was requested, but it isn't present.
-            if const.ML_SLOW not in command_arguments[const.GA_ADDITIONAL_ARGS]:
-                command_arguments[const.GA_ADDITIONAL_ARGS].append(const.ML_SLOW)
-
             # Remove the export path, if it is present.
             if const.GA_EXPORT_PATH in command_arguments:
                 del command_arguments[const.GA_EXPORT_PATH]
@@ -223,6 +219,12 @@ class TrainingWrapperArguments:
 
             # The --debug argument does not accept a value.
             if key == const.ML_DEBUG:
+                if value is True:
+                    result += [key]
+                continue
+
+            # The --cpu argument does not accept a value.
+            if key == const.ML_CPU:
                 if value is True:
                     result += [key]
                 continue

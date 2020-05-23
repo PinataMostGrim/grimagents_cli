@@ -8,7 +8,7 @@ with readme_path.open(mode='r') as f:
 
 setuptools.setup(
     name="grimagents",
-    version="2.2.1",
+    version="2.3.0",
     description="Collection of command line applications that wrap Unity's Machine Learning Agents toolkit with more automation",
     long_description=long_description,
     long_description_content_type="text/markdown",

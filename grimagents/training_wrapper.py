@@ -181,7 +181,7 @@ def parse_args(argv):
     parser.add_argument(
         'args',
         nargs=argparse.REMAINDER,
-        help='Additional arguments passed on to mlagents-learn (ex. --slow, --debug, --load)',
+        help='Additional arguments passed on to mlagents-learn (ex. --debug, --load)',
     )
 
     wrapper_args, extra_args = wrapper_parser.parse_known_args(argv)
