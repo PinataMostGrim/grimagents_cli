@@ -18,7 +18,6 @@ def grim_config():
         '--keep-checkpoints': '',
         '--lesson': '',
         '--run-id': '3DBall',
-        '--num-runs': '',
         '--save-freq': '',
         '--seed': '',
         '--base-port': '',
