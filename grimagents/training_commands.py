@@ -142,8 +142,8 @@ class TrainingWrapperArguments:
         if args.run_id is not None:
             self.set_run_id(args.run_id)
 
-        if args.base_port is not None:
-            self.set_base_port(args.base_port)
+        if args.mlagents_port is not None:
+            self.set_mlagents_port(args.mlagents_port)
 
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
@@ -301,8 +301,8 @@ class TrainingWrapperArguments:
     def set_timestamp_enabled(self, value):
         self.arguments[const.GA_TIMESTAMP] = value
 
-    def set_base_port(self, value):
-        self.arguments[const.ML_BASE_PORT] = value
+    def set_mlagents_port(self, value):
+        self.arguments[const.ML_PORT] = value
 
     def set_multi_gpu_enabled(self, value):
         self.arguments[const.ML_MULTI_GPU] = value
