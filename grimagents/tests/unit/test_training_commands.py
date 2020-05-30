@@ -33,7 +33,7 @@ def namespace_args():
         sampler=None,
         lesson=None,
         run_id='3DBall',
-        base_port=None,
+        mlagents_port=None,
         num_envs=None,
         inference=None,
         graphics=None,

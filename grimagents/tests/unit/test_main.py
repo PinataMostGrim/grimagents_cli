@@ -26,7 +26,7 @@ def arguments():
 def namespace_args():
     return Namespace(
         additional_args=[],
-        base_port=None,
+        mlagents_port=None,
         configuration_file='config/3DBall_grimagents.json',
         dry_run=False,
         edit_config=None,
