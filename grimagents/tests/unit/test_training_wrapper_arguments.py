@@ -56,7 +56,6 @@ def test_create_training_arguments(grim_config):
         'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
-        '--train',
     ]
 
 
@@ -140,7 +139,6 @@ def test_training_arguments_add_additional_args(grim_config):
         '--run-id',
         '3DBall',
         '--load',
-        '--train',
     ]
 
 
@@ -236,7 +234,6 @@ def test_override_configuration_values(grim_config):
         '--quality-leve',
         1,
         '--load',
-        '--train',
     ]
 
 
@@ -286,7 +283,6 @@ def test_training_arguments_inference(grim_config):
     """Tests for correct processing of the '--inference' argument.
 
     - Ensures get_arguments() can handle no additional args being set
-    - Ensures the '--train' argument is removed
     - Ensures the '--export-path' argument is removed
     """
 

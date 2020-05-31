@@ -61,7 +61,6 @@ def training_command_arguments():
         'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
-        '--train',
     ]
 
 
@@ -194,7 +193,6 @@ def test_resume_training(monkeypatch):
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
-        '--train',
     ]
 
     def mock_load_history():
@@ -216,7 +214,6 @@ def test_resume_training(monkeypatch):
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
-        '--train',
         '--load',
     ]
 
@@ -234,7 +231,6 @@ def test_resume_training(monkeypatch):
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall_01-2019-07-12_23-55-05',
-        '--train',
         '--load',
         '--lesson',
         '3',
