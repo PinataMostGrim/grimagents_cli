@@ -148,9 +148,6 @@ class TrainingWrapperArguments:
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
 
-        if args.inference is not None:
-            self.set_inference(args.inference)
-
         if args.graphics:
             # As the argument is 'no-graphics', false in this case means
             # graphics are used.
@@ -167,6 +164,9 @@ class TrainingWrapperArguments:
             self.set_multi_gpu_enabled(True)
         if args.no_multi_gpu:
             self.set_multi_gpu_enabled(False)
+
+        if args.inference:
+            self.set_inference(args.inference)
 
     def set_additional_arguments(self, args):
         self.arguments[const.GA_ADDITIONAL_ARGS] = args
@@ -223,6 +223,12 @@ class TrainingWrapperArguments:
                     result += [key]
                 continue
 
+            # The inference argument does not accept a value.
+            if key == const.GA_INFERENCE:
+                if value is True:
+                    result += [key]
+                continue
+
             # The --cpu argument does not accept a value.
             if key == const.ML_CPU:
                 if value is True:
@@ -231,10 +237,6 @@ class TrainingWrapperArguments:
 
             # The timestamp argument is not sent to training_wrapper.
             if key == const.GA_TIMESTAMP:
-                continue
-
-            # The inference argument is not sent to training_wrapper.
-            if key == const.GA_INFERENCE:
                 continue
 
             # The 'search' dictionary is not sent to training_wrapper.
@@ -254,10 +256,6 @@ class TrainingWrapperArguments:
 
             if value:
                 result += [key, value]
-
-        # Exclude '--train' argument if inference was requested.
-        if not use_inference:
-            result += [const.ML_TRAIN]
 
         # Env-args need to be appended to the end of the training arguments.
         if const.ML_ENV_ARGS in command_arguments and command_arguments[const.ML_ENV_ARGS]:
