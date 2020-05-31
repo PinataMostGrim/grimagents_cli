@@ -23,6 +23,7 @@ def grim_config():
         '--base-port': '',
         '--num-envs': '',
         '--no-graphics': False,
+        '--inference': False,
         '--timestamp': False,
         '--multi-gpu': False,
         '--env-args': '',
@@ -155,12 +156,12 @@ def test_override_configuration_values(grim_config):
         --no-graphics
         --timestamp
         --multi-gpu
-        '--cpu'
-        '--width'
-        '--height'
-        '--time-scale'
-        '--quality-leve'
-        '--target-frame-rate'
+        --cpu
+        --width
+        --height
+        --time-scale
+        --quality-leve
+        --target-frame-rate
     """
 
     grim_config['--sampler'] = 'config/3DBall_generalize.yaml'
@@ -237,6 +238,54 @@ def test_override_configuration_values(grim_config):
     ]
 
 
+def test_inference_override_configuration_values(grim_config):
+    """Test for correct handling of the '--inference' argument override."""
+
+    # Note: We cannot test the override handling of the '--inference' argument with the
+    # other overrides as it will affect the result of '--env' (the '--env' path is
+    # stripped out if '--inference' is present).
+
+    override_args = Namespace(
+        configuration_file='config/3DBall_grimagents.json',
+        trainer_config='config/PushBlock_grimagents.json',
+        env=None,
+        sampler=None,
+        lesson=None,
+        run_id=None,
+        base_port=None,
+        num_envs=None,
+        inference=True,
+        graphics=None,
+        no_graphics=None,
+        timestamp=None,
+        no_timestamp=None,
+        multi_gpu=None,
+        no_multi_gpu=None,
+        args=[],
+    )
+
+    arguments = TrainingWrapperArguments(grim_config)
+    arguments.apply_argument_overrides(override_args)
+
+    result = arguments.get_arguments()
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents/training_wrapper.py'
+
+    assert result == [
+        'pipenv',
+        'run',
+        'python',
+        'grimagents/training_wrapper.py',
+        'config/PushBlock_grimagents.json',
+        '--env',
+        'builds/3DBall/3DBall.exe',
+        '--run-id',
+        '3DBall',
+        '--inference',
+    ]
+
+
 def test_training_arguments_set_methods(grim_config):
     """Tests that TrainingWrapperArguments correctly sets argument values."""
 
@@ -282,13 +331,18 @@ def test_training_arguments_timestamp(monkeypatch, grim_config):
 def test_training_arguments_inference(grim_config):
     """Tests for correct processing of the '--inference' argument.
 
-    - Ensures get_arguments() can handle no additional args being set
+    - Ensures '--inference' argument is added
+    - Ensures get_arguments() can handle no additional args being set"
     - Ensures the '--export-path' argument is removed
     """
 
-    grim_config['--inference'] = True
+    # '--inference' should not be present
+    grim_config['--inference'] = False
+    arguments = TrainingWrapperArguments(grim_config)
+    assert '--inference' not in arguments.get_arguments()
 
-    # --train is removed and no exceptions are caused by additional args not being set
+    # '--inference' should be present and '--export-path' argument should be removed
+    grim_config['--inference'] = True
     arguments = TrainingWrapperArguments(grim_config)
     arguments_list = [
         'pipenv',
@@ -300,6 +354,7 @@ def test_training_arguments_inference(grim_config):
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall',
+        '--inference',
     ]
 
     # The absolute path to training_wrapper.py will differ based on the system running this test.
