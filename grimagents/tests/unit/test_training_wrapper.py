@@ -17,14 +17,13 @@ def arguments():
         'builds/3DBall/3DBall.exe',
         '--run-id',
         '3DBall',
-        '--train',
     ]
 
 
 @pytest.fixture
 def namespace_args():
     return Namespace(
-        args=['--env', 'builds/3DBall/3DBall.exe', '--train'],
+        args=['--env', 'builds/3DBall/3DBall.exe'],
         export_path=None,
         run_id='3DBall',
         trainer_config_path='config/3DBall_config.yaml',
