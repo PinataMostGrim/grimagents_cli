@@ -69,6 +69,7 @@ def test_optional_configuration_entries(grim_config):
         --env-args
         --export-path
         --height
+        --initialize-from
         --keep-checkpoints
         --lesson
         --num-envs
@@ -96,6 +97,7 @@ def test_optional_configuration_entries(grim_config):
     grim_config['--env-args'] = ["--num-orcs", 42]
     grim_config['--export-path'] = 'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels'
     grim_config['--height'] = 240
+    grim_config['--initialize-from'] = '3DBall'
     grim_config['--keep-checkpoints'] = 10
     grim_config['--lesson'] = 2
     grim_config['--num-envs'] = 5
@@ -134,6 +136,8 @@ def test_optional_configuration_entries(grim_config):
         10,
         '--lesson',
         2,
+        '--initialize-from',
+        '3DBall',
         '--save-freq',
         5000,
         '--seed',
