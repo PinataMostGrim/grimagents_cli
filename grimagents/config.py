@@ -1,4 +1,5 @@
-"""Creates new configuration files, loads configuration files for editing, and validates loaded configurations.
+"""Creates new configuration files, loads configuration files for editing, and validates
+loaded configurations.
 
 Notes:
 - All path values should be a relative path from the MLAgents project root folder

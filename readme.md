@@ -3,7 +3,6 @@
 
 **grimagents** CLI features include:
 - Initiate training using arguments loaded from a configuration file
-- Easily resume the last training run (`grimagents --resume`)
 - *(Optional)* Automatically add time-stamp to training run-ids
 - *(Optional)* Override loaded configuration values with command line arguments
 
@@ -17,12 +16,12 @@
 
 ## Requirements
 - Pipenv accessible through the PATH environment variable
-- A virtual environment setup for the `MLAgents` project folder using pipenv and Python 3.6
-- ML-Agents 0.14.1
+- A virtual environment setup for the `MLAgents` project folder using Pipenv
+- ML-Agents 0.16.1
 
 
 ## Installation
-- Copy or clone this repository into the `MLAgents` project in a folder named `grim-agents`
+- Copy or clone this repository in the `MLAgents` project into a folder named `grim-agents`
 - Install `grimagents` with `pipenv install grim-agents/` or in "editable" mode with `pipenv install -e grim-agents/`
 - *(Optional)* Give the `grim-agents` folder another name and update `settings.py` accordingly
 
@@ -81,7 +80,7 @@ optional arguments:
                         Open a curriculum file for editing
   --tensorboard-start, -s
                         Start tensorboard server
-  --resume, -r          Resume the last training run
+  --resume, -r          Resume the training run specified by --run-id
   --dry-run, -n         Print command without executing
   --trainer-config TRAINER_CONFIG
                         Overrides configuration setting
@@ -92,7 +91,7 @@ optional arguments:
   --base-port BASE_PORT
                         Overrides configuration setting
   --num-envs NUM_ENVS   Overrides configuration setting
-  --inference           Load environment in inference mode instead of training
+  --inference           Overrides configuration setting
   --graphics            Overrides configuration setting
   --no-graphics         Overrides configuration setting
   --timestamp           Append timestamp to run-id. Overrides configuration
@@ -115,14 +114,9 @@ Initiate training with the `3DBall_grimagents.json` configuration file:
 grimagents grim-agents\etc\3DBall.json
 ```
 
-Initiate training with the `3DBall_grimagents.json` configuration file, but override several configuration values (in this case, to manually resume an earlier training run):
+Initiate training with the `3DBall_grimagents.json` configuration file, but override the configuration value for `run-id` (in this case, to resume an earlier training run):
 ```
-grimagents grim-agents\etc\3DBall_grimagents.json --run-id 3DBall-2019-06-20_19-23-58 --no-timestamp --load
-```
-
-Resume the last training run:
-```
-grimagents --resume
+grimagents grim-agents\etc\3DBall_grimagents.json --run-id 3DBall-2019-06-20_19-23-58 --resume
 ```
 
 
@@ -162,7 +156,7 @@ optional arguments:
 ```
 
 #### Example usage
-Create or edit a `grimagents` training configuration file (default search parameters are added automatically):
+Edit a `grimagents` training configuration file (default search parameters are added automatically):
 ```
 grimsearch --edit-config grim-agents\etc\3DBall_grimagents.json
 ```
@@ -271,7 +265,7 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 
 
 ## Notes
-`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a pipenv subprocess call.
+`grimagents`, `grimwrapper`, and `grimsearch` initiate training using a Pipenv subprocess call.
 
 The `grimagents --resume` argument will not remember how far through a curriculum the previous training run progressed but will accept a `--lesson` override argument.
 

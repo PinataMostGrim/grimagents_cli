@@ -6,7 +6,6 @@ repetitive training tasks.
 Features:
 - Load training arguments from a configuration file
 - Override loaded configuration arguments with command line arguments
-- Quickly resume the last training run
 - Optionally time-stamp the training run-id
 
 See readme.md for more information.
@@ -27,7 +26,6 @@ from grimagents.training_commands import (
     EditCurriculumFile,
     StartTensorboard,
     PerformTraining,
-    ResumeTraining,
 )
 
 
@@ -57,8 +55,6 @@ def main():
         EditCurriculumFile(args).execute()
     elif args.tensorboard_start:
         StartTensorboard(args).execute()
-    elif args.resume:
-        ResumeTraining(args).execute()
     else:
         PerformTraining(args).execute()
 
@@ -98,7 +94,7 @@ def parse_args(argv):
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
     options_parser.add_argument(
-        '--resume', '-r', action='store_true', help='Resume the last training run'
+        '--resume', '-r', action='store_true', help='Resume the training run specified by --run-id'
     )
     options_parser.add_argument(
         '--dry-run', '-n', action='store_true', help='Print command without executing'
@@ -116,9 +112,7 @@ def parse_args(argv):
     overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--num-envs', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument(
-        '--inference',
-        action='store_true',
-        help='Load environment in inference mode instead of training',
+        '--inference', action='store_true', help='Overrides configuration setting',
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()
