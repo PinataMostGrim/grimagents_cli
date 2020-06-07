@@ -179,6 +179,7 @@ def test_override_configuration_values(grim_config):
         trainer_config='config/PushBlock_grimagents.json',
         env='builds/PushBlock/PushBlock.exe',
         sampler='config/PushBlock_generalize.yaml',
+        resume=False,
         lesson=2,
         run_id='PushBlock',
         base_port=5010,
@@ -241,13 +242,12 @@ def test_override_configuration_values(grim_config):
 def test_inference_override_configuration_values(grim_config):
     """Test for correct handling of the '--inference' argument override."""
 
-    # Note: We cannot test the override handling of the '--inference' argument with the
-    # other overrides as it will affect the result of '--env' (the '--env' path is
-    # stripped out if '--inference' is present).
+    # We test the override handling of the '--inference' argument by itself as it will affect the result of the '--env' argument.
 
     override_args = Namespace(
         configuration_file='config/3DBall_grimagents.json',
         trainer_config='config/PushBlock_grimagents.json',
+        resume=False,
         env=None,
         sampler=None,
         lesson=None,
@@ -283,6 +283,56 @@ def test_inference_override_configuration_values(grim_config):
         '--run-id',
         '3DBall',
         '--inference',
+    ]
+
+
+def test_resume_override_configuration_values(grim_config):
+    """Test for correct handling of the '--resume' argument."""
+
+    # We test handling of the '--resume' argument by itself as it will affect the result
+    # of the timestamps and inference arguments.
+
+    override_args = Namespace(
+        configuration_file='config/3DBall_grimagents.json',
+        trainer_config=None,
+        resume=True,
+        inference=True,
+        timestamp=True,
+        env=None,
+        sampler=None,
+        lesson=None,
+        run_id=None,
+        base_port=None,
+        num_envs=None,
+        graphics=None,
+        no_graphics=None,
+        no_timestamp=None,
+        multi_gpu=None,
+        no_multi_gpu=None,
+        args=[],
+    )
+
+    arguments = TrainingWrapperArguments(grim_config)
+    arguments.apply_argument_overrides(override_args)
+
+    result = arguments.get_arguments()
+
+    # The absolute path to training_wrapper.py will differ based on the system running this test.
+    result[3] = 'grimagents/training_wrapper.py'
+
+    assert result == [
+        'pipenv',
+        'run',
+        'python',
+        'grimagents/training_wrapper.py',
+        'config/3DBall.yaml',
+        '--env',
+        'builds/3DBall/3DBall.exe',
+        '--export-path',
+        'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
+        '--run-id',
+        '3DBall',
+        '--resume',
     ]
 
 
