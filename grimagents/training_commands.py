@@ -178,6 +178,12 @@ class TrainingWrapperArguments:
                     result += [key]
                 continue
 
+            # The --force argument does not accept a value.
+            if key == const.ML_FORCE:
+                if value is True:
+                    result += [key]
+                continue
+
             # The --no-graphics argument does not accept a value.
             if key == const.ML_NO_GRAPHICS:
                 if value is True:
