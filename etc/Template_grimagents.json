@@ -5,6 +5,7 @@
     "--curriculum": "",
     "--sampler": "",
     "--keep-checkpoints": "",
+    "--force": "",
     "--lesson": "",
     "--run-id": "TRAINING_RUN",
     "--initialize-from": "",
