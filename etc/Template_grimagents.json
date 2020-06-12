@@ -5,9 +5,10 @@
     "--curriculum": "",
     "--sampler": "",
     "--keep-checkpoints": "",
+    "--force": "",
     "--lesson": "",
     "--run-id": "TRAINING_RUN",
-    "--num-runs": "",
+    "--initialize-from": "",
     "--save-freq": "",
     "--seed": "",
     "--base-port": "",
@@ -27,7 +28,7 @@
     "--target-frame-rate": "",
     "search": {
         "brain": {
-            "name": "BRAIN_NAME",
+            "name": "BEHAVIOUR_NAME",
             "hyperparameters": {
                 "batch_size": [512, 5120],
                 "beta": [0.0001, 0.01],

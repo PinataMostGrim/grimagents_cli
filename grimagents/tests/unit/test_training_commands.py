@@ -10,7 +10,6 @@ from grimagents.training_commands import (
     ListTrainingOptions,
     StartTensorboard,
     PerformTraining,
-    ResumeTraining,
 )
 
 
@@ -27,6 +26,7 @@ def grim_config():
 def namespace_args():
     return Namespace(
         configuration_file='config/3DBall_grimagents.json',
+        resume=False,
         dry_run=False,
         trainer_config=None,
         env=None,
@@ -61,7 +61,6 @@ def training_command_arguments():
         'UnitySDK/Assets/ML-Agents/Examples/3DBall/ImportedModels',
         '--run-id',
         '3DBall',
-        '--train',
     ]
 
 
@@ -175,67 +174,3 @@ def test_command_dry_run(monkeypatch):
     command = Command(dry_run_args)
     command.execute()
     assert command.dry_run is True
-
-
-def test_resume_training(monkeypatch):
-    """Tests for correct parsing of ResumeTraining command.
-
-    - Ensures --load argument is appended
-    - Ensures --lesson argument is appended, if present in args
-    """
-
-    last_history = [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents/training_wrapper.py',
-        'config/3DBall.yaml',
-        '--env',
-        'builds/3DBall/3DBall.exe',
-        '--run-id',
-        '3DBall_01-2019-07-12_23-55-05',
-        '--train',
-    ]
-
-    def mock_load_history():
-        return last_history
-
-    monkeypatch.setattr(grimagents.command_util, 'load_last_history', mock_load_history)
-
-    # --load argument is appended and --lesson IS NOT present
-    args = Namespace(dry_run=False, lesson=None, args=[])
-    resume_training = ResumeTraining(args)
-
-    assert resume_training.create_command() == [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents/training_wrapper.py',
-        'config/3DBall.yaml',
-        '--env',
-        'builds/3DBall/3DBall.exe',
-        '--run-id',
-        '3DBall_01-2019-07-12_23-55-05',
-        '--train',
-        '--load',
-    ]
-
-    # --load argument is appended and --lesson IS present
-    args = Namespace(dry_run=False, lesson=3, args=[])
-    resume_training = ResumeTraining(args)
-
-    assert resume_training.create_command() == [
-        'pipenv',
-        'run',
-        'python',
-        'grimagents/training_wrapper.py',
-        'config/3DBall.yaml',
-        '--env',
-        'builds/3DBall/3DBall.exe',
-        '--run-id',
-        '3DBall_01-2019-07-12_23-55-05',
-        '--train',
-        '--load',
-        '--lesson',
-        '3',
-    ]

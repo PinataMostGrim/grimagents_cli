@@ -1,4 +1,5 @@
-"""Creates new configuration files, loads configuration files for editing, and validates loaded configurations.
+"""Creates new configuration files, loads configuration files for editing, and validates
+loaded configurations.
 
 Notes:
 - All path values should be a relative path from the MLAgents project root folder
@@ -21,8 +22,10 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_CURRICULUM: '',
     const.ML_SAMPLER: '',
     const.ML_KEEP_CHECKPOINTS: '',
+    const.ML_FORCE: '',
     const.ML_LESSON: '',
     const.ML_RUN_ID: 'TRAINING_RUN',
+    const.ML_INITIALIZE_FROM: '',
     const.ML_SAVE_FREQUENCY: '',
     const.ML_SEED: '',
     const.ML_BASE_PORT: '',

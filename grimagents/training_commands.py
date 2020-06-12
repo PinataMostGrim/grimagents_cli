@@ -95,30 +95,9 @@ class PerformTraining(Command):
         return training_arguments.get_arguments()
 
 
-class ResumeTraining(Command):
-    """Launches the training wrapper script with the arguments used
-    by the last training command executed."""
-
-    def __init__(self, args):
-        super().__init__(args)
-
-        self.show_command = False
-
-    def create_command(self):
-
-        command = command_util.load_last_history()
-
-        if const.ML_LOAD not in command:
-            command.append(const.ML_LOAD)
-        if self.args.lesson:
-            command.append(const.ML_LESSON)
-            command.append(str(self.args.lesson))
-
-        return command
-
-
 class TrainingWrapperArguments:
-    """Faciliates converting grimagents configuration values into a list of training_wrapper command line arguments.
+    """Faciliates converting grimagents configuration values into a list of
+    training_wrapper command line arguments.
     """
 
     def __init__(self, arguments: dict):
@@ -136,6 +115,9 @@ class TrainingWrapperArguments:
         if args.sampler is not None:
             self.set_sampler(args.sampler)
 
+        if args.resume:
+            self.set_resume(args.resume)
+
         if args.lesson is not None:
             self.set_lesson(str(args.lesson))
 
@@ -147,9 +129,6 @@ class TrainingWrapperArguments:
 
         if args.num_envs is not None:
             self.set_num_envs(str(args.num_envs))
-
-        if args.inference is not None:
-            self.set_inference(args.inference)
 
         if args.graphics:
             # As the argument is 'no-graphics', false in this case means
@@ -168,6 +147,9 @@ class TrainingWrapperArguments:
         if args.no_multi_gpu:
             self.set_multi_gpu_enabled(False)
 
+        if args.inference:
+            self.set_inference(args.inference)
+
     def set_additional_arguments(self, args):
         self.arguments[const.GA_ADDITIONAL_ARGS] = args
 
@@ -177,32 +159,29 @@ class TrainingWrapperArguments:
         the training process.
         """
 
-        # We copy arguments in order to mutate it in the event a time-stamp is present.
+        # We copy arguments in order to mutate them in the event '--time-stamp' is present.
         command_arguments = self.arguments.copy()
 
-        # Process --timestamp argument.
-        if const.GA_TIMESTAMP in command_arguments and command_arguments[const.GA_TIMESTAMP]:
-
-            timestamp = common.get_timestamp()
-            command_arguments[const.ML_RUN_ID] = f'{command_arguments[const.ML_RUN_ID]}-{timestamp}'
-
-        # Process --inference argument.
-        use_inference = (
-            const.GA_INFERENCE in command_arguments and command_arguments[const.GA_INFERENCE]
-        )
-        if use_inference:
-            if const.GA_ADDITIONAL_ARGS not in command_arguments:
-                command_arguments[const.GA_ADDITIONAL_ARGS] = []
-
-            # Remove the export path, if it is present.
-            if const.GA_EXPORT_PATH in command_arguments:
-                del command_arguments[const.GA_EXPORT_PATH]
+        self.process_timestamp_argument(command_arguments)
+        self.process_inference_argument(command_arguments)
 
         result = []
         for key, value in command_arguments.items():
             # mlagents-learn requires trainer config path be the first argument.
             if key == const.ML_TRAINER_CONFIG_PATH and value:
                 result.insert(0, value)
+                continue
+
+            # The --resume argument does not accept a value.
+            if key == const.ML_RESUME:
+                if value is True:
+                    result += [key]
+                continue
+
+            # The --force argument does not accept a value.
+            if key == const.ML_FORCE:
+                if value is True:
+                    result += [key]
                 continue
 
             # The --no-graphics argument does not accept a value.
@@ -223,6 +202,12 @@ class TrainingWrapperArguments:
                     result += [key]
                 continue
 
+            # The inference argument does not accept a value.
+            if key == const.GA_INFERENCE:
+                if value is True:
+                    result += [key]
+                continue
+
             # The --cpu argument does not accept a value.
             if key == const.ML_CPU:
                 if value is True:
@@ -231,10 +216,6 @@ class TrainingWrapperArguments:
 
             # The timestamp argument is not sent to training_wrapper.
             if key == const.GA_TIMESTAMP:
-                continue
-
-            # The inference argument is not sent to training_wrapper.
-            if key == const.GA_INFERENCE:
                 continue
 
             # The 'search' dictionary is not sent to training_wrapper.
@@ -255,10 +236,6 @@ class TrainingWrapperArguments:
             if value:
                 result += [key, value]
 
-        # Exclude '--train' argument if inference was requested.
-        if not use_inference:
-            result += [const.ML_TRAIN]
-
         # Env-args need to be appended to the end of the training arguments.
         if const.ML_ENV_ARGS in command_arguments and command_arguments[const.ML_ENV_ARGS]:
             result += [const.ML_ENV_ARGS] + command_arguments[const.ML_ENV_ARGS]
@@ -267,6 +244,49 @@ class TrainingWrapperArguments:
         result = ['pipenv', 'run', 'python', str(trainer_path)] + result
 
         return result
+
+    @staticmethod
+    def process_timestamp_argument(command_arguments):
+        """Modifies command line arguments for mlagents-learn if the '--timestamp' argument is present.
+        """
+
+        # No processing is necessary if timestamp hasn't been requested
+        if (
+            const.GA_TIMESTAMP not in command_arguments
+            or command_arguments[const.GA_TIMESTAMP] is False
+        ):
+            return
+
+        # We do not want to apply a timestamp to the run ID if '--resume' has been requested.
+        if const.ML_RESUME in command_arguments and command_arguments[const.ML_RESUME]:
+            return
+
+        timestamp = common.get_timestamp()
+        command_arguments[const.ML_RUN_ID] = f'{command_arguments[const.ML_RUN_ID]}-{timestamp}'
+
+    @staticmethod
+    def process_inference_argument(command_arguments):
+        """Modifies command line arguments for mlagents-learn if the '--inference' argument is present.
+        """
+
+        # No processing is necessary if the inference argument is False
+        if (
+            const.GA_INFERENCE not in command_arguments
+            or command_arguments[const.GA_INFERENCE] is False
+        ):
+            return
+
+        # We do not want to apply inference if '--resume' has been requested.
+        if const.ML_RESUME in command_arguments and command_arguments[const.ML_RESUME]:
+            command_arguments[const.GA_INFERENCE] = False
+            return
+
+        if const.GA_ADDITIONAL_ARGS not in command_arguments:
+            command_arguments[const.GA_ADDITIONAL_ARGS] = []
+
+        # Remove the export path, if it is present.
+        if const.GA_EXPORT_PATH in command_arguments:
+            del command_arguments[const.GA_EXPORT_PATH]
 
     def get_arguments_as_string(self):
         return ' '.join([str(element) for element in self.get_arguments()])
@@ -279,6 +299,9 @@ class TrainingWrapperArguments:
 
     def set_sampler(self, value):
         self.arguments[const.ML_SAMPLER] = value
+
+    def set_resume(self, value):
+        self.arguments[const.ML_RESUME] = value
 
     def set_lesson(self, value):
         self.arguments[const.ML_LESSON] = value

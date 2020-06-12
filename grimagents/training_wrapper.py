@@ -20,6 +20,7 @@ from subprocess import Popen, PIPE
 
 import grimagents.settings as settings
 import grimagents.common as common
+import grimagents.constants as const
 
 
 training_log = logging.getLogger('grimagents.training_wrapper')
@@ -110,6 +111,7 @@ def main():
             training_log.info(f'Initiating \'{run_id}\'')
 
             start_time = time.perf_counter()
+            output_time_remaining = const.GA_INFERENCE not in args.args
 
             for line in p.stderr:
                 # Print intercepted line so it is visible in the console
@@ -118,7 +120,7 @@ def main():
 
                 training_info.update_from_training_output(line)
 
-                if training_info.line_has_time_elapsed(line):
+                if output_time_remaining and training_info.line_has_time_elapsed(line):
                     print(
                         f'Estimated time remaining: {common.get_human_readable_duration(training_info.time_remaining)}'
                     )
