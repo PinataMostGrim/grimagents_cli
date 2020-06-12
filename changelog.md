@@ -1,3 +1,12 @@
+### 2.5.0
+- Added support for ML-Agents 0.16.1
+- Removed the '--train' argument and update the way '--inference' argument is used
+- Added suport for the '--initialize-from' argument
+- Added support for the '--force' argument
+- grimagents '--resume' argument will now use the resume argument added to mlagents-learn in ML-Agents 0.16.0
+- grimwrapper will no longer display "Time remaining" in inference mode
+
+
 ### 2.4.0
 - Added support for ML-Agents 0.14.1
 - Removed '--num-runs' configuration argument
@@ -52,7 +61,7 @@
 - Added Random Search strategy to grimsearch
 - Added a command for adding or editing search configuration values in a grimagents configuration file
 - Added setup.py to convert grimagents into a package and allow installation
-- Remove support for loading multiple trainer configuration files. This functionality has been replaced with grimsearch.
+- Removed support for loading multiple trainer configuration files. This functionality has been replaced with grimsearch.
 - Numerous bug fixes
 
 ### 0.3.0
