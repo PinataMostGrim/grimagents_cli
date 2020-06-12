@@ -17,6 +17,7 @@ def grim_config():
         '--export-path': '',
         '--curriculum': '',
         '--keep-checkpoints': '',
+        '--force': '',
         '--lesson': '',
         "--initialize-from": "",
         '--save-freq': '',
@@ -71,6 +72,7 @@ def test_optional_configuration_entries(grim_config):
         --height
         --initialize-from
         --keep-checkpoints
+        --force
         --lesson
         --num-envs
         --quality-level
@@ -99,6 +101,7 @@ def test_optional_configuration_entries(grim_config):
     grim_config['--height'] = 240
     grim_config['--initialize-from'] = '3DBall'
     grim_config['--keep-checkpoints'] = 10
+    grim_config['--force'] = True
     grim_config['--lesson'] = 2
     grim_config['--num-envs'] = 5
     grim_config['--quality-leve'] = 1
@@ -134,6 +137,7 @@ def test_optional_configuration_entries(grim_config):
         'curricula/3DBall.yaml',
         '--keep-checkpoints',
         10,
+        '--force',
         '--lesson',
         2,
         '--initialize-from',
