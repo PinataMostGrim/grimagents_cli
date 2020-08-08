@@ -1,3 +1,6 @@
+### 2.5.1
+- Updated Python version requirements in setup.py
+
 ### 2.5.0
 - Added support for ML-Agents 0.16.1
 - Removed the '--train' argument and update the way '--inference' argument is used
