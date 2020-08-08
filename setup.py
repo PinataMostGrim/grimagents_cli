@@ -20,13 +20,15 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=setuptools.find_packages(),
     install_requires=[
         "pyyaml",
         "bayesian-optimization>=1.0.3,<=1.1.0"
     ],
-    python_requires=">=3.6,<3.7",
+    python_requires=">=3.6.1",
     entry_points={
         'console_scripts': [
             'grimagents = grimagents.__main__:main',
