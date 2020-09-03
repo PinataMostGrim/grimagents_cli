@@ -300,7 +300,7 @@ def test_get_parameter_bounds():
     }
 
 
-def test_enforce_parameter_value_types():
+def test_get_search_config_from_bounds():
     """Tests that
         - Only standard Python value types are returned
         - Values that should be int are converted to int
@@ -317,13 +317,14 @@ def test_enforce_parameter_value_types():
         'num_layers': numpy.float64(2.49028942),
         'time_horizon': numpy.float64(64.049292),
         'sequence_length': numpy.float64(144.9028),
+        'memory_size': numpy.float64(154.9019),
         'reward_signal.extrinsic.strength': numpy.float64(1.0),
         'reward_signal.strength.encoding_size': numpy.float64(184.6824928),
         'reward_signal.curiosity.encoding_size': numpy.float64(184.6824928),
         'reward_signal.gail.encoding_size': numpy.float64(184.6824928),
     }
 
-    assert BayesianSearch.enforce_parameter_value_types(bounds) == {
+    assert BayesianSearch.get_search_config_from_bounds(bounds) == {
         'batch_size': 144,
         'beta': 0.0028687875149226343,
         'buffer_size_multiple': 50,
@@ -333,6 +334,7 @@ def test_enforce_parameter_value_types():
         'num_layers': 2,
         'time_horizon': 64,
         'sequence_length': 144,
+        'memory_size': 152,
         'reward_signal.extrinsic.strength': 1.0,
         'reward_signal.strength.encoding_size': 184,
         'reward_signal.curiosity.encoding_size': 184,

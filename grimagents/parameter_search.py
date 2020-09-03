@@ -227,13 +227,15 @@ class BayesianSearch(ParameterSearch):
         return bounds
 
     @staticmethod
-    def enforce_parameter_value_types(bounds: dict):
+    def get_search_config_from_bounds(bounds: dict):
         """Enforces int type on parameters that should be int and ensures native value types are used for the rest.
 
         Converts values to standard Python value types. BayesianOptimization objects return numpy floats and numpy floats cause problems with yaml serialization.
         """
 
         for key, value in bounds.items():
+
+            # Convert bound items that must be ints into int
             if (
                 key == const.HP_BATCH_SIZE
                 # 'const.GS_BUFFER_SIZE' should never be used for searches. Use 'const.GS_BUFFER_SIZE_MULTIPLE' instead.
@@ -246,6 +248,11 @@ class BayesianSearch(ParameterSearch):
                 or key == const.HP_SEQUENCE_LENGTH
             ):
                 bounds[key] = int(value)
+                continue
+
+            # Ensure 'memory_size' is a multiple of 4 and an int
+            if key == const.HP_MEMORY_SIZE:
+                bounds[key] = int(bounds[key] - bounds[key] % 4)
                 continue
 
             # Process reward signal hyperparameters
