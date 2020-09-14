@@ -69,9 +69,9 @@ def fixture_cleanup_nested_test_file(nested_test_file):
 def test_write_file(test_file, fixture_cleanup_test_file):
     """Tests functionality for writing text to file. Ensures:
 
-        - Text is written to file
-        - The file is overwritten if flag is set
-        - The file is not overwritten if flag is not set
+    - Text is written to file
+    - The file is overwritten if flag is set
+    - The file is not overwritten if flag is not set
     """
 
     # Write text to file
@@ -105,8 +105,8 @@ def test_write_file(test_file, fixture_cleanup_test_file):
 def test_write_json_file(test_dictionary, nested_test_file, fixture_cleanup_nested_test_file):
     """Tests writing JSON data to file. Ensures:
 
-        - A folder path to the file is created if it doesn't exist
-        - JSON is written to the correct file
+    - A folder path to the file is created if it doesn't exist
+    - JSON is written to the correct file
     """
 
     command_util.write_json_file(test_dictionary, nested_test_file)
@@ -122,9 +122,9 @@ def test_write_json_file(test_dictionary, nested_test_file, fixture_cleanup_nest
 def test_load_json_file(test_dictionary, test_file, fixture_cleanup_test_file):
     """Tests loading JSON data from file. Ensures:
 
-        - JSON is loaded from file
-        - FileNotFoundError is raised
-        - JSONDecodeError is raised
+    - JSON is loaded from file
+    - FileNotFoundError is raised
+    - JSONDecodeError is raised
     """
 
     # FileNotFoundError is raised
@@ -150,8 +150,8 @@ def test_load_json_file(test_dictionary, test_file, fixture_cleanup_test_file):
 def test_write_yaml_file(test_dictionary, nested_test_file, fixture_cleanup_nested_test_file):
     """Tests writing Yaml data to file. Ensures:
 
-        - A folder path to the file is created if it doesn't exist
-        - Yaml is written to the correct file
+    - A folder path to the file is created if it doesn't exist
+    - Yaml is written to the correct file
     """
 
     command_util.write_yaml_file(test_dictionary, nested_test_file)
@@ -167,8 +167,8 @@ def test_write_yaml_file(test_dictionary, nested_test_file, fixture_cleanup_nest
 def test_load_yaml_file(test_dictionary, test_file, fixture_cleanup_test_file):
     """Tests loading Yaml data from file. Ensures:
 
-        - Yaml is loaded from file
-        - FileNotFoundError is raised
+    - Yaml is loaded from file
+    - FileNotFoundError is raised
     """
 
     # FileNotFoundError
@@ -200,8 +200,8 @@ def test_create_history_file(test_file, patch_get_history_file, fixture_cleanup_
 def test_load_history(test_file, patch_get_history_file, fixture_cleanup_test_file):
     """Tests loading history from file. Ensures:
 
-        - If history file doesn't exist, it is created
-        - The history dictionary is loaded from file
+    - If history file doesn't exist, it is created
+    - The history dictionary is loaded from file
     """
 
     assert not test_file.exists()
@@ -215,8 +215,8 @@ def test_load_history(test_file, patch_get_history_file, fixture_cleanup_test_fi
 def test_load_last_history(test_file, patch_get_history_file, fixture_cleanup_test_file):
     """Tests loading the last training command from history. Ensures:
 
-        - Loads the last command
-        - CommandUtilError is raised if the history is empty
+    - Loads the last command
+    - CommandUtilError is raised if the history is empty
     """
 
     # CommandUtilError is raised
@@ -233,8 +233,7 @@ def test_load_last_history(test_file, patch_get_history_file, fixture_cleanup_te
 
 
 def test_load_last_lines_from_file(test_file, fixture_cleanup_test_file):
-    """Tests the last lines of a file are correctly read. Ensures that requesting more lines than exist in the file is gracefully handled.
-    """
+    """Tests the last lines of a file are correctly read. Ensures that requesting more lines than exist in the file is gracefully handled."""
 
     lines = 'first line\nsecond line\nthird line\nfourth line'
     with test_file.open(mode='w') as f:

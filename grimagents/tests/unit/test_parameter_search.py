@@ -186,8 +186,7 @@ def test_invalid_trainer_config(trainer_config):
 
 
 def test_get_brain_config_with_overrides(search_config, trainer_config):
-    """Tests that flattened reward_signal keys are correctly expanded for the brain configuration. Additionally tests to ensure nested sibling keys do not get overwritten.
-    """
+    """Tests that flattened reward_signal keys are correctly expanded for the brain configuration. Additionally tests to ensure nested sibling keys do not get overwritten."""
 
     # Insert am unrelated reward signal to ensure it does not get overwritten by
     # the overrides.
@@ -224,8 +223,7 @@ def test_get_brain_config_with_overrides(search_config, trainer_config):
 
 
 def test_buffer_size_multiple(search_config, trainer_config):
-    """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config.
-    """
+    """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config."""
 
     search_config['brain']['hyperparameters']['buffer_size_multiple'] = [4]
 
@@ -281,8 +279,7 @@ def test_get_random_intersect(search_config, trainer_config):
 
 
 def test_get_parameter_bounds():
-    """Tests for the correct construction of a parameter bounds dictionary.
-    """
+    """Tests for the correct construction of a parameter bounds dictionary."""
 
     parameter_names = ['batch_size', 'buffer_size_multiple', 'beta']
     parameter_values = [[64, 128], [4], [0.001, 0.0001]]
@@ -302,9 +299,9 @@ def test_get_parameter_bounds():
 
 def test_get_search_config_from_bounds():
     """Tests that
-        - Only standard Python value types are returned
-        - Values that should be int are converted to int
-        - The item() method is not called on non-numpy value types
+    - Only standard Python value types are returned
+    - Values that should be int are converted to int
+    - The item() method is not called on non-numpy value types
     """
 
     bounds = {
@@ -333,10 +330,10 @@ def test_get_search_config_from_bounds():
         'max_steps': 500000,
         'num_layers': 2,
         'time_horizon': 64,
-        'sequence_length': 144,
+        'sequence_length': 145,
         'memory_size': 152,
         'reward_signal.extrinsic.strength': 1.0,
-        'reward_signal.strength.encoding_size': 184,
-        'reward_signal.curiosity.encoding_size': 184,
-        'reward_signal.gail.encoding_size': 184,
+        'reward_signal.strength.encoding_size': 185,
+        'reward_signal.curiosity.encoding_size': 185,
+        'reward_signal.gail.encoding_size': 185,
     }

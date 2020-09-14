@@ -152,10 +152,10 @@ def test_perform_training_command_dry_run(monkeypatch, namespace_args, grim_conf
 
 def test_command_dry_run(monkeypatch):
     """Tests the correct assignment of the 'dry_run' argument for the following commands:
-        - Command
-        - ListTrainingOptions
-        - StartTensorboard
-        - ResumeTraining
+    - Command
+    - ListTrainingOptions
+    - StartTensorboard
+    - ResumeTraining
     """
 
     no_dry_run_args = Namespace(dry_run=False, args=[])

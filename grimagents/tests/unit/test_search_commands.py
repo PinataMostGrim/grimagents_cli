@@ -502,9 +502,9 @@ def test_perform_bayesian_search_execute(
 ):
     """Tests for the correct execution of a Bayesian search.
 
-        - Ensures observation log loading respects the command line argument
-        - Ensures obseration log saving respects the command line argument
-        - Ensures the correct number of searches desired is communicated to the BayesianOptimization object
+    - Ensures observation log loading respects the command line argument
+    - Ensures obseration log saving respects the command line argument
+    - Ensures the correct number of searches desired is communicated to the BayesianOptimization object
     """
 
     subscribe_counter = Counter()
