@@ -247,18 +247,18 @@ class BayesianSearch(ParameterSearch):
                 or key == const.HP_TIME_HORIZON
                 or key == const.HP_SEQUENCE_LENGTH
             ):
-                bounds[key] = int(value)
+                bounds[key] = round(value)
                 continue
 
             # Ensure 'memory_size' is a multiple of 4 and an int
             if key == const.HP_MEMORY_SIZE:
-                bounds[key] = int(bounds[key] - bounds[key] % 4)
+                bounds[key] = round(bounds[key] - bounds[key] % 4)
                 continue
 
             # Process reward signal hyperparameters
             splitKey = key.rsplit('.', maxsplit=1)
             if (len(splitKey) > 1) and (splitKey[1] == const.HP_ENCODING_SIZE):
-                bounds[key] = int(value)
+                bounds[key] = round(value)
                 continue
 
             if isinstance(value, numpy.generic):
