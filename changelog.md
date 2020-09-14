@@ -9,7 +9,6 @@
 - grimagents '--resume' argument will now use the resume argument added to mlagents-learn in ML-Agents 0.16.0
 - grimwrapper will no longer display "Time remaining" in inference mode
 
-
 ### 2.4.0
 - Added support for ML-Agents 0.14.1
 - Removed '--num-runs' configuration argument
