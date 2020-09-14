@@ -112,7 +112,9 @@ def parse_args(argv):
     overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--num-envs', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument(
-        '--inference', action='store_true', help='Overrides configuration setting',
+        '--inference',
+        action='store_true',
+        help='Overrides configuration setting',
     )
 
     graphics_group = overrides_parser.add_mutually_exclusive_group()

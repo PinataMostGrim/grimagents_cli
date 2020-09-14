@@ -183,7 +183,7 @@ def load_last_history():
 
 
 def load_last_lines_from_file(file_path: Path, line_count):
-    """ Returns the last <n> number of lines from a file.
+    """Returns the last <n> number of lines from a file.
 
     While the entire file is read, lines are read into a circular buffer so as to not consume large amounts of memory.
     """

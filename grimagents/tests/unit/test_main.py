@@ -111,8 +111,7 @@ def patch_training_commands(monkeypatch):
 
 
 def test_parse_args(arguments, namespace_args):
-    """Tests that parse_arges() produces a Namespace object with the required attributes.
-    """
+    """Tests that parse_arges() produces a Namespace object with the required attributes."""
 
     args = grimagents.__main__.parse_args(arguments)
     assert args == namespace_args

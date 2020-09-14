@@ -126,8 +126,7 @@ class ParameterSearch:
 
     @staticmethod
     def get_batch_size_value(brain_config, brain_name):
-        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead.
-        """
+        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead."""
 
         if const.HP_BATCH_SIZE in brain_config[brain_name]:
             return brain_config[brain_name][const.HP_BATCH_SIZE]
@@ -176,8 +175,7 @@ class RandomSearch(ParameterSearch):
 
     @staticmethod
     def get_random_value(values, seed=None):
-        """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise.
-        """
+        """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise."""
 
         if seed is not None:
             random.seed(seed)

@@ -5,8 +5,7 @@ import subprocess
 
 
 def is_pipenv_present():
-    """Returns True if a virtual environment can be accessed through Pipenv and False if it can't.
-    """
+    """Returns True if a virtual environment can be accessed through Pipenv and False if it can't."""
 
     try:
         process = subprocess.run(

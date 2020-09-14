@@ -5,8 +5,7 @@ import grimagents.common as common
 
 
 def test_is_pipenv_present(monkeypatch):
-    """Tests for determining if a virtual environment is accessible through Pipenv.
-    """
+    """Tests for determining if a virtual environment is accessible through Pipenv."""
 
     class MockProcess:
         def __init__(self, returncode):
@@ -37,8 +36,7 @@ def test_is_pipenv_present(monkeypatch):
 
 
 def test_get_timestamp(monkeypatch):
-    """Tests for the return of a correctly formatted timestamp.
-    """
+    """Tests for the return of a correctly formatted timestamp."""
 
     mock_time = datetime.datetime(2000, 1, 1, hour=0, minute=0, second=0)
 
@@ -54,8 +52,7 @@ def test_get_timestamp(monkeypatch):
 
 
 def test_get_human_readable_duration():
-    """Tests for the return of a duration of seconds in human readable terms.
-    """
+    """Tests for the return of a duration of seconds in human readable terms."""
 
     human_readable = common.get_human_readable_duration(-1)
     assert human_readable == '0 seconds'

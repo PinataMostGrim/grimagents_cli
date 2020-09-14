@@ -223,8 +223,7 @@ def validate_grim_configuration(configuration):
 
 
 def load_trainer_configuration_file(file_path: Path):
-    """Loads a MLAgents trainer configuration from a yaml file.
-    """
+    """Loads a MLAgents trainer configuration from a yaml file."""
 
     configuration = command_util.load_yaml_file(file_path)
     return configuration

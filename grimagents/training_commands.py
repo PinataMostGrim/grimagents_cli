@@ -247,8 +247,7 @@ class TrainingWrapperArguments:
 
     @staticmethod
     def process_timestamp_argument(command_arguments):
-        """Modifies command line arguments for mlagents-learn if the '--timestamp' argument is present.
-        """
+        """Modifies command line arguments for mlagents-learn if the '--timestamp' argument is present."""
 
         # No processing is necessary if timestamp hasn't been requested
         if (
@@ -266,8 +265,7 @@ class TrainingWrapperArguments:
 
     @staticmethod
     def process_inference_argument(command_arguments):
-        """Modifies command line arguments for mlagents-learn if the '--inference' argument is present.
-        """
+        """Modifies command line arguments for mlagents-learn if the '--inference' argument is present."""
 
         # No processing is necessary if the inference argument is False
         if (
