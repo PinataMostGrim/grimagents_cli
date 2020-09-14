@@ -1,5 +1,5 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap [Unity's Machine Learning Agents](https://github.com/Unity-Technologies/ml-agents) toolkit with more automation.
+**grimagents** is collection of command line applications that wrap the [Unity Machine Learning Agents](https://github.com/Unity-Technologies/ml-agents) toolkit with more automation.
 
 **grimagents** CLI features include:
 - Initiate training using arguments loaded from a configuration file
@@ -200,7 +200,7 @@ optional arguments:
 
 ## Configuration
 #### grimagents Configuration
-Values that are not present in a configuration file or left empty will not be passed on to `mlagents-learn`. `--trainer-config-path` and `--run-id` are the only mandatory configuration values. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
+`--trainer-config-path` and `--run-id` are the only mandatory configuration values. Configuration values left empty will not be passed on to `mlagents-learn`. Override arguments sent to `grimagents` from the command line will be sent to `mlagents-learn` instead of those loaded from the configuration file.
 
 All paths stored in configuration files should be relative paths from the current working directory. It is advisable to run `grimagents` modules from the `MLAgents` project root folder and configure paths accordingly.
 
@@ -224,11 +224,11 @@ Example `grimagents` configuration:
 #### grimsearch Configuration
 Grid Search is the default strategy used by `grimsearch`. Each hyperparameter value added to the search configuration will dramatically increase the number of training runs executed during a Grid Search. Often it can be helpful to run a limited grid search with hyperparameter values bracketing either side of their current value.
 
-Random Search can be applied using the `--random` argument. When used, a random value is chosen between the minimum and maximum values defined for each hyperparameter in the search configuration. A hyperparameter with only one value defined will not be randomized.
+Random Search can be applied using the `--random` argument. When used, a random value is chosen between the minimum and maximum values (inclusive) defined for each hyperparameter in the search configuration. A hyperparameter with only one value defined will not be randomized.
 
-When the `--bayesian` argument is present, [Bayesian optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
+When the `--bayesian` argument is present, [Bayesian Optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
-`grimsearch` only supports searching hyperparamters for one brain at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching hyperparamters for one behaviour at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
 Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
 
@@ -262,6 +262,8 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
       }
   }
 ```
+
+Likewise, `encoding_size` should always be a multiple of 4 and will be forced to the highest valid multiple below the value chosen by Bayesian Optimization.
 
 
 ## Notes
