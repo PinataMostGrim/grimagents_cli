@@ -1,3 +1,8 @@
+### 2.5.2
+- `memory_size` can now be used in Bayesian searches. The value produced by BayesianOptimization will be set to the highest multiple of four beneath it.
+- Configuration validation will no longer fail if a key is found that isn't also present in the default configuration
+- Hyperparameters that must be integers will be rounded instead of truncated during Baysian search
+
 ### 2.5.1
 - Updated Python version requirements in setup.py
 
