@@ -301,16 +301,16 @@ def test_training_arguments_add_additional_args(grim_config):
 
 def test_override_configuration_values(grim_config):
     """Test that TrainingWrapperArguments correctly applies argument overrides, including:
-        --base-port
-        --env
-        --lesson
-        --multi-gpu
-        --no-graphics
-        --num-envs
-        --run-id
-        --sampler
-        --timestamp
-        --trainer-config
+    --base-port
+    --env
+    --lesson
+    --multi-gpu
+    --no-graphics
+    --num-envs
+    --run-id
+    --sampler
+    --timestamp
+    --trainer-config
     """
 
     grim_config['--base-port'] = 5010

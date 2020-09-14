@@ -203,7 +203,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_get_parameter_bounds(self, names, values):
         return bounds
 
-    def mock_enforce_parameter_value_types(self, dict):
+    def mock_get_search_config_from_bounds(self, dict):
         return {}
 
     def mock_get_brain_config_with_overrides(self, search_overrides):
@@ -221,7 +221,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     monkeypatch.setattr(BayesianSearch, 'get_parameter_bounds', mock_get_parameter_bounds)
 
     monkeypatch.setattr(
-        BayesianSearch, 'enforce_parameter_value_types', mock_enforce_parameter_value_types
+        BayesianSearch, 'get_search_config_from_bounds', mock_get_search_config_from_bounds
     )
 
     monkeypatch.setattr(
@@ -502,9 +502,9 @@ def test_perform_bayesian_search_execute(
 ):
     """Tests for the correct execution of a Bayesian search.
 
-        - Ensures observation log loading respects the command line argument
-        - Ensures obseration log saving respects the command line argument
-        - Ensures the correct number of searches desired is communicated to the BayesianOptimization object
+    - Ensures observation log loading respects the command line argument
+    - Ensures obseration log saving respects the command line argument
+    - Ensures the correct number of searches desired is communicated to the BayesianOptimization object
     """
 
     subscribe_counter = Counter()

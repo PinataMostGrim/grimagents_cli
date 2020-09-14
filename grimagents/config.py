@@ -189,7 +189,6 @@ def validate_grim_configuration(configuration):
       True if the configuration is valid and False if it is not.
     """
 
-    default_config = get_default_grim_config()
     is_valid_config = True
 
     # Check all keys in configuration against the default configuration.
@@ -200,12 +199,6 @@ def validate_grim_configuration(configuration):
         # 'search' is not defined in the default configuration but is still a valid key.
         if key == const.GS_SEARCH:
             continue
-
-        try:
-            default_config[key]
-        except KeyError:
-            config_log.error(f'Configuration contains invalid key \'{key}\'')
-            is_valid_config = False
 
     # The only required keys are 'trainer-config-path' and '--run-id'
     for key in {const.ML_TRAINER_CONFIG_PATH, const.ML_RUN_ID}:
@@ -230,8 +223,7 @@ def validate_grim_configuration(configuration):
 
 
 def load_trainer_configuration_file(file_path: Path):
-    """Loads a MLAgents trainer configuration from a yaml file.
-    """
+    """Loads a MLAgents trainer configuration from a yaml file."""
 
     configuration = command_util.load_yaml_file(file_path)
     return configuration

@@ -222,8 +222,7 @@ def test_line_has_time_elapsed():
 
 
 def test_export_brains(export_brains, export_brains_destination, fixture_export_brains):
-    """Tests that training_wrapper correctly copies brain files into a destination folder. This also implicitly tests that the destination folder is created if it does not already exist.
-    """
+    """Tests that training_wrapper correctly copies brain files into a destination folder. This also implicitly tests that the destination folder is created if it does not already exist."""
 
     grimagents.training_wrapper.export_brains(export_brains, export_brains_destination)
 

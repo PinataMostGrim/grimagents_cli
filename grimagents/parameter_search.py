@@ -126,8 +126,7 @@ class ParameterSearch:
 
     @staticmethod
     def get_batch_size_value(brain_config, brain_name):
-        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead.
-        """
+        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead."""
 
         if const.HP_BATCH_SIZE in brain_config[brain_name]:
             return brain_config[brain_name][const.HP_BATCH_SIZE]
@@ -176,8 +175,7 @@ class RandomSearch(ParameterSearch):
 
     @staticmethod
     def get_random_value(values, seed=None):
-        """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise.
-        """
+        """Determines the minimum and maximum values in a range of values and picks a random value inside that range (inclusive). Returns a float if any of the values are floats and returns an int value otherwise."""
 
         if seed is not None:
             random.seed(seed)
@@ -227,13 +225,15 @@ class BayesianSearch(ParameterSearch):
         return bounds
 
     @staticmethod
-    def enforce_parameter_value_types(bounds: dict):
+    def get_search_config_from_bounds(bounds: dict):
         """Enforces int type on parameters that should be int and ensures native value types are used for the rest.
 
         Converts values to standard Python value types. BayesianOptimization objects return numpy floats and numpy floats cause problems with yaml serialization.
         """
 
         for key, value in bounds.items():
+
+            # Convert bound items that must be ints into int
             if (
                 key == const.HP_BATCH_SIZE
                 # 'const.GS_BUFFER_SIZE' should never be used for searches. Use 'const.GS_BUFFER_SIZE_MULTIPLE' instead.
@@ -245,13 +245,18 @@ class BayesianSearch(ParameterSearch):
                 or key == const.HP_TIME_HORIZON
                 or key == const.HP_SEQUENCE_LENGTH
             ):
-                bounds[key] = int(value)
+                bounds[key] = round(value)
+                continue
+
+            # Ensure 'memory_size' is a multiple of 4 and an int
+            if key == const.HP_MEMORY_SIZE:
+                bounds[key] = round(bounds[key] - bounds[key] % 4)
                 continue
 
             # Process reward signal hyperparameters
             splitKey = key.rsplit('.', maxsplit=1)
             if (len(splitKey) > 1) and (splitKey[1] == const.HP_ENCODING_SIZE):
-                bounds[key] = int(value)
+                bounds[key] = round(value)
                 continue
 
             if isinstance(value, numpy.generic):

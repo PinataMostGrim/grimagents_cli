@@ -160,8 +160,7 @@ def test_create_curriculum_file(curriculum_config_path, fixture_cleanup_curricul
 
 
 def test_no_add_search_entry(grim_config_path, fixture_cleanup_grim_config, monkeypatch):
-    """Test for correct handling of the 'add_search' flag in config.edit_grim_config_file()
-    """
+    """Test for correct handling of the 'add_search' flag in config.edit_grim_config_file()"""
 
     def mock_open_file(file_path):
         pass
@@ -183,8 +182,7 @@ def test_no_add_search_entry(grim_config_path, fixture_cleanup_grim_config, monk
 
 
 def test_no_overwrite_search_entry(grim_config_path, fixture_cleanup_grim_config, monkeypatch):
-    """Tests to ensure config.edit_grim_config_file(add_search=True) does not overwrite an existing search entry.
-    """
+    """Tests to ensure config.edit_grim_config_file(add_search=True) does not overwrite an existing search entry."""
 
     def mock_open_file(file_path):
         pass

@@ -1,3 +1,8 @@
+### 2.5.2
+- `memory_size` can now be used in Bayesian searches. The value produced by BayesianOptimization will be set to the highest multiple of four beneath it.
+- Configuration validation will no longer fail if a key is found that isn't also present in the default configuration
+- Hyperparameters that must be integers will be rounded instead of truncated during Baysian search
+
 ### 2.5.1
 - Updated Python version requirements in setup.py
 
@@ -8,7 +13,6 @@
 - Added support for the '--force' argument
 - grimagents '--resume' argument will now use the resume argument added to mlagents-learn in ML-Agents 0.16.0
 - grimwrapper will no longer display "Time remaining" in inference mode
-
 
 ### 2.4.0
 - Added support for ML-Agents 0.14.1

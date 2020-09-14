@@ -31,8 +31,7 @@ class Command:
 
 
 class EditGrimConfigFile(Command):
-    """Opens a grimagents configuration file for editing or creates on if a file does not already exist. Appends a search entry to the configuration file if it does not already have one.
-    """
+    """Opens a grimagents configuration file for editing or creates on if a file does not already exist. Appends a search entry to the configuration file if it does not already have one."""
 
     def execute(self):
         file_path = Path(self.args.edit_config)
@@ -103,8 +102,7 @@ class GridSearchCommand(SearchCommand):
 
 
 class OutputGridSearchCount(GridSearchCommand):
-    """Prints out the total number of training runs a grimagents configuration file will attempt.
-    """
+    """Prints out the total number of training runs a grimagents configuration file will attempt."""
 
     def execute(self):
 
@@ -271,7 +269,7 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info('Bayesian search complete')
         search_log.info(f'Best Configuration ({optimizer_max["target"]}):')
 
-        best_configuration = self.bayes_search.enforce_parameter_value_types(
+        best_configuration = self.bayes_search.get_search_config_from_bounds(
             optimizer_max["params"]
         )
         for key, value in best_configuration.items():
@@ -292,7 +290,7 @@ class PerformBayesianSearch(SearchCommand):
         """
 
         # Construct search configuration using input from the BayesianSearch object.
-        search_config = self.bayes_search.enforce_parameter_value_types(kwargs)
+        search_config = self.bayes_search.get_search_config_from_bounds(kwargs)
         bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
@@ -353,7 +351,7 @@ class PerformBayesianSearch(SearchCommand):
 
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
-        search_config = self.bayes_search.enforce_parameter_value_types(max['params'])
+        search_config = self.bayes_search.get_search_config_from_bounds(max['params'])
         best_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
         command_util.write_yaml_file(best_brain_config, self.output_config_path)
 
@@ -369,8 +367,7 @@ class PerformBayesianSearch(SearchCommand):
         return log_file_path
 
     def get_load_log_paths(self):
-        """Returns a list of all JSON files in the Bayesian optimization observation logs folder.
-        """
+        """Returns a list of all JSON files in the Bayesian optimization observation logs folder."""
 
         log_folder_path = self.get_log_folder_path()
         log_file_list = log_folder_path.glob('*.json')
@@ -378,8 +375,7 @@ class PerformBayesianSearch(SearchCommand):
         return list(log_file_list)
 
     def get_log_folder_path(self):
-        """Returns a Path object to a folder for Bayesian search logs. The folder is created next to the grimagents configuration file used for the search. The log folder will be created if it doesn't exist.
-        """
+        """Returns a Path object to a folder for Bayesian search logs. The folder is created next to the grimagents configuration file used for the search. The log folder will be created if it doesn't exist."""
 
         log_folder_path = (
             self.trainer_config_path.parent / f'{self.grim_config[const.ML_RUN_ID]}_bayes'
