@@ -118,9 +118,6 @@ class TrainingWrapperArguments:
         if args.resume:
             self.set_resume(args.resume)
 
-        if args.lesson is not None:
-            self.set_lesson(str(args.lesson))
-
         if args.run_id is not None:
             self.set_run_id(args.run_id)
 
@@ -300,9 +297,6 @@ class TrainingWrapperArguments:
 
     def set_resume(self, value):
         self.arguments[const.ML_RESUME] = value
-
-    def set_lesson(self, value):
-        self.arguments[const.ML_LESSON] = value
 
     def set_run_id(self, value):
         self.arguments[const.ML_RUN_ID] = value

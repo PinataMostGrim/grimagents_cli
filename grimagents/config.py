@@ -23,7 +23,6 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_SAMPLER: '',
     const.ML_KEEP_CHECKPOINTS: '',
     const.ML_FORCE: '',
-    const.ML_LESSON: '',
     const.ML_RUN_ID: 'TRAINING_RUN',
     const.ML_INITIALIZE_FROM: '',
     const.ML_SAVE_FREQUENCY: '',
