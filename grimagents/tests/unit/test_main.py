@@ -42,7 +42,6 @@ def namespace_args():
         num_envs=None,
         resume=False,
         run_id=None,
-        sampler=None,
         tensorboard_start=False,
         timestamp=False,
         trainer_config=None,

@@ -307,7 +307,6 @@ def test_override_configuration_values(grim_config):
     --no-graphics
     --num-envs
     --run-id
-    --sampler
     --timestamp
     --trainer-config
     """
@@ -317,7 +316,6 @@ def test_override_configuration_values(grim_config):
     grim_config['--multi-gpu'] = True
     grim_config['--no-graphics'] = False
     grim_config['--num-envs'] = 2
-    grim_config['--sampler'] = 'config/3DBall_randomize.yaml'
     grim_config['--timestamp'] = True
 
     override_args = Namespace(
@@ -334,7 +332,6 @@ def test_override_configuration_values(grim_config):
         num_envs=4,
         resume=False,
         run_id='PushBlock',
-        sampler='config/PushBlock_randomize.yaml',
         timestamp=None,
         trainer_config='config/PushBlock_grimagents.json',
     )
@@ -358,8 +355,6 @@ def test_override_configuration_values(grim_config):
         'PushBlock',
         '--env',
         'builds/PushBlock/PushBlock.exe',
-        '--sampler',
-        'config/PushBlock_randomize.yaml',
         '--base-port',
         6010,
         '--num-envs',
@@ -469,7 +464,6 @@ def test_training_arguments_set_methods(grim_config):
     arguments = TrainingWrapperArguments(grim_config)
 
     arguments.set_env('builds/3DBall/3DBallHard.exe')
-    arguments.set_sampler('config/3DBall_randomize.yaml')
     arguments.set_run_id('ball')
     arguments.set_num_envs('4')
     arguments.set_no_graphics_enabled(True)
@@ -479,7 +473,6 @@ def test_training_arguments_set_methods(grim_config):
 
     arguments_string = arguments.get_arguments_as_string()
     assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
-    assert '--sampler config/3DBall_randomize.yaml' in arguments_string
     assert '--run-id ball' in arguments_string
     assert '--num-envs 4' in arguments_string
     assert '--no-graphics' in arguments_string
