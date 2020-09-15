@@ -10,7 +10,6 @@ from grimagents.training_commands import (
     ListTrainingOptions,
     EditGrimConfigFile,
     EditTrainerConfigFile,
-    EditCurriculumFile,
     StartTensorboard,
     PerformTraining,
 )
@@ -29,7 +28,6 @@ def namespace_args():
         configuration_file='config/3DBall_grimagents.json',
         dry_run=False,
         edit_config=None,
-        edit_curriculum=None,
         edit_trainer_config=None,
         env=None,
         graphics=False,
@@ -96,14 +94,12 @@ def patch_training_commands(monkeypatch):
     monkeypatch.setattr(ListTrainingOptions, '__init__', mock_init)
     monkeypatch.setattr(EditGrimConfigFile, '__init__', mock_init)
     monkeypatch.setattr(EditTrainerConfigFile, '__init__', mock_init)
-    monkeypatch.setattr(EditCurriculumFile, '__init__', mock_init)
     monkeypatch.setattr(StartTensorboard, '__init__', mock_init)
     monkeypatch.setattr(PerformTraining, '__init__', mock_init)
 
     monkeypatch.setattr(ListTrainingOptions, 'execute', mock_execute_list_options)
     monkeypatch.setattr(EditGrimConfigFile, 'execute', mock_execute_edit_grim_config)
     monkeypatch.setattr(EditTrainerConfigFile, 'execute', mock_execute_edit_trainer_config)
-    monkeypatch.setattr(EditCurriculumFile, 'execute', mock_execute_edit_curriculum)
     monkeypatch.setattr(StartTensorboard, 'execute', mock_execute_start_tensorboard)
     monkeypatch.setattr(PerformTraining, 'execute', mock_execute_perform_training)
 
@@ -162,23 +158,6 @@ def test_edit_trainer_config(monkeypatch, patch_main, namespace_args, patch_trai
 
     monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
     monkeypatch.setattr(EditTrainerConfigFile, 'execute', mock_execute)
-
-    grimagents.__main__.main()
-
-
-def test_edit_curriculum(monkeypatch, patch_main, namespace_args, patch_training_commands):
-    """Tests that EditCurriculumFile is executed."""
-
-    namespace_args.edit_curriculum = True
-
-    def mock_parse_args(argvs):
-        return namespace_args
-
-    def mock_execute(self):
-        assert True
-
-    monkeypatch.setattr(grimagents.__main__, 'parse_args', mock_parse_args)
-    monkeypatch.setattr(EditCurriculumFile, 'execute', mock_execute)
 
     grimagents.__main__.main()
 
