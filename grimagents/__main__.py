@@ -106,7 +106,6 @@ def parse_args(argv):
         '--trainer-config', type=str, help='Overrides configuration setting'
     )
     overrides_parser.add_argument('--env', type=str, help='Overrides configuration setting')
-    overrides_parser.add_argument('--sampler', type=str, help='Overrides configuration setting')
     overrides_parser.add_argument('--run-id', type=str, help='Overrides configuration setting')
     overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--num-envs', type=int, help='Overrides configuration setting')

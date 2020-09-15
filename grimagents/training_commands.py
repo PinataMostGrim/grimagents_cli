@@ -112,9 +112,6 @@ class TrainingWrapperArguments:
         if args.env is not None:
             self.set_env(args.env)
 
-        if args.sampler is not None:
-            self.set_sampler(args.sampler)
-
         if args.resume:
             self.set_resume(args.resume)
 
@@ -291,9 +288,6 @@ class TrainingWrapperArguments:
 
     def set_env(self, value):
         self.arguments[const.ML_ENV] = value
-
-    def set_sampler(self, value):
-        self.arguments[const.ML_SAMPLER] = value
 
     def set_resume(self, value):
         self.arguments[const.ML_RESUME] = value

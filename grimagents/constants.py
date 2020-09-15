@@ -4,7 +4,6 @@
 ML_TRAINER_CONFIG_PATH = 'trainer-config-path'
 ML_ENV = '--env'
 ML_CURRICULUM = '--curriculum'
-ML_SAMPLER = '--sampler'
 ML_KEEP_CHECKPOINTS = '--keep-checkpoints'
 ML_RESUME = '--resume'
 ML_FORCE = '--force'
