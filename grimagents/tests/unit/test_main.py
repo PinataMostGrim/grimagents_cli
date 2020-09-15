@@ -34,7 +34,6 @@ def namespace_args():
         env=None,
         graphics=False,
         inference=False,
-        lesson=None,
         list=False,
         multi_gpu=False,
         no_graphics=False,
