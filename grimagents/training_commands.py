@@ -48,16 +48,6 @@ class EditTrainerConfigFile(Command):
         config_util.edit_trainer_configuration_file(file_path)
 
 
-class EditCurriculumFile(Command):
-    """Opens a curriculum file for editing or creates one if a file does
-    not already exist.
-    """
-
-    def execute(self):
-        file_path = Path(self.args.edit_curriculum)
-        config_util.edit_curriculum_file(file_path)
-
-
 class StartTensorboard(Command):
     """Starts a new instance of tensorboard server."""
 

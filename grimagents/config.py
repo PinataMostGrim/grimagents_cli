@@ -19,7 +19,6 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_TRAINER_CONFIG_PATH: '',
     const.ML_ENV: '',
     const.GA_EXPORT_PATH: '',
-    const.ML_CURRICULUM: '',
     const.ML_KEEP_CHECKPOINTS: '',
     const.ML_FORCE: '',
     const.ML_RUN_ID: 'TRAINING_RUN',
@@ -67,17 +66,6 @@ _DEFAULT_TRAINER_CONFIG = """default:
             strength: 1.0
             gamma: 0.99
 """
-
-_DEFAULT_CURRICULUM = {
-    'BEHAVIOUR_NAME': {
-        const.CU_MEASURE: const.CU_PROGRESS,
-        const.CU_THRESHOLDS: [0.1],
-        const.CU_MIN_LESSON_LENGTH: 100,
-        const.CU_SIGNAL_SMOOTHING: True,
-        const.CU_PARAMETERS: {'example_parameter': [1.5, 2.0]},
-    }
-}
-
 
 _DEFAULT_SEARCH_CONFIG = {
     const.GS_BRAIN: {
@@ -149,12 +137,6 @@ def get_default_trainer_config():
     """Fetches the default trainer configuration."""
 
     return yaml.safe_load(_DEFAULT_TRAINER_CONFIG)
-
-
-def get_default_curriculum():
-    """Fetches the default curriculum."""
-
-    return _DEFAULT_CURRICULUM.copy()
 
 
 def get_default_search_config():
@@ -244,23 +226,3 @@ def create_trainer_configuration_file(file_path: Path):
     """Creates a trainer configuration file with default values at the specified path."""
 
     command_util.write_yaml_file(get_default_trainer_config(), file_path)
-
-
-def edit_curriculum_file(file_path: Path):
-    """Opens a curriculum file for editing. Creates a curriculum file with
-    default values if file does not already exit.
-    """
-
-    if not file_path.suffix == '.yaml':
-        file_path = file_path.with_suffix('.yaml')
-
-    if not file_path.exists():
-        create_curriculum_file(file_path)
-
-    command_util.open_file(file_path)
-
-
-def create_curriculum_file(file_path: Path):
-    """Creates a curriculum file with default values at the specified path."""
-
-    command_util.write_yaml_file(get_default_curriculum(), file_path)
