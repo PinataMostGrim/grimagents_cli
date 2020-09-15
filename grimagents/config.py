@@ -25,7 +25,6 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_FORCE: '',
     const.ML_RUN_ID: 'TRAINING_RUN',
     const.ML_INITIALIZE_FROM: '',
-    const.ML_SAVE_FREQUENCY: '',
     const.ML_SEED: '',
     const.ML_BASE_PORT: '',
     const.ML_NUM_ENVS: '',
