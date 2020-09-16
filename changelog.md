@@ -1,3 +1,10 @@
+### 2.6.0
+- Added support for ML-Agents 0.17.0
+- Removed support for '--lesson', '--save-freq', '--sampler' and '--curriculum' arguments as they have been removed in ML-Agents 0.17.0
+- Removed the '--edit-curriculum' argument as curriculum configuration is now located inside the trainer config file
+- Updated the '--tensorboard-start' argument so that it points Tensorboard to the new 'results' directory
+- Added information regarding Tensorflow 2.3.0 and 2.2.0 to the readme
+
 ### 2.5.2
 - `memory_size` can now be used in Bayesian searches. The value produced by BayesianOptimization will be set to the highest multiple of four beneath it.
 - Configuration validation will no longer fail if a key is found that isn't also present in the default configuration
