@@ -48,16 +48,6 @@ class EditTrainerConfigFile(Command):
         config_util.edit_trainer_configuration_file(file_path)
 
 
-class EditCurriculumFile(Command):
-    """Opens a curriculum file for editing or creates one if a file does
-    not already exist.
-    """
-
-    def execute(self):
-        file_path = Path(self.args.edit_curriculum)
-        config_util.edit_curriculum_file(file_path)
-
-
 class StartTensorboard(Command):
     """Starts a new instance of tensorboard server."""
 
@@ -112,14 +102,8 @@ class TrainingWrapperArguments:
         if args.env is not None:
             self.set_env(args.env)
 
-        if args.sampler is not None:
-            self.set_sampler(args.sampler)
-
         if args.resume:
             self.set_resume(args.resume)
-
-        if args.lesson is not None:
-            self.set_lesson(str(args.lesson))
 
         if args.run_id is not None:
             self.set_run_id(args.run_id)
@@ -295,14 +279,8 @@ class TrainingWrapperArguments:
     def set_env(self, value):
         self.arguments[const.ML_ENV] = value
 
-    def set_sampler(self, value):
-        self.arguments[const.ML_SAMPLER] = value
-
     def set_resume(self, value):
         self.arguments[const.ML_RESUME] = value
-
-    def set_lesson(self, value):
-        self.arguments[const.ML_LESSON] = value
 
     def set_run_id(self, value):
         self.arguments[const.ML_RUN_ID] = value

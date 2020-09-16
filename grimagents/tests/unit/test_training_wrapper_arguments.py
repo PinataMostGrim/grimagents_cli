@@ -303,23 +303,19 @@ def test_override_configuration_values(grim_config):
     """Test that TrainingWrapperArguments correctly applies argument overrides, including:
     --base-port
     --env
-    --lesson
     --multi-gpu
     --no-graphics
     --num-envs
     --run-id
-    --sampler
     --timestamp
     --trainer-config
     """
 
     grim_config['--base-port'] = 5010
     grim_config['--env'] = 'builds/3DBall/3DBall.exe'
-    grim_config['--lesson'] = 1
     grim_config['--multi-gpu'] = True
     grim_config['--no-graphics'] = False
     grim_config['--num-envs'] = 2
-    grim_config['--sampler'] = 'config/3DBall_randomize.yaml'
     grim_config['--timestamp'] = True
 
     override_args = Namespace(
@@ -329,7 +325,6 @@ def test_override_configuration_values(grim_config):
         env='builds/PushBlock/PushBlock.exe',
         graphics=None,
         inference=False,
-        lesson=3,
         multi_gpu=None,
         no_graphics=True,
         no_multi_gpu=True,
@@ -337,7 +332,6 @@ def test_override_configuration_values(grim_config):
         num_envs=4,
         resume=False,
         run_id='PushBlock',
-        sampler='config/PushBlock_randomize.yaml',
         timestamp=None,
         trainer_config='config/PushBlock_grimagents.json',
     )
@@ -361,10 +355,6 @@ def test_override_configuration_values(grim_config):
         'PushBlock',
         '--env',
         'builds/PushBlock/PushBlock.exe',
-        '--sampler',
-        'config/PushBlock_randomize.yaml',
-        '--lesson',
-        '3',
         '--base-port',
         6010,
         '--num-envs',
@@ -474,8 +464,6 @@ def test_training_arguments_set_methods(grim_config):
     arguments = TrainingWrapperArguments(grim_config)
 
     arguments.set_env('builds/3DBall/3DBallHard.exe')
-    arguments.set_sampler('config/3DBall_randomize.yaml')
-    arguments.set_lesson('3')
     arguments.set_run_id('ball')
     arguments.set_num_envs('4')
     arguments.set_no_graphics_enabled(True)
@@ -485,8 +473,6 @@ def test_training_arguments_set_methods(grim_config):
 
     arguments_string = arguments.get_arguments_as_string()
     assert '--env builds/3DBall/3DBallHard.exe' in arguments_string
-    assert '--sampler config/3DBall_randomize.yaml' in arguments_string
-    assert '--lesson 3' in arguments_string
     assert '--run-id ball' in arguments_string
     assert '--num-envs 4' in arguments_string
     assert '--no-graphics' in arguments_string
