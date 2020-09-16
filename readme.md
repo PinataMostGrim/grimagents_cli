@@ -54,11 +54,10 @@ grim-agents\grimwrapper.bat -h
 ### grimagents
 ```
 usage: grimagents [-h] [--list] [--edit-config <file>]
-                  [--edit-trainer-config <file>] [--edit-curriculum <file>]
-                  [--tensorboard-start] [--resume] [--dry-run]
-                  [--trainer-config TRAINER_CONFIG] [--env ENV]
-                  [--sampler SAMPLER] [--lesson LESSON] [--run-id RUN_ID]
-                  [--base-port BASE_PORT] [--num-envs NUM_ENVS] [--inference]
+                  [--edit-trainer-config <file>] [--tensorboard-start]
+                  [--resume] [--dry-run] [--trainer-config TRAINER_CONFIG]
+                  [--env ENV] [--run-id RUN_ID] [--base-port BASE_PORT]
+                  [--num-envs NUM_ENVS] [--inference]
                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                   [--multi-gpu | --no-multi-gpu]
                   configuration_file ...
@@ -76,8 +75,6 @@ optional arguments:
   --edit-config <file>  Open a grimagents configuration file for editing
   --edit-trainer-config <file>
                         Open a trainer configuration file for editing
-  --edit-curriculum <file>
-                        Open a curriculum file for editing
   --tensorboard-start, -s
                         Start tensorboard server
   --resume, -r          Resume the training run specified by --run-id
@@ -85,8 +82,6 @@ optional arguments:
   --trainer-config TRAINER_CONFIG
                         Overrides configuration setting
   --env ENV             Overrides configuration setting
-  --sampler SAMPLER     Overrides configuration setting
-  --lesson LESSON       Overrides configuration setting
   --run-id RUN_ID       Overrides configuration setting
   --base-port BASE_PORT
                         Overrides configuration setting
