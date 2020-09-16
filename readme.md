@@ -18,6 +18,7 @@
 - Pipenv accessible through the PATH environment variable
 - A virtual environment setup for the `MLAgents` project folder using Pipenv
 - ML-Agents 0.16.1
+- Tensorflow 2.2.0 (See [Notes](#notes))
 
 
 ## Installation
@@ -54,11 +55,10 @@ grim-agents\grimwrapper.bat -h
 ### grimagents
 ```
 usage: grimagents [-h] [--list] [--edit-config <file>]
-                  [--edit-trainer-config <file>] [--edit-curriculum <file>]
-                  [--tensorboard-start] [--resume] [--dry-run]
-                  [--trainer-config TRAINER_CONFIG] [--env ENV]
-                  [--sampler SAMPLER] [--lesson LESSON] [--run-id RUN_ID]
-                  [--base-port BASE_PORT] [--num-envs NUM_ENVS] [--inference]
+                  [--edit-trainer-config <file>] [--tensorboard-start]
+                  [--resume] [--dry-run] [--trainer-config TRAINER_CONFIG]
+                  [--env ENV] [--run-id RUN_ID] [--base-port BASE_PORT]
+                  [--num-envs NUM_ENVS] [--inference]
                   [--graphics | --no-graphics] [--timestamp | --no-timestamp]
                   [--multi-gpu | --no-multi-gpu]
                   configuration_file ...
@@ -76,8 +76,6 @@ optional arguments:
   --edit-config <file>  Open a grimagents configuration file for editing
   --edit-trainer-config <file>
                         Open a trainer configuration file for editing
-  --edit-curriculum <file>
-                        Open a curriculum file for editing
   --tensorboard-start, -s
                         Start tensorboard server
   --resume, -r          Resume the training run specified by --run-id
@@ -85,8 +83,6 @@ optional arguments:
   --trainer-config TRAINER_CONFIG
                         Overrides configuration setting
   --env ENV             Overrides configuration setting
-  --sampler SAMPLER     Overrides configuration setting
-  --lesson LESSON       Overrides configuration setting
   --run-id RUN_ID       Overrides configuration setting
   --base-port BASE_PORT
                         Overrides configuration setting
@@ -274,3 +270,5 @@ The `grimagents --resume` argument will not remember how far through a curriculu
 grimagent's log file is written into `grim-agents/logs` by default, but this can be changed in `settings.py`.
 
 Bayesian search will write the best configuration discovered into a yaml file named `<run-id>_bayes.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files from the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
+
+`BayesianOptimization` requires `numpy >=1.19.0` while `Tensorflow 2.3.0` and greater requires `numpy <1.19.0`. `Tensorflow 2.2.0` must be used until current versions are updated to work with higher versions of `numpy` ([source](https://github.com/tensorflow/tensorflow/commit/79518facb4b857af9d9d5df2da463fdbf7eb0e3e)).

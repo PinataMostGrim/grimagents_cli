@@ -3,15 +3,11 @@
 # ML-Agents
 ML_TRAINER_CONFIG_PATH = 'trainer-config-path'
 ML_ENV = '--env'
-ML_CURRICULUM = '--curriculum'
-ML_SAMPLER = '--sampler'
 ML_KEEP_CHECKPOINTS = '--keep-checkpoints'
-ML_LESSON = '--lesson'
 ML_RESUME = '--resume'
 ML_FORCE = '--force'
 ML_RUN_ID = '--run-id'
 ML_INITIALIZE_FROM = '--initialize-from'
-ML_SAVE_FREQUENCY = '--save-freq'
 ML_SEED = '--seed'
 ML_BASE_PORT = '--base-port'
 ML_NUM_ENVS = '--num-envs'
@@ -62,15 +58,6 @@ HP_USE_VAIL = 'use_vail'
 
 # Trainer Configuration
 TC_DEFAULT = 'default'
-
-# Curriculum
-CU_MEASURE = 'measure'
-CU_PROGRESS = 'progress'
-CU_REWARD = 'reward'
-CU_THRESHOLDS = 'thresholds'
-CU_MIN_LESSON_LENGTH = 'min_lesson_length'
-CU_SIGNAL_SMOOTHING = 'signal_smoothing'
-CU_PARAMETERS = 'parameters'
 
 # Grimagents
 GA_EXPORT_PATH = '--export-path'

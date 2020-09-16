@@ -23,7 +23,6 @@ from grimagents.training_commands import (
     ListTrainingOptions,
     EditGrimConfigFile,
     EditTrainerConfigFile,
-    EditCurriculumFile,
     StartTensorboard,
     PerformTraining,
 )
@@ -51,8 +50,6 @@ def main():
         EditGrimConfigFile(args).execute()
     elif args.edit_trainer_config:
         EditTrainerConfigFile(args).execute()
-    elif args.edit_curriculum:
-        EditCurriculumFile(args).execute()
     elif args.tensorboard_start:
         StartTensorboard(args).execute()
     else:
@@ -88,9 +85,6 @@ def parse_args(argv):
         help='Open a trainer configuration file for editing',
     )
     options_parser.add_argument(
-        '--edit-curriculum', metavar='<file>', type=str, help='Open a curriculum file for editing'
-    )
-    options_parser.add_argument(
         '--tensorboard-start', '-s', action='store_true', help='Start tensorboard server'
     )
     options_parser.add_argument(
@@ -106,8 +100,6 @@ def parse_args(argv):
         '--trainer-config', type=str, help='Overrides configuration setting'
     )
     overrides_parser.add_argument('--env', type=str, help='Overrides configuration setting')
-    overrides_parser.add_argument('--sampler', type=str, help='Overrides configuration setting')
-    overrides_parser.add_argument('--lesson', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--run-id', type=str, help='Overrides configuration setting')
     overrides_parser.add_argument('--base-port', type=int, help='Overrides configuration setting')
     overrides_parser.add_argument('--num-envs', type=int, help='Overrides configuration setting')

@@ -56,11 +56,6 @@ def trainer_config_path():
 
 
 @pytest.fixture
-def curriculum_config_path():
-    return Path(__file__).parent / 'curriculum.json'
-
-
-@pytest.fixture
 def fixture_cleanup_grim_config(grim_config_path):
     delete_file(grim_config_path)
     yield 'fixture_cleanup_grim_config'
@@ -72,13 +67,6 @@ def fixture_cleanup_trainer_config(trainer_config_path):
     delete_file(trainer_config_path)
     yield 'fixture_cleanup_trainer_config'
     delete_file(trainer_config_path)
-
-
-@pytest.fixture
-def fixture_cleanup_curriculum(curriculum_config_path):
-    delete_file(curriculum_config_path)
-    yield 'fixture_cleanup_curriculum'
-    delete_file(curriculum_config_path)
 
 
 def test_create_grim_config_file(grim_config_path, fixture_cleanup_grim_config):
@@ -150,13 +138,6 @@ def test_create_trainer_config_file(trainer_config_path, fixture_cleanup_trainer
 
     config.create_trainer_configuration_file(trainer_config_path)
     assert trainer_config_path.exists()
-
-
-def test_create_curriculum_file(curriculum_config_path, fixture_cleanup_curriculum):
-    """Test for creating a default curriculum file."""
-
-    config.create_curriculum_file(curriculum_config_path)
-    assert curriculum_config_path.exists()
 
 
 def test_no_add_search_entry(grim_config_path, fixture_cleanup_grim_config, monkeypatch):
