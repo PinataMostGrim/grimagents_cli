@@ -6,7 +6,7 @@ from pathlib import Path
 def get_summaries_folder():
     """Returns absolute path to the summaries folder."""
 
-    return (Path(__file__).parent / '../../summaries').resolve()
+    return (Path(__file__).parent / '../../results').resolve()
 
 
 def get_log_file_path():
