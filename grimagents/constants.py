@@ -23,26 +23,27 @@ ML_TIMESCALE = '--time-scale'
 ML_QUALITY_LEVEL = '--quality-level'
 ML_TARGET_FRAME_RATE = '--target-frame-rate'
 
+# General
+HP_MAX_STEPS = 'max_steps'
+HP_TIME_HORIZON = 'time_horizon'
+
 # Hyperparameters
-HP_TRAINER = 'trainer'
 HP_BATCH_SIZE = 'batch_size'
 HP_BETA = 'beta'
 HP_BUFFER_SIZE = 'buffer_size'
 HP_EPSILON = 'epsilon'
-HP_HIDDEN_UNITS = 'hidden_units'
 HP_LAMBD = 'lambd'
 HP_LEARNING_RATE = 'learning_rate'
 HP_LEARNING_RATE_SCHEDULE = 'learning_rate_schedule'
-HP_MAX_STEPS = 'max_steps'
-HP_MEMORY_SIZE = 'memory_size'
-HP_NORMALIZE = 'normalize'
 HP_NUM_EPOCH = 'num_epoch'
+
+# Network settings
+HP_HIDDEN_UNITS = 'hidden_units'
+HP_NORMALIZE = 'normalize'
 HP_NUM_LAYERS = 'num_layers'
-HP_TIME_HORIZON = 'time_horizon'
-HP_SEQUENCE_LENGTH = 'sequence_length'
-HP_SUMMARY_FREQ = 'summary_freq'
-HP_USE_RECURRENT = 'use_recurrent'
 HP_VIS_ENCODE_TYPE = 'vis_encode_type'
+HP_MEMORY_SIZE = 'memory_size'
+HP_SEQUENCE_LENGTH = 'sequence_length'
 
 # Reward signals
 HP_REWARD_SIGNALS = 'reward_signals'
