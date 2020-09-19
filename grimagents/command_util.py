@@ -102,7 +102,7 @@ def write_yaml_file(yaml_data, file_path: Path):
 
     command_log.debug(f'Creating file \'{file_path}\'')
     with file_path.open(mode='w') as f:
-        yaml.dump(yaml_data, f, indent=2)
+        yaml.dump(yaml_data, f, sort_keys=False, indent=2)
 
 
 def load_yaml_file(file_path: Path):
