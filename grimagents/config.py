@@ -41,30 +41,63 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_TARGET_FRAME_RATE: "",
 }
 
-_DEFAULT_TRAINER_CONFIG = """default:
-    trainer: ppo
-    batch_size: 1024
-    beta: 5.0e-3
-    buffer_size: 10240
-    epsilon: 0.2
-    hidden_units: 128
-    lambd: 0.95
-    learning_rate: 3.0e-4
-    learning_rate_schedule: linear
-    max_steps: 5.0e4
-    memory_size: 256
-    normalize: false
-    num_epoch: 3
-    num_layers: 2
-    time_horizon: 64
-    sequence_length: 64
-    summary_freq: 1000
-    use_recurrent: false
-    vis_encode_type: simple
+_DEFAULT_TRAINER_CONFIG = """
+behaviors:
+  Basic:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 32
+      buffer_size: 256
+      learning_rate: 0.0003
+      beta: 0.005
+      epsilon: 0.2
+      lambd: 0.95
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      normalize: false
+      hidden_units: 20
+      num_layers: 1
+      vis_encode_type: simple
+      memory:
+        sequence_length: 32
+        memory_size: 256
     reward_signals:
-        extrinsic:
-            strength: 1.0
-            gamma: 0.99
+      extrinsic:
+        gamma: 0.9
+        strength: 1.0
+      curiosity:
+        strength: 0.02
+        gamma: 0.99
+        encoding_size: 256
+    keep_checkpoints: 5
+    max_steps: 500000
+    time_horizon: 3
+    summary_freq: 2000
+    threaded: true
+
+curriculum:
+  Basic:
+    measure: progress
+    thresholds:
+    - 0.1
+    - 0.3
+    - 0.5
+    min_lesson_length: 100
+    signal_smoothing: true
+    parameters:
+      example_parameter:
+      - 0.0
+      - 4.0
+      - 6.0
+      - 8.0
+
+parameter_randomization:
+  resampling-interval: 5000
+  another_example_parameter:
+    sampler-type: uniform
+    min_value: 0.5
+    max_value: 10
 """
 
 _DEFAULT_SEARCH_CONFIG = {
