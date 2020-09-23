@@ -208,9 +208,8 @@ Example configuration files can be found in the `etc` folder.
 Example `grimagents` configuration:
 ```json
 {
-    "trainer-config-path": "grim-agents/etc/3DBall_config.yaml",
+    "trainer-config-path": "grim-agents/etc/3DBall.yaml",
     "--env": "builds/3DBall/3DBall.exe",
-    "--sampler": "grim-agents/etc/3dball_generalize.yaml",
     "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true
@@ -232,7 +231,7 @@ Reward Signals can be included in hyperparameter searches by using a period-sepa
 {
   "search": {
       "brain": {
-          "name": "3DBallLearning",
+          "name": "3DBall",
           "hyperparameters":
           {
             "reward_signals.extrinsic.gamma" : [0.98 , 0.99],
@@ -249,7 +248,7 @@ As `buffer_size` should always be a multiple of the `batch_size`, it impossible 
 {
   "search": {
       "brain": {
-          "name": "3DBallLearning",
+          "name": "3DBall",
           "hyperparameters":
           {
               "beta": [1e-4, 1e-2],

@@ -1,8 +1,7 @@
 {
-    "trainer-config-path": "grim-agents/etc/3DBall_config.yaml",
+    "trainer-config-path": "grim-agents/etc/3DBall.yaml",
     "--env": "builds/3DBall/3DBall.exe",
-    "--sampler": "grim-agents/etc/3dball_generalize.yaml",
-    "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
+    "--export-path": "Project/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true,
     "search": {
