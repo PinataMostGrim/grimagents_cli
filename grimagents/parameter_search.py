@@ -214,18 +214,18 @@ class BayesianSearch(ParameterSearch):
                 or key == 'time_horizon'
                 or key == 'network_settings.memory.sequence_length'
             ):
-                bounds[key] = round(value)
+                bounds[key] = int(round(value))
                 continue
 
             # Ensure 'memory_size' is a multiple of 4 and an int
-            if key == const.HP_MEMORY_SIZE:
-                bounds[key] = round(bounds[key] - bounds[key] % 4)
+            if key == 'network_settings.memory.memory_size':
+                bounds[key] = int(round(bounds[key] - bounds[key] % 4))
                 continue
 
-            # Process reward signal hyperparameters
+            # Ensure all 'encoding_size' values are rounded to int
             splitKey = key.rsplit('.', maxsplit=1)
-            if (len(splitKey) > 1) and (splitKey[1] == const.HP_ENCODING_SIZE):
-                bounds[key] = round(value)
+            if (len(splitKey) > 1) and (splitKey[-1] == 'encoding_size'):
+                bounds[key] = int(round(value))
                 continue
 
             if isinstance(value, numpy.generic):
