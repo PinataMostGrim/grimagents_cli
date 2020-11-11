@@ -48,20 +48,20 @@ behaviors:
     hyperparameters:
       batch_size: 32
       buffer_size: 256
-      learning_rate: 0.0003
       beta: 0.005
       epsilon: 0.2
       lambd: 0.95
-      num_epoch: 3
+      learning_rate: 0.0003
       learning_rate_schedule: linear
+      num_epoch: 3
     network_settings:
-      normalize: false
       hidden_units: 20
+      normalize: false
       num_layers: 1
       vis_encode_type: simple
       memory:
-        sequence_length: 32
         memory_size: 256
+        sequence_length: 32
     reward_signals:
       extrinsic:
         gamma: 0.9
@@ -101,25 +101,23 @@ parameter_randomization:
 """
 
 _DEFAULT_SEARCH_CONFIG = {
-    const.GS_BRAIN: {
-        const.GS_NAME: 'BEHAVIOUR_NAME',
-        const.GS_HYPERPARAMS: {
-            const.HP_BATCH_SIZE: [512, 5120],
-            const.HP_BETA: [1e-4, 1e-2],
-            const.GS_BUFFER_SIZE_MULTIPLE: [4, 10],
-            const.HP_EPSILON: [0.1, 0.3],
-            const.HP_HIDDEN_UNITS: [32, 512],
-            const.HP_LAMBD: [0.9, 0.95],
-            const.HP_LEARNING_RATE: [1e-5, 1e-3],
-            const.HP_MAX_STEPS: [5e5, 1e7],
-            const.HP_MEMORY_SIZE: [64, 512],
-            const.HP_NUM_LAYERS: [1, 3],
-            const.HP_NUM_EPOCH: [3, 10],
-            const.HP_TIME_HORIZON: [32, 2048],
-            const.HP_SEQUENCE_LENGTH: [4, 128],
-            'reward_signals.extrinsic.gamma': [0.98, 0.99],
-        },
-    }
+    'behavior_name': 'BEHAVIOR_NAME',
+    'search_parameters': {
+        'hyperparameters.batch_size': [512, 5120],
+        'hyperparameters.beta': [1e-4, 1e-2],
+        'hyperparameters.buffer_size_multiple': [4, 10],
+        'hyperparameters.epsilon': [0.1, 0.3],
+        'hyperparameters.lambd': [0.9, 0.95],
+        'hyperparameters.num_epoch': [3, 10],
+        'hyperparameters.learning_rate': [1e-5, 1e-3],
+        'network_settings.hidden_units': [32, 512],
+        'network_settings.num_layers': [1, 3],
+        'network_settings.memory.memory_size': [64, 512],
+        'network_settings.memory.sequence_length': [4, 128],
+        'max_steps': [5e5, 1e7],
+        'time_horizon': [32, 2048],
+        'reward_signals.extrinsic.gamma': [0.98, 0.99],
+    },
 }
 
 

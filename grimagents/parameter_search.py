@@ -33,10 +33,7 @@ class ParameterSearch:
         self.hyperparameters = []
         self.hyperparameter_sets = []
 
-        # brain_config contains only the brain configuration and defaults
-        self.brain_config = {}
-
-        # search_config contains hyperparameters to search, as well as a range of values to search through for each
+        # 'search_config' contains hyperparameters to search, as well as a range of values to search through for each parameter
         self.set_search_config(search_config)
 
         self.set_trainer_config(trainer_config)
@@ -44,7 +41,7 @@ class ParameterSearch:
     def set_search_config(self, search_config):
 
         self.search_config = search_config.copy()
-        self.brain_name = self.search_config[const.GS_BRAIN][const.GS_NAME]
+        self.brain_name = self.search_config['behavior_name']
         self.hyperparameters = self.get_search_hyperparameters(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
 
@@ -52,14 +49,14 @@ class ParameterSearch:
     def get_search_hyperparameters(search_config):
         """Returns the list of hyperparameter names defined in search configuration."""
 
-        return [name for name in search_config[const.GS_BRAIN][const.GS_HYPERPARAMS]]
+        return [name for name in search_config['search_parameters']]
 
     @staticmethod
     def get_hyperparameter_sets(search_config):
         """Returns an array containing all sets of hyperparameter values to use in the search."""
 
         search_sets = []
-        for _, values in search_config[const.GS_BRAIN][const.GS_HYPERPARAMS].items():
+        for _, values in search_config['search_parameters'].items():
             search_sets.append(values)
 
         return search_sets
@@ -71,67 +68,39 @@ class ParameterSearch:
         """
 
         self.trainer_config = trainer_config.copy()
-        self.brain_config = self.extract_brain_config(self.trainer_config, self.brain_name)
 
-    @staticmethod
-    def extract_brain_config(trainer_config, brain_name):
-        """Returns a complete trainer configuration for a brain, including default parameters.
-
-        This method strips all configuration values except 'default' and 'brain_name' from 'trainer_config'.
-
-        Raises:
-          InvalidTrainerConfig: Raised if 'default' or 'brain_name' parameters aren't found as keys in the trainer_config
-        """
-
-        try:
-            result = {const.TC_DEFAULT: trainer_config[const.TC_DEFAULT]}
-        except KeyError:
-            raise InvalidTrainerConfig(
-                f'Unable to find \'default\' configuration values in trainer configuration:\n{trainer_config}'
-            )
-
-        try:
-            brain_data = trainer_config[brain_name]
-        except KeyError:
-            raise InvalidTrainerConfig(
-                f'Unable to find configuration settings for brain \'{brain_name}\' in trainer configuration:{trainer_config}'
-            )
-
-        result[brain_name] = {}
-        for key, value in brain_data.items():
-            result[brain_name][key] = value
-
-        return result
-
-    def get_brain_config_with_overrides(self, overrides):
+    def get_trainer_config_with_overrides(self, overrides):
         """Returns a copy of the brain configuration with the specified values overriden.
 
         Parameters:
             overrides: dict: A dictionary containing hyperparameter names paired with override values
         """
 
-        result = self.brain_config.copy()
+        result = self.trainer_config.copy()
         for key, value in overrides.items():
-            common.add_nested_dict_value(result[self.brain_name], key, value)
+            common.add_nested_dict_value(result['behaviors'][self.brain_name], key, value)
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
-        if const.GS_BUFFER_SIZE_MULTIPLE in result[self.brain_name]:
+        if const.GS_BUFFER_SIZE_MULTIPLE in result['behaviors'][self.brain_name]['hyperparameters']:
             batch_size = self.get_batch_size_value(result, self.brain_name)
-            result[self.brain_name][const.HP_BUFFER_SIZE] = (
-                batch_size * result[self.brain_name][const.GS_BUFFER_SIZE_MULTIPLE]
+
+            result['behaviors'][self.brain_name]['hyperparameters'][const.HP_BUFFER_SIZE] = (
+                batch_size
+                * result['behaviors'][self.brain_name]['hyperparameters'][
+                    const.GS_BUFFER_SIZE_MULTIPLE
+                ]
             )
-            del result[self.brain_name][const.GS_BUFFER_SIZE_MULTIPLE]
+            del result['behaviors'][self.brain_name]['hyperparameters'][
+                const.GS_BUFFER_SIZE_MULTIPLE
+            ]
 
         return result
 
     @staticmethod
-    def get_batch_size_value(brain_config, brain_name):
-        """Returns the 'batch_size' value in a 'brain_config' dictionary. If the specified 'brain_name' does not contain an entry for 'batch_size', the 'default' value is returned instead."""
+    def get_batch_size_value(training_config, behavior_name):
+        """Returns the 'batch_size' value from a trainer configuration for the given behavior name."""
 
-        if const.HP_BATCH_SIZE in brain_config[brain_name]:
-            return brain_config[brain_name][const.HP_BATCH_SIZE]
-
-        return brain_config[const.TC_DEFAULT][const.HP_BATCH_SIZE]
+        return training_config['behaviors'][behavior_name]['hyperparameters'][const.HP_BATCH_SIZE]
 
 
 class GridSearch(ParameterSearch):
@@ -235,15 +204,15 @@ class BayesianSearch(ParameterSearch):
 
             # Convert bound items that must be ints into int
             if (
-                key == const.HP_BATCH_SIZE
-                # 'const.GS_BUFFER_SIZE' should never be used for searches. Use 'const.GS_BUFFER_SIZE_MULTIPLE' instead.
-                or key == const.GS_BUFFER_SIZE_MULTIPLE
-                or key == const.HP_HIDDEN_UNITS
-                or key == const.HP_MAX_STEPS
-                or key == const.HP_NUM_EPOCH
-                or key == const.HP_NUM_LAYERS
-                or key == const.HP_TIME_HORIZON
-                or key == const.HP_SEQUENCE_LENGTH
+                key == 'hyperparameters.batch_size'
+                # 'buffer_size' should never be used for searches. Use 'buffer_size_multiple' instead.
+                or key == 'hyperparameters.buffer_size_multiple'
+                or key == 'network_settings.hidden_units'
+                or key == 'max_steps'
+                or key == 'hyperparameters.num_epoc'
+                or key == 'network_settings.num_layers'
+                or key == 'time_horizon'
+                or key == 'network_settings.memory.sequence_length'
             ):
                 bounds[key] = round(value)
                 continue

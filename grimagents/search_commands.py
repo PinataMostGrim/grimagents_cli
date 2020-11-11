@@ -51,7 +51,7 @@ class SearchCommand(Command):
         self.grim_config_path = Path(args.configuration_file)
         self.grim_config = config_util.load_grim_configuration_file(self.grim_config_path)
 
-        self.search_config = self.grim_config[const.GS_SEARCH]
+        self.search_config = self.grim_config['search']
 
         self.trainer_config_path = Path(self.grim_config[const.ML_TRAINER_CONFIG_PATH])
         self.trainer_config = config_util.load_trainer_configuration_file(self.trainer_config_path)
@@ -141,7 +141,7 @@ class PerformGridSearch(GridSearchCommand):
         for i in range(start_index, self.grid_search.get_grid_search_count()):
 
             search_config = self.grid_search.get_search_configuration(i)
-            search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
+            search_brain_config = self.grid_search.get_trainer_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -168,7 +168,7 @@ class ExportGridSearchConfiguration(GridSearchCommand):
         )
 
         search_config = self.grid_search.get_search_configuration(self.args.export_index)
-        search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
+        search_brain_config = self.grid_search.get_trainer_config_with_overrides(search_config)
         command_util.write_yaml_file(search_brain_config, self.search_config_path)
 
 
@@ -195,7 +195,9 @@ class PerformRandomSearch(SearchCommand):
         for i in range(self.args.random):
 
             search_config = self.random_search.get_randomized_search_configuration()
-            search_brain_config = self.random_search.get_brain_config_with_overrides(search_config)
+            search_brain_config = self.random_search.get_trainer_config_with_overrides(
+                search_config
+            )
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -291,7 +293,7 @@ class PerformBayesianSearch(SearchCommand):
 
         # Construct search configuration using input from the BayesianSearch object.
         search_config = self.bayes_search.get_search_config_from_bounds(kwargs)
-        bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
+        bayes_brain_config = self.bayes_search.get_trainer_config_with_overrides(search_config)
         command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
 
         # Execute training with the search config and run_id
@@ -352,7 +354,7 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
         search_config = self.bayes_search.get_search_config_from_bounds(max['params'])
-        best_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
+        best_brain_config = self.bayes_search.get_trainer_config_with_overrides(search_config)
         command_util.write_yaml_file(best_brain_config, self.output_config_path)
 
     def get_save_log_path(self):

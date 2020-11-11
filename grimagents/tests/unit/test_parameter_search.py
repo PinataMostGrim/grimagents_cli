@@ -198,7 +198,7 @@ def test_get_brain_config_with_overrides(search_config, trainer_config):
         'reward_signal.curiosity.curiosity_enc_size': 256,
     }
 
-    brain_config = search.get_brain_config_with_overrides(overrides)
+    brain_config = search.get_trainer_config_with_overrides(overrides)
 
     assert brain_config == {
         'BRAIN_NAME': {
@@ -229,7 +229,7 @@ def test_buffer_size_multiple(search_config, trainer_config):
 
     search = GridSearch(search_config, trainer_config)
     overrides = search.get_search_configuration(0)
-    brain_config = search.get_brain_config_with_overrides(overrides)
+    brain_config = search.get_trainer_config_with_overrides(overrides)
 
     assert 'buffer_size_multiple' not in brain_config['BRAIN_NAME']
 
