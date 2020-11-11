@@ -41,7 +41,7 @@ class ParameterSearch:
     def set_search_config(self, search_config):
 
         self.search_config = search_config.copy()
-        self.brain_name = self.search_config['behavior_name']
+        self.brain_name = self.search_config[const.GS_BEHAVIOR_NAME]
         self.hyperparameters = self.get_search_hyperparameters(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
 
@@ -49,14 +49,14 @@ class ParameterSearch:
     def get_search_hyperparameters(search_config):
         """Returns the list of hyperparameter names defined in search configuration."""
 
-        return [name for name in search_config['search_parameters']]
+        return [name for name in search_config[const.GS_SEARCH_PARAMETERS]]
 
     @staticmethod
     def get_hyperparameter_sets(search_config):
         """Returns an array containing all sets of hyperparameter values to use in the search."""
 
         search_sets = []
-        for _, values in search_config['search_parameters'].items():
+        for _, values in search_config[const.GS_SEARCH_PARAMETERS].items():
             search_sets.append(values)
 
         return search_sets
@@ -78,19 +78,24 @@ class ParameterSearch:
 
         result = self.trainer_config.copy()
         for key, value in overrides.items():
-            common.add_nested_dict_value(result['behaviors'][self.brain_name], key, value)
+            common.add_nested_dict_value(result[const.TC_BEHAVIORS][self.brain_name], key, value)
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
-        if const.GS_BUFFER_SIZE_MULTIPLE in result['behaviors'][self.brain_name]['hyperparameters']:
+        if (
+            const.GS_BUFFER_SIZE_MULTIPLE
+            in result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS]
+        ):
             batch_size = self.get_batch_size_value(result, self.brain_name)
 
-            result['behaviors'][self.brain_name]['hyperparameters'][const.HP_BUFFER_SIZE] = (
+            result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
+                const.HP_BUFFER_SIZE
+            ] = (
                 batch_size
-                * result['behaviors'][self.brain_name]['hyperparameters'][
+                * result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
                     const.GS_BUFFER_SIZE_MULTIPLE
                 ]
             )
-            del result['behaviors'][self.brain_name]['hyperparameters'][
+            del result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
                 const.GS_BUFFER_SIZE_MULTIPLE
             ]
 
@@ -100,7 +105,9 @@ class ParameterSearch:
     def get_batch_size_value(training_config, behavior_name):
         """Returns the 'batch_size' value from a trainer configuration for the given behavior name."""
 
-        return training_config['behaviors'][behavior_name]['hyperparameters'][const.HP_BATCH_SIZE]
+        return training_config[const.TC_BEHAVIORS][behavior_name][const.TC_HYPERPARAMETERS][
+            const.HP_BATCH_SIZE
+        ]
 
 
 class GridSearch(ParameterSearch):

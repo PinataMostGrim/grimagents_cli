@@ -101,8 +101,8 @@ parameter_randomization:
 """
 
 _DEFAULT_SEARCH_CONFIG = {
-    'behavior_name': 'BEHAVIOR_NAME',
-    'search_parameters': {
+    const.GS_BEHAVIOR_NAME: 'BEHAVIOR_NAME',
+    const.GS_SEARCH_PARAMETERS: {
         'hyperparameters.batch_size': [512, 5120],
         'hyperparameters.beta': [1e-4, 1e-2],
         'hyperparameters.buffer_size_multiple': [4, 10],
