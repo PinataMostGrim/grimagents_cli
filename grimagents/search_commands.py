@@ -107,7 +107,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
+            f'\'{self.grim_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
         )
 
 
