@@ -225,40 +225,37 @@ When the `--bayesian` argument is present, [Bayesian Optimization](https://githu
 
 `grimsearch` only supports searching hyperparamters for one behaviour at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
-Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
+Hyperparameters should be defined using period-separated strings to designate nested relationships.
 
 ```json
 {
-  "search": {
-      "brain": {
-          "name": "3DBall",
-          "hyperparameters":
-          {
-            "reward_signals.extrinsic.gamma" : [0.98 , 0.99],
-            "reward_signals.curiosity.strength" : [0.001, 0.1],
-            "reward_signals.curiosity.encoding_size" : [64, 256]
-          }
-      }
-  }
+    "search": {
+        "behavior_name": "3DBall",
+        "search_parameters": {
+            "hyperparameters.batch_size": [512, 5120],
+            "network_settings.hidden_units": [32, 512],
+            "time_horizon": [32, 2048],
+            "reward_signals.extrinsic.gamma": [0.98, 0.99]
+        }
+    }
+}
 ```
 
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform searches on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
-  "search": {
-      "brain": {
-          "name": "3DBall",
-          "hyperparameters":
-          {
-              "beta": [1e-4, 1e-2],
-              "buffer_size_multiple": [4, 10]
-          }
-      }
-  }
+    "search": {
+        "behavior_name": "3DBall",
+        "search_parameters": {
+            "hyperparameters.batch_size": [512, 5120],
+            "hyperparameters.buffer_size_multiple": [4, 10],
+        }
+    }
+}
 ```
 
-Likewise, `encoding_size` should always be a multiple of 4 and will be forced to the highest valid multiple below the value chosen by Bayesian Optimization.
+Additionally, `encoding_size` values (such as `hyperparameters.reward_signals.curiosity.encoding_size`) should always be a multiple of 4 and will be forced to the highest valid multiple below the value chosen by Bayesian Optimization.
 
 
 ## Notes
