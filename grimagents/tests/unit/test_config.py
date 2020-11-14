@@ -184,4 +184,4 @@ def test_no_overwrite_search_entry(grim_config_path, fixture_cleanup_grim_config
     with grim_config_path.open('r') as f:
         file_data = json.load(f)
 
-    assert 'brain' not in file_data['search']
+    assert 'behavior_name' not in file_data['search']

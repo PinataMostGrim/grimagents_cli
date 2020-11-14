@@ -41,52 +41,83 @@ _DEFAULT_GRIM_CONFIG = {
     const.ML_TARGET_FRAME_RATE: "",
 }
 
-_DEFAULT_TRAINER_CONFIG = """default:
-    trainer: ppo
-    batch_size: 1024
-    beta: 5.0e-3
-    buffer_size: 10240
-    epsilon: 0.2
-    hidden_units: 128
-    lambd: 0.95
-    learning_rate: 3.0e-4
-    learning_rate_schedule: linear
-    max_steps: 5.0e4
-    memory_size: 256
-    normalize: false
-    num_epoch: 3
-    num_layers: 2
-    time_horizon: 64
-    sequence_length: 64
-    summary_freq: 1000
-    use_recurrent: false
-    vis_encode_type: simple
+_DEFAULT_TRAINER_CONFIG = """
+behaviors:
+  Basic:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 32
+      buffer_size: 256
+      beta: 0.005
+      epsilon: 0.2
+      lambd: 0.95
+      learning_rate: 0.0003
+      learning_rate_schedule: linear
+      num_epoch: 3
+    network_settings:
+      hidden_units: 20
+      normalize: false
+      num_layers: 1
+      vis_encode_type: simple
+      memory:
+        memory_size: 256
+        sequence_length: 32
     reward_signals:
-        extrinsic:
-            strength: 1.0
-            gamma: 0.99
+      extrinsic:
+        gamma: 0.9
+        strength: 1.0
+      curiosity:
+        strength: 0.02
+        gamma: 0.99
+        encoding_size: 256
+    keep_checkpoints: 5
+    max_steps: 500000
+    time_horizon: 3
+    summary_freq: 2000
+    threaded: true
+
+curriculum:
+  Basic:
+    measure: progress
+    thresholds:
+    - 0.1
+    - 0.3
+    - 0.5
+    min_lesson_length: 100
+    signal_smoothing: true
+    parameters:
+      example_parameter:
+      - 0.0
+      - 4.0
+      - 6.0
+      - 8.0
+
+parameter_randomization:
+  resampling-interval: 5000
+  another_example_parameter:
+    sampler-type: uniform
+    min_value: 0.5
+    max_value: 10
 """
 
 _DEFAULT_SEARCH_CONFIG = {
-    const.GS_BRAIN: {
-        const.GS_NAME: 'BEHAVIOUR_NAME',
-        const.GS_HYPERPARAMS: {
-            const.HP_BATCH_SIZE: [512, 5120],
-            const.HP_BETA: [1e-4, 1e-2],
-            const.GS_BUFFER_SIZE_MULTIPLE: [4, 10],
-            const.HP_EPSILON: [0.1, 0.3],
-            const.HP_HIDDEN_UNITS: [32, 512],
-            const.HP_LAMBD: [0.9, 0.95],
-            const.HP_LEARNING_RATE: [1e-5, 1e-3],
-            const.HP_MAX_STEPS: [5e5, 1e7],
-            const.HP_MEMORY_SIZE: [64, 512],
-            const.HP_NUM_LAYERS: [1, 3],
-            const.HP_NUM_EPOCH: [3, 10],
-            const.HP_TIME_HORIZON: [32, 2048],
-            const.HP_SEQUENCE_LENGTH: [4, 128],
-            'reward_signals.extrinsic.gamma': [0.98, 0.99],
-        },
-    }
+    const.GS_BEHAVIOR_NAME: 'BEHAVIOR_NAME',
+    const.GS_SEARCH_PARAMETERS: {
+        'hyperparameters.batch_size': [512, 5120],
+        'hyperparameters.beta': [1e-4, 1e-2],
+        'hyperparameters.buffer_size_multiple': [4, 10],
+        'hyperparameters.epsilon': [0.1, 0.3],
+        'hyperparameters.lambd': [0.9, 0.95],
+        'hyperparameters.num_epoch': [3, 10],
+        'hyperparameters.learning_rate': [1e-5, 1e-3],
+        'network_settings.hidden_units': [32, 512],
+        'network_settings.num_layers': [1, 3],
+        'network_settings.memory.memory_size': [64, 512],
+        'network_settings.memory.sequence_length': [4, 128],
+        'max_steps': [5e5, 1e7],
+        'time_horizon': [32, 2048],
+        'reward_signals.extrinsic.gamma': [0.98, 0.99],
+    },
 }
 
 

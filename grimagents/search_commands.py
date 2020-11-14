@@ -51,7 +51,7 @@ class SearchCommand(Command):
         self.grim_config_path = Path(args.configuration_file)
         self.grim_config = config_util.load_grim_configuration_file(self.grim_config_path)
 
-        self.search_config = self.grim_config[const.GS_SEARCH]
+        self.search_config = self.grim_config['search']
 
         self.trainer_config_path = Path(self.grim_config[const.ML_TRAINER_CONFIG_PATH])
         self.trainer_config = config_util.load_trainer_configuration_file(self.trainer_config_path)
@@ -60,17 +60,17 @@ class SearchCommand(Command):
 
         self.search_counter = 0
 
-    def perform_search_with_configuration(self, search_brain_config):
+    def perform_search_with_configuration(self, trainer_config):
         """Executes a search using the provided search configuration.
 
         Parameters:
-            search_brain_config: dict: A dictionary containing a set of default hyperparameters and brain specific hyperparameters that will be used in the search. This will be written into a trainer config file for the search.
+            trainer_config: dict: The complete trainer configuration that will be used in the search. This will be written into a trainer config file for the search.
         """
 
-        # Write trainer configuration file using the search configuration
-        command_util.write_yaml_file(search_brain_config, self.search_config_path)
+        # Write trainer configuration to file
+        command_util.write_yaml_file(trainer_config, self.search_config_path)
 
-        # Execute training with the search_brain_config and run_id
+        # Execute training with the 'trainer_config' and 'run_id'
         run_id = self.get_search_run_id()
         command = [
             'pipenv',
@@ -107,7 +107,7 @@ class OutputGridSearchCount(GridSearchCommand):
     def execute(self):
 
         search_log.info(
-            f'\'{self.trainer_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
+            f'\'{self.grim_config_path}\' will perform {self.grid_search.get_grid_search_count()} training runs'
         )
 
 
@@ -141,7 +141,7 @@ class PerformGridSearch(GridSearchCommand):
         for i in range(start_index, self.grid_search.get_grid_search_count()):
 
             search_config = self.grid_search.get_search_configuration(i)
-            search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
+            trainer_config = self.grid_search.get_trainer_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -150,7 +150,7 @@ class PerformGridSearch(GridSearchCommand):
                 search_log.info(f'    {key}: {value}')
             search_log.info('-' * 63)
 
-            self.perform_search_with_configuration(search_brain_config)
+            self.perform_search_with_configuration(trainer_config)
 
         if self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -168,8 +168,8 @@ class ExportGridSearchConfiguration(GridSearchCommand):
         )
 
         search_config = self.grid_search.get_search_configuration(self.args.export_index)
-        search_brain_config = self.grid_search.get_brain_config_with_overrides(search_config)
-        command_util.write_yaml_file(search_brain_config, self.search_config_path)
+        trainer_config = self.grid_search.get_trainer_config_with_overrides(search_config)
+        command_util.write_yaml_file(trainer_config, self.search_config_path)
 
 
 class PerformRandomSearch(SearchCommand):
@@ -195,7 +195,7 @@ class PerformRandomSearch(SearchCommand):
         for i in range(self.args.random):
 
             search_config = self.random_search.get_randomized_search_configuration()
-            search_brain_config = self.random_search.get_brain_config_with_overrides(search_config)
+            trainer_config = self.random_search.get_trainer_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
@@ -204,7 +204,7 @@ class PerformRandomSearch(SearchCommand):
                 search_log.info(f'    {key}: {value}')
             search_log.info('-' * 63)
 
-            self.perform_search_with_configuration(search_brain_config)
+            self.perform_search_with_configuration(trainer_config)
 
         if self.search_config_path.exists():
             self.search_config_path.unlink()
@@ -291,8 +291,8 @@ class PerformBayesianSearch(SearchCommand):
 
         # Construct search configuration using input from the BayesianSearch object.
         search_config = self.bayes_search.get_search_config_from_bounds(kwargs)
-        bayes_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
-        command_util.write_yaml_file(bayes_brain_config, self.search_config_path)
+        trainer_config = self.bayes_search.get_trainer_config_with_overrides(search_config)
+        command_util.write_yaml_file(trainer_config, self.search_config_path)
 
         # Execute training with the search config and run_id
         run_id = self.grim_config[const.ML_RUN_ID] + f'_{self.search_counter:02d}'
@@ -352,8 +352,8 @@ class PerformBayesianSearch(SearchCommand):
         search_log.info(f'Saving best configuration to \'{self.output_config_path}\'')
 
         search_config = self.bayes_search.get_search_config_from_bounds(max['params'])
-        best_brain_config = self.bayes_search.get_brain_config_with_overrides(search_config)
-        command_util.write_yaml_file(best_brain_config, self.output_config_path)
+        best_trainer_config = self.bayes_search.get_trainer_config_with_overrides(search_config)
+        command_util.write_yaml_file(best_trainer_config, self.output_config_path)
 
     def get_save_log_path(self):
         """Generates a timestamped log file path for Bayesian optimization observations."""

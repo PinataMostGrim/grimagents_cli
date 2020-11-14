@@ -1,5 +1,5 @@
 # grimagents
-**grimagents** is collection of command line applications that wrap the [Unity Machine Learning Agents](https://github.com/Unity-Technologies/ml-agents) toolkit with more automation.
+**grimagents** is collection of command line applications that wrap the [Unity Machine Learning Agents](1) toolkit with more automation.
 
 **grimagents** CLI features include:
 - Initiate training using arguments loaded from a configuration file
@@ -19,6 +19,7 @@
 - A virtual environment setup for the `MLAgents` project folder using Pipenv
 - ML-Agents 0.16.1
 - Tensorflow 2.2.0 (See [Notes](#notes))
+- Scikit-learn 0.22.2 (See [Notes](#notes))
 
 
 ## Installation
@@ -208,9 +209,8 @@ Example configuration files can be found in the `etc` folder.
 Example `grimagents` configuration:
 ```json
 {
-    "trainer-config-path": "grim-agents/etc/3DBall_config.yaml",
+    "trainer-config-path": "grim-agents/etc/3DBall.yaml",
     "--env": "builds/3DBall/3DBall.exe",
-    "--sampler": "grim-agents/etc/3dball_generalize.yaml",
     "--export-path": "UnitySDK/Assets/ML-Agents/Examples/3DBall/TFModels",
     "--run-id": "3DBall",
     "--timestamp": true
@@ -222,44 +222,41 @@ Grid Search is the default strategy used by `grimsearch`. Each hyperparameter va
 
 Random Search can be applied using the `--random` argument. When used, a random value is chosen between the minimum and maximum values (inclusive) defined for each hyperparameter in the search configuration. A hyperparameter with only one value defined will not be randomized.
 
-When the `--bayesian` argument is present, [Bayesian Optimization](https://github.com/fmfn/BayesianOptimization) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
+When the `--bayesian` argument is present, [Bayesian Optimization](2) will be used to search for optimal hyperparameters. Two values are required for each hyperparameter specified for the search; a minimum and maximum.
 
-`grimsearch` only supports searching hyperparamters for one behaviour at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
+`grimsearch` only supports searching hyperparameters for one behaviour at a time. `grimsearch` will respect `--num-envs` while running searches and will also export the trained policy for every search if `--export-path` is present in the configuration file. This may not be desirable as each successive search will overwrite the previous policy's file.
 
-Reward Signals can be included in hyperparameter searches by using a period-separated string in search configuration keys.
+Hyperparameters should be defined using period-separated strings to designate nested relationships.
 
 ```json
 {
-  "search": {
-      "brain": {
-          "name": "3DBallLearning",
-          "hyperparameters":
-          {
-            "reward_signals.extrinsic.gamma" : [0.98 , 0.99],
-            "reward_signals.curiosity.strength" : [0.001, 0.1],
-            "reward_signals.curiosity.encoding_size" : [64, 256]
-          }
-      }
-  }
+    "search": {
+        "behavior_name": "3DBall",
+        "search_parameters": {
+            "hyperparameters.batch_size": [512, 5120],
+            "network_settings.hidden_units": [32, 512],
+            "time_horizon": [32, 2048],
+            "reward_signals.extrinsic.gamma": [0.98, 0.99]
+        }
+    }
+}
 ```
 
 As `buffer_size` should always be a multiple of the `batch_size`, it impossible to perform searches on one or the other using static values. A special `buffer_size_multiple` value can be defined that allows `grimsearch` to dynamically set the `buffer_size` based directly on the `batch_size`.
 
 ```json
 {
-  "search": {
-      "brain": {
-          "name": "3DBallLearning",
-          "hyperparameters":
-          {
-              "beta": [1e-4, 1e-2],
-              "buffer_size_multiple": [4, 10]
-          }
-      }
-  }
+    "search": {
+        "behavior_name": "3DBall",
+        "search_parameters": {
+            "hyperparameters.batch_size": [512, 5120],
+            "hyperparameters.buffer_size_multiple": [4, 10],
+        }
+    }
+}
 ```
 
-Likewise, `encoding_size` should always be a multiple of 4 and will be forced to the highest valid multiple below the value chosen by Bayesian Optimization.
+Additionally, `encoding_size` values (such as `hyperparameters.reward_signals.curiosity.encoding_size`) should always be a multiple of 4 and will be forced to the highest valid multiple below the value chosen by Bayesian Optimization.
 
 
 ## Notes
@@ -271,4 +268,12 @@ grimagent's log file is written into `grim-agents/logs` by default, but this can
 
 Bayesian search will write the best configuration discovered into a yaml file named `<run-id>_bayes.yaml` next to the trainer config file used for the search. If the `--bayes-save` argument is used, an observations log file will be automatically generated with a timestamp in a folder next to the trainer config file. Likewise, the `--bayes-load` argument will load log files from the same folder. The folder name generated will take the form `<run_id>_bayes`. This folder should be cleared or deleted before beginning a new Bayesian search from scratch.
 
-`BayesianOptimization` requires `numpy >=1.19.0` while `Tensorflow 2.3.0` and greater requires `numpy <1.19.0`. `Tensorflow 2.2.0` must be used until current versions are updated to work with higher versions of `numpy` ([source](https://github.com/tensorflow/tensorflow/commit/79518facb4b857af9d9d5df2da463fdbf7eb0e3e)).
+`BayesianOptimization` requires `numpy >=1.19.0` while `Tensorflow 2.3.0` and greater requires `numpy <1.19.0`. `Tensorflow 2.2.0` must be used until current versions are updated to work with higher versions of `numpy` ([source](3)).
+
+Newer versions of `scikit-learn` throw a `ValueError` when using Bayesian search. Until this issue is resolved, use `scikit-learn 0.22.2`. ([source](4)).
+
+
+[1](https://github.com/Unity-Technologies/ml-agents)
+[2](https://github.com/fmfn/BayesianOptimization)
+[3](https://github.com/tensorflow/tensorflow/commit/79518facb4b857af9d9d5df2da463fdbf7eb0e3e)
+[4](https://github.com/scikit-optimize/scikit-optimize/issues/910)

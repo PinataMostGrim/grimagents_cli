@@ -24,40 +24,12 @@ ML_QUALITY_LEVEL = '--quality-level'
 ML_TARGET_FRAME_RATE = '--target-frame-rate'
 
 # Hyperparameters
-HP_TRAINER = 'trainer'
 HP_BATCH_SIZE = 'batch_size'
-HP_BETA = 'beta'
 HP_BUFFER_SIZE = 'buffer_size'
-HP_EPSILON = 'epsilon'
-HP_HIDDEN_UNITS = 'hidden_units'
-HP_LAMBD = 'lambd'
-HP_LEARNING_RATE = 'learning_rate'
-HP_LEARNING_RATE_SCHEDULE = 'learning_rate_schedule'
-HP_MAX_STEPS = 'max_steps'
-HP_MEMORY_SIZE = 'memory_size'
-HP_NORMALIZE = 'normalize'
-HP_NUM_EPOCH = 'num_epoch'
-HP_NUM_LAYERS = 'num_layers'
-HP_TIME_HORIZON = 'time_horizon'
-HP_SEQUENCE_LENGTH = 'sequence_length'
-HP_SUMMARY_FREQ = 'summary_freq'
-HP_USE_RECURRENT = 'use_recurrent'
-HP_VIS_ENCODE_TYPE = 'vis_encode_type'
 
-# Reward signals
-HP_REWARD_SIGNALS = 'reward_signals'
-HP_EXTRINSIC = 'extrinsic'
-HP_CURIOSITY = 'curiosity'
-HP_GAIL = 'gail'
-
-HP_STRENGTH = 'strength'
-HP_GAMMA = 'gamma'
-HP_ENCODING_SIZE = 'encoding_size'
-HP_USE_ACTIONS = 'use_actions'
-HP_USE_VAIL = 'use_vail'
-
-# Trainer Configuration
-TC_DEFAULT = 'default'
+# Trainer configuration
+TC_BEHAVIORS = 'behaviors'
+TC_HYPERPARAMETERS = 'hyperparameters'
 
 # Grimagents
 GA_EXPORT_PATH = '--export-path'
@@ -67,7 +39,6 @@ GA_ADDITIONAL_ARGS = 'additional-args'
 
 # Grimsearch
 GS_SEARCH = 'search'
-GS_BRAIN = 'brain'
-GS_NAME = 'name'
-GS_HYPERPARAMS = 'hyperparameters'
+GS_BEHAVIOR_NAME = 'behavior_name'
+GS_SEARCH_PARAMETERS = 'search_parameters'
 GS_BUFFER_SIZE_MULTIPLE = 'buffer_size_multiple'
