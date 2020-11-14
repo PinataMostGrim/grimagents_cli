@@ -8,8 +8,8 @@ from bayes_opt import BayesianOptimization
 from pathlib import Path
 
 import grimagents.command_util
-import grimagents.config
 import grimagents.common
+import grimagents.config
 import grimagents.settings
 
 from grimagents.search_commands import (
@@ -53,14 +53,12 @@ def grim_config():
         '--seed': '',
         '--timestamp': True,
         'search': {
-            'brain': {
-                'name': '3DBallLearning',
-                'hyperparameters': {
-                    'batch_size': [64, 256],
-                    'buffer_size_multiple': [50, 200],
-                    'beta': [0.01, 0.0001],
-                },
-            }
+            'behavior_name': '3DBallLearning',
+            'search_parameters': {
+                'hyperparameters.batch_size': [64, 256],
+                'hyperparameters.buffer_size_multiple': [50, 200],
+                'hyperparameters.beta': [0.01, 0.0001],
+            },
         },
     }
 
@@ -68,47 +66,57 @@ def grim_config():
 @pytest.fixture
 def trainer_config():
     return {
-        'default': {
-            'trainer': 'ppo',
-            'batch_size': 1024,
-            'beta': 0.005,
-            'buffer_size': 10240,
-            'epsilon': 0.2,
-            'gamma': 0.99,
-            'hidden_units': 128,
-            'lambd': 0.95,
-            'learning_rate': 0.0003,
-            'max_steps': '5.0e4',
-            'num_epoch': 3,
-            'num_layers': 2,
-            'time_horizon': 64,
-            'use_curiosity': False,
-            'curiosity_strength': 0.01,
-            'curiosity_enc_size': 128,
-        },
-        '3DBallLearning': {
-            'max_steps': '3.0e3',
-            'normalize': True,
-            'batch_size': 84,
-            'buffer_size': 7392,
-            'summary_freq': 1000,
-            'time_horizon': 1000,
-            'lambd': 0.99,
-            'gamma': 0.995,
-            'beta': 0.002,
-            'use_curiosity': True,
-        },
+        'behaviors': {
+            '3DBall': {
+                'trainer_type': 'ppo',
+                'hyperparameters': {
+                    'batch_size': 64,
+                    'buffer_size': 12000,
+                    'beta': 0.001,
+                    'epsilon': 0.2,
+                    'lambd': 0.99,
+                    'learning_rate': 0.0003,
+                    'learning_rate_schedule': 'linear',
+                    'num_epoch': 3,
+                },
+                'network_settings': {
+                    'hidden_units': 128,
+                    'normalize': True,
+                    'num_layers': 2,
+                    'vis_encode_type': 'simple',
+                },
+                'reward_signals': {
+                    'extrinsic': {
+                        'gamma': 0.9,
+                        'strength': 1.0,
+                    },
+                },
+                'keep_checkpoints': 5,
+                'max_steps': 50000,
+                'time_horizon': 1000,
+                'summary_freq': 5000,
+                'threaded': True,
+            }
+        }
     }
 
 
 @pytest.fixture
 def search_overrides():
-    return {'batch_size': 84, 'beta': 0.002, 'buffer_size_multiple': 88}
+    return {
+        'hyperparameters.batch_size': 84,
+        'hyperparameters.beta': 0.002,
+        'hyperparameters.buffer_size_multiple': 88,
+    }
 
 
 @pytest.fixture
 def bounds():
-    return {'batch_size': [64, 256], 'buffer_size_multiple': [50, 200], 'beta': [0.01, 0.0001]}
+    return {
+        'hyperparameters.batch_size': [64, 256],
+        'hyperparameters.buffer_size_multiple': [50, 200],
+        'hyperparameters.beta': [0.01, 0.0001],
+    }
 
 
 @pytest.fixture
@@ -167,7 +175,7 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
 def patch_perform_search_with_configuration(monkeypatch):
     """Patches SearchCommand.perform_search_with_configuration()."""
 
-    def mock_perform_search_with_configuration(self, brain_config):
+    def mock_perform_search_with_configuration(self, trainer_config):
         pass
 
     monkeypatch.setattr(
@@ -185,14 +193,14 @@ def patch_perform_grid_search(monkeypatch, trainer_config, search_overrides):
     def mock_get_search_configuration(self, index):
         return search_overrides
 
-    def mock_get_brain_config_with_overrides(self, search_overrides):
+    def mock_get_trainer_config_with_overrides(self, search_overrides):
         return trainer_config
 
     monkeypatch.setattr(GridSearch, 'get_grid_search_count', mock_get_grid_search_count)
     monkeypatch.setattr(GridSearch, 'get_search_configuration', mock_get_search_configuration)
 
     monkeypatch.setattr(
-        ParameterSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides
+        ParameterSearch, 'get_trainer_config_with_overrides', mock_get_trainer_config_with_overrides
     )
 
 
@@ -206,7 +214,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     def mock_get_search_config_from_bounds(self, dict):
         return {}
 
-    def mock_get_brain_config_with_overrides(self, search_overrides):
+    def mock_get_trainer_config_with_overrides(self, search_overrides):
         return trainer_config
 
     def mock_bayes_opt_load_logs(optimizer, logs):
@@ -225,7 +233,7 @@ def patch_perform_bayesian_search(monkeypatch, bounds, trainer_config):
     )
 
     monkeypatch.setattr(
-        BayesianSearch, 'get_brain_config_with_overrides', mock_get_brain_config_with_overrides
+        BayesianSearch, 'get_trainer_config_with_overrides', mock_get_trainer_config_with_overrides
     )
 
     monkeypatch.setattr(bayes_opt.util, 'load_logs', mock_bayes_opt_load_logs)
@@ -398,7 +406,7 @@ def test_resume_perform_grid_search(
 
     search_counter = Counter()
 
-    def mock_perform_search_with_configuration(self, brain_config):
+    def mock_perform_search_with_configuration(self, trainer_config):
         search_counter.increment_counter()
 
     monkeypatch.setattr(
@@ -454,7 +462,7 @@ def test_perform_random_search(
     def mock_get_randomized_search_configuration(self):
         return search_overrides
 
-    def mock_get_brain_config_with_overrides(self, search_overrides):
+    def mock_get_trainer_config_with_overrides(self, search_overrides):
         return trainer_config
 
     monkeypatch.setattr(
@@ -465,8 +473,8 @@ def test_perform_random_search(
 
     monkeypatch.setattr(
         grimagents.parameter_search.ParameterSearch,
-        'get_brain_config_with_overrides',
-        mock_get_brain_config_with_overrides,
+        'get_trainer_config_with_overrides',
+        mock_get_trainer_config_with_overrides,
     )
 
     namespace_args.random = 4

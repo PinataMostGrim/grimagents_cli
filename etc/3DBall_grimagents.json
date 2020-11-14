@@ -5,12 +5,14 @@
     "--run-id": "3DBall",
     "--timestamp": true,
     "search": {
-        "brain": {
-            "name": "3DBallLearning",
-            "hyperparameters":
-            {
-                "beta": [1e-4, 1e-2]
-            }
+        "behavior_name": "3DBall",
+        "search_parameters": {
+            "hyperparameters.batch_size": [512, 5120],
+            "hyperparameters.buffer_size_multiple": [4, 10],
+            "hyperparameters.learning_rate": [1e-05, 0.001],
+            "network_settings.hidden_units": [32, 512],
+            "time_horizon": [32, 2048],
+            "reward_signals.extrinsic.gamma": [0.98, 0.99]
         }
     }
 }
