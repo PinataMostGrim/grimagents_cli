@@ -24,11 +24,11 @@ class ParameterSearch:
     def __init__(self, search_config, trainer_config):
         self.search_config = None
 
-        # trainer_config potentially contains many embedded brain configurations and defaults.
+        # 'trainer_config' potentially contains configurations for several behaviors
         self.trainer_config = None
 
-        # brain_name contains the specific brain this parameter search is concerned with
-        self.brain_name = ''
+        # 'behavior_name' contains the specific behavior this parameter search is concerned with
+        self.behavior_name = ''
 
         self.hyperparameters = []
         self.hyperparameter_sets = []
@@ -41,12 +41,12 @@ class ParameterSearch:
     def set_search_config(self, search_config):
 
         self.search_config = search_config.copy()
-        self.brain_name = self.search_config[const.GS_BEHAVIOR_NAME]
-        self.hyperparameters = self.get_search_hyperparameters(self.search_config)
+        self.behavior_name = self.search_config[const.GS_BEHAVIOR_NAME]
+        self.hyperparameters = self.get_search_hyperparameter_names(self.search_config)
         self.hyperparameter_sets = self.get_hyperparameter_sets(self.search_config)
 
     @staticmethod
-    def get_search_hyperparameters(search_config):
+    def get_search_hyperparameter_names(search_config):
         """Returns the list of hyperparameter names defined in search configuration."""
 
         return [name for name in search_config[const.GS_SEARCH_PARAMETERS]]
@@ -62,15 +62,13 @@ class ParameterSearch:
         return search_sets
 
     def set_trainer_config(self, trainer_config):
-        """Assigns the trainer configuration for this parameter search and isolates
-        a copy of the brain configuration we are concerned with, paired with default
-        values.
+        """Assigns the trainer configuration for this parameter search.
         """
 
         self.trainer_config = trainer_config.copy()
 
     def get_trainer_config_with_overrides(self, overrides):
-        """Returns a copy of the brain configuration with the specified values overriden.
+        """Returns a copy of the trainer configuration with the specified values overriden for the behavior.
 
         Parameters:
             overrides: dict: A dictionary containing hyperparameter names paired with override values
@@ -78,24 +76,24 @@ class ParameterSearch:
 
         result = self.trainer_config.copy()
         for key, value in overrides.items():
-            common.add_nested_dict_value(result[const.TC_BEHAVIORS][self.brain_name], key, value)
+            common.add_nested_dict_value(result[const.TC_BEHAVIORS][self.behavior_name], key, value)
 
         # Set 'buffer_size' based on 'buffer_size_multiple', if present
         if (
             const.GS_BUFFER_SIZE_MULTIPLE
-            in result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS]
+            in result[const.TC_BEHAVIORS][self.behavior_name][const.TC_HYPERPARAMETERS]
         ):
-            batch_size = self.get_batch_size_value(result, self.brain_name)
+            batch_size = self.get_batch_size_value(result, self.behavior_name)
 
-            result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
+            result[const.TC_BEHAVIORS][self.behavior_name][const.TC_HYPERPARAMETERS][
                 const.HP_BUFFER_SIZE
             ] = (
                 batch_size
-                * result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
+                * result[const.TC_BEHAVIORS][self.behavior_name][const.TC_HYPERPARAMETERS][
                     const.GS_BUFFER_SIZE_MULTIPLE
                 ]
             )
-            del result[const.TC_BEHAVIORS][self.brain_name][const.TC_HYPERPARAMETERS][
+            del result[const.TC_BEHAVIORS][self.behavior_name][const.TC_HYPERPARAMETERS][
                 const.GS_BUFFER_SIZE_MULTIPLE
             ]
 
@@ -125,7 +123,7 @@ class GridSearch(ParameterSearch):
         return list(itertools.product(*hyperparameter_sets))
 
     def get_search_configuration(self, index):
-        """Returns a dictionary containing the search parameters to use for a GridSearch by search index.
+        """Returns a dictionary containing the hyperparameters to use for a GridSearch, using the search's index.
 
         Raises:
           InvalidGridSearchIndex: Raised if the 'index' parameter exceeds the number of search permutations the GridSearch contains.

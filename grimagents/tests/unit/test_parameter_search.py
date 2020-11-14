@@ -61,7 +61,7 @@ def trainer_config():
 def test_get_search_hyperparameters(search_config):
     """Test for the extraction of hyperparameter names from a search configuration dictionary."""
 
-    assert GridSearch.get_search_hyperparameters(search_config) == [
+    assert GridSearch.get_search_hyperparameter_names(search_config) == [
         'hyperparameters.beta',
         'hyperparameters.num_epoch',
         'hyperparameters.learning_rate',
@@ -183,7 +183,7 @@ def test_get_trainer_config_with_overrides(search_config, trainer_config):
 
 
 def test_buffer_size_multiple(search_config, trainer_config):
-    """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from the brain_config."""
+    """Tests that 'buffer_size' is correctly calculated if 'buffer_size_multiple' is present and that 'buffer_size_multiple' is stripped from 'trainer_config'."""
 
     search_config['search_parameters']['hyperparameters.buffer_size_multiple'] = [4]
 

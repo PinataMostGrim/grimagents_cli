@@ -175,7 +175,7 @@ def patch_search_command(monkeypatch, grim_config, trainer_config):
 def patch_perform_search_with_configuration(monkeypatch):
     """Patches SearchCommand.perform_search_with_configuration()."""
 
-    def mock_perform_search_with_configuration(self, brain_config):
+    def mock_perform_search_with_configuration(self, trainer_config):
         pass
 
     monkeypatch.setattr(
@@ -406,7 +406,7 @@ def test_resume_perform_grid_search(
 
     search_counter = Counter()
 
-    def mock_perform_search_with_configuration(self, brain_config):
+    def mock_perform_search_with_configuration(self, trainer_config):
         search_counter.increment_counter()
 
     monkeypatch.setattr(
