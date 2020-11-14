@@ -195,9 +195,7 @@ class PerformRandomSearch(SearchCommand):
         for i in range(self.args.random):
 
             search_config = self.random_search.get_randomized_search_configuration()
-            trainer_config = self.random_search.get_trainer_config_with_overrides(
-                search_config
-            )
+            trainer_config = self.random_search.get_trainer_config_with_overrides(search_config)
             self.search_counter = i
 
             search_log.info('-' * 63)
