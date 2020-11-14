@@ -62,8 +62,7 @@ class ParameterSearch:
         return search_sets
 
     def set_trainer_config(self, trainer_config):
-        """Assigns the trainer configuration for this parameter search.
-        """
+        """Assigns the trainer configuration for this parameter search."""
 
         self.trainer_config = trainer_config.copy()
 
