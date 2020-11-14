@@ -1,3 +1,7 @@
+### 2.6.1
+- Updated grimsearch to work with ML-Agents 0.17.0
+- The structure of grimsearch's configuration has changed to reflect the changes to ML-Agents 0.17.0. See the readme for more information.
+
 ### 2.6.0
 - Added support for ML-Agents 0.17.0
 - Removed support for '--lesson', '--save-freq', '--sampler' and '--curriculum' arguments as they have been removed in ML-Agents 0.17.0
