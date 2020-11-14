@@ -216,7 +216,7 @@ class BayesianSearch(ParameterSearch):
                 or key == 'hyperparameters.buffer_size_multiple'
                 or key == 'network_settings.hidden_units'
                 or key == 'max_steps'
-                or key == 'hyperparameters.num_epoc'
+                or key == 'hyperparameters.num_epoch'
                 or key == 'network_settings.num_layers'
                 or key == 'time_horizon'
                 or key == 'network_settings.memory.sequence_length'
